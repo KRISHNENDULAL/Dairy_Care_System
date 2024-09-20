@@ -34,6 +34,15 @@
                     <div class="error-message" id="passwordError"></div>
                 </div><br>
                 <button type="submit">log in</button><br>
+                
+                {% if messages %}
+                <div class="error-message" id="formError">
+                    {% for message in messages %}
+                        {{ message }}<br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
                 <p class="forgot-password"><a href="forgotpassword">Forgot Password ?</a></p>
                 <p class="no-account">Don't have an account ? <a href="registration">Register</a></p><br>
                 <hr>
