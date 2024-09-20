@@ -27,10 +27,10 @@ class User(models.Model):
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
     
-    def save(self, *args, **kwargs):
+    """ def save(self, *args, **kwargs):
         if not self.pk or not self.password.startswith('pbkdf2_sha256$'):  # Ensures the password is hashed only once
             self.password = make_password(self.password)
-        super(User, self).save(*args, **kwargs)
+        super(User, self).save(*args, **kwargs) """
 
     def __str__(self):
         return self.username

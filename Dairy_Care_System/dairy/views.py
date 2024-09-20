@@ -11,7 +11,6 @@ import string
 import logging
 from django.utils.crypto import get_random_string
 from django.urls import reverse
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth import logout
 
 
@@ -44,7 +43,7 @@ def registration(request):
             return redirect('registration')
 
         # Create the new user with hashed password
-        user = User(username=username, email=email, phone=phone, password=make_password(password))
+        user = User(username=username, email=email, phone=phone, password=password)
         user.save()
 
         messages.success(request, 'Registration successful! Please log in.')
@@ -93,7 +92,7 @@ def resetpassword(request, token):
             new_password = request.POST.get('new_password')
             confirm_password = request.POST.get('confirm_password')
             if new_password == confirm_password:
-                user.password = make_password(new_password)  # Hashing the new password
+                user.password = new_password
                 user.reset_token = None
                 user.save()
                 messages.success(request, 'Password reset successful. You can now log in.')
@@ -174,7 +173,7 @@ def addemployee(request):
 
         # Send email with login credentials
         subject = 'Welcome to the Dairy Care System'
-        message = f"Hello {username},\n\nYour account has been created.\nUsername: {username}\nPassword: {password}\nLogin Link: {login_link}\n\nPlease log in and change your password in update profile option."
+        message = f"Hello {username},\n\nYour account has been created.\nUsername: {username}\nPassword: {password}\nLogin Link: {login_link}\n\nPlease log in and change your password in profile option."
         send_mail(subject, message, 'admin@example.com', [email])
 
         return redirect('addemployee')
@@ -190,7 +189,7 @@ def login(request):
         # Try to find the user by username or email
         user = User.objects.filter(username=username_or_email).first() or User.objects.filter(email=username_or_email).first()
 
-        if user and check_password(password, user.password):
+        if user and user.password == password:
             # Store user information in session
             request.session['user_id'] = user.user_id
             request.session['username'] = user.username
@@ -199,7 +198,8 @@ def login(request):
             if user.role == 'customer':
                 return redirect('customerpage')
             elif user.role == 'employee':
-                return redirect('employeepage')
+                if user.password == password:  # Assuming the random password is stored in plain text (ideally it should be hashed)
+                    return redirect('employeepage')
             elif user.role == 'admin':
                 return redirect('adminpage')
         else:
@@ -218,8 +218,7 @@ def changepassword(request):
 
             if new_password == confirm_password:
                 user = User.objects.get(user_id=user_id)
-                # Hash the new password before saving
-                user.password = make_password(new_password)  
+                user.password = new_password  # Update with the new password
                 user.save()
 
                 messages.success(request, 'Password reset successful. Please log in with your new password.')
