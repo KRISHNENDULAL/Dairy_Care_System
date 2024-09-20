@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile</title>
+    <link rel="stylesheet" href="{% static 'css/updateprofile.css' %}">
+</head>
+<body><center>
+    <h1>Update Profile</h1><br><br>
+    <form method="POST">
+        {% csrf_token %}
+        <!-- Your form fields for updating the profile -->
+        <button type="button" onclick="window.location.href='/employeeresetpass';">Reset Password</button><br><br>
+        <!-- <button type="submit">Update</button> 
+
+        <a href="{% url 'employeepage' %}">Back</a>  -->
+    </form>
+</center></body>
+</html>

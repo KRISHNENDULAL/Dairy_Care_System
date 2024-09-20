@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reset Password</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body><center>
+    <h2>Reset Password</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="new_password">New Password:</label>
+        <input type="password" id="new_password" name="new_password" placeholder="Enter your new password" ><br><br>
+
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your new password" ><br><br>
+
+        <button type="submit">Reset Password</button><br><br>
+    </form>
+</center></body>
+</html>
+
+

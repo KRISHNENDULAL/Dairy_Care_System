@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Employee</title>
+    <link rel="stylesheet" href="{% static 'css/addemployee.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/addemployee.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById('employeeForm');
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+    
+            // Function to show error
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.style.display = "block"; // Show error message
+            }
+    
+            // Function to clear error
+            function clearError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = '';
+                errorElement.style.display = "none"; // Hide error message
+            }
+    
+            // Function to validate phone number
+            function validatePhoneNumber(phoneNumber) {
+                return /^\d{10}$/.test(phoneNumber);
+            }
+    
+            // General validation for field dependencies
+            function validateFieldsBefore(field, fieldErrorId, dependentField) {
+                field.addEventListener('focus', function() {
+                    if (dependentField.value.trim() === "") {
+                        showError(fieldErrorId, `Please fill out the previous field before filling this one.`);
+                        field.blur(); // Remove focus from the current field
+                    } else {
+                        clearError(fieldErrorId);
+                    }
+                });
+            }
+    
+            // Apply validation for each field
+            validateFieldsBefore(email, 'emailError', username);
+            validateFieldsBefore(phone, 'phoneError', email);
+    
+            // Event listener for form submission
+            form.addEventListener('submit', function(event) {
+                let valid = true;
+    
+                // Username validation
+                if (username.value.trim() === "") {
+                    showError('usernameError', 'Username is required.');
+                    valid = false;
+                } else {
+                    clearError('usernameError');
+                }
+    
+                // Email validation
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+                if (!emailPattern.test(email.value.trim())) {
+                    showError('emailError', 'Enter a valid email id.');
+                    valid = false;
+                } else {
+                    clearError('emailError');
+                }
+    
+                // Phone validation
+                if (!validatePhoneNumber(phone.value.trim())) {
+                    showError('phoneError', 'Phone number must be 10 digits.');
+                    valid = false;
+                } else {
+                    clearError('phoneError');
+                }
+    
+                // If any validation fails, prevent form submission
+                if (!valid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'adminpage' %}" class="back-link">BACK</a>
+        <div class="login-box">
+            <h2>Add Employee</h2><br>
+            <form id="employeeForm" method="post">
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username">
+                    <div id="usernameError" class="error-message" style="display: none;"></div>
+                </div>
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email">
+                    <div id="emailError" class="error-message" style="display: none;"></div>
+                </div>
+                
+                <!-- Phone Field -->
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
+                    <div id="phoneError" class="error-message" style="display: none;"></div>
+                </div><br>
+                
+                <!-- Submit Button -->
+                <button type="submit">Add Employee</button>
+            </form><br><br>
+            
+            <!-- Display success/error messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

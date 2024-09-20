@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/pic" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- <a href="{% url 'home' %}" class="home-link">
+        <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
+    </a> -->
+
+<!-- Navigation Bar-->
+<ul>
+    <div class="header">
+        <!-- Greeting with username on the left
+        <div class="nav-item left">
+            <li><b>Hi, {{ username }}</b></li>
+        </div>   -->
+        <div class="nav-item">
+            <li><b><a href="{% url 'addemployee' %}">Add Employee</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'home' %}">Animals list</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'home' %}">Products list</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'home' %}">Transactions</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'home' %}">Feedback Review</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li>
+                <b><a href="#">{{ username }}</a></b>
+                <div class="dropdown-content">
+                    <a href="{% url 'userprofile' %}">Profile</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+        </div>
+    </div>
+</ul>
+
+
+<center>
+    <h1><b>Admin Dashboard</b></h1>
+</center>
+</body>
+</html>

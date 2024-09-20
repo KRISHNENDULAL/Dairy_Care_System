@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="{% static 'css/contactus.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/contactus.jpeg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="home-link">
+        <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
+    </a>
+
+<!-- Navigation Bar -->
+<ul>
+    <div class="header">
+        <div class="nav-item">
+            <li><b><a href="{% url 'about' %}">About</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'registration' %}">Register</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'login' %}">Login</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'contactus' %}">Contact Us</a></b></li>
+        </div>
+    </div>
+</ul>
+
+    <div class="container">
+        <h1><u>Contact Us</u></h1>
+        <p class="description">
+            We'd love to hear from you! Whether you have a question, feedback, or need support with our Dairy Care System, our team is here to help. Please find our contact information below, and feel free to reach out to us.
+        </p>
+        <div class="contact-info">
+            <div><strong>Name:</strong> Krishnendu</div>
+            <div><strong>Email:</strong> krishnendulal113@gmail.com</div>
+            <div><strong>Phone Number:</strong> 6282752569</div>
+            <div><strong>Pincode:</strong> 686505</div>
+            <div><strong>District:</strong> Kottayam</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/customerpage.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/pic" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="header">
+            <!-- Greeting with username on the left 
+            <div class="nav-item left">
+                <li><b>Hi, {{ username }}</b></li>
+            </div> -->
+            <div class="nav-item">
+                <li><b><a href="{% url 'home' %}">Products list</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'home' %}">Orders list</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'feedbackpage' %}">Feedback</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li>
+                    <b><a href="#">{{ username }}</a></b>
+                    <div class="dropdown-content">
+                        <a href="{% url 'userprofile' %}">Profile</a>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul>
+
+    <center>
+        <h1><b>Customer Dashboard</b></h1>
+    </center>
+</body>

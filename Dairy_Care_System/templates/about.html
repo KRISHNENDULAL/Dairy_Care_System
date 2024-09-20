@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Page</title>
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/about.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="home-link">
+        <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
+    </a>
+
+    <!-- Navigation Bar -->
+<ul>
+    <div class="header">
+        <div class="nav-item">
+            <li><b><a href="{% url 'about' %}">About</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'registration' %}">Register</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'login' %}">Login</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'contactus' %}">Contact Us</a></b></li>
+        </div>
+    </div>
+</ul>
+
+<div class="container">
+    <h1><u>About Dairy Care System</u></h1>
+    <p>
+        Welcome to Dairy Care System, a specialized platform designed to streamline the management of dairy farms and enhance the shopping experience for customers. Our private system is dedicated to providing an efficient and secure environment where farm activities and customer transactions are seamlessly integrated.
+    </p>
+    <h2>Our Mission</h2>
+    <p>
+        Our mission at Dairy Care System is to offer a comprehensive solution that addresses the unique needs of both dairy farm management and product sales. We aim to facilitate smooth operations for farm employees while providing customers with a convenient and reliable way to purchase high-quality dairy products.
+    </p>
+    <h2>What We Offer</h2>
+    <p><b>Farm Management for Employees:</b> Our platform equips farm employees with powerful tools to manage daily farm activities efficiently. From tracking animal health and managing feeding schedules to overseeing milk production, Dairy Care System ensures that farm operations run smoothly and effectively.</p>
+    <p><b>Customer Shopping Experience:</b> Customers can easily browse and purchase a range of dairy products through our user-friendly online store. Our secure system ensures a smooth shopping experience, from selecting products to completing transactions.</p>
+    <p><b>Integrated Management:</b> With our all-in-one platform, employees and customers benefit from integrated management features. Employees can focus on optimizing farm activities, while customers enjoy a seamless shopping experience.</p>
+    <h2>Join Us</h2>
+    <p>
+        Experience the benefits of Dairy Care System and see how our platform can transform your farm operations and shopping experience. Whether you're managing farm activities or purchasing dairy products, our system is here to support your needs with efficiency and ease.
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+/* General reset for ul elements */
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
+}
+
+/* Specific styles for navigation items */
+.header ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
+}
+
+.header li {
+    float: right;
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.header li a {
+    display: block;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    padding: 10px 12px;
+    transition: background-color 0.3s ease;
+}
+
+.header li a:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+/* Header style */
+.header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 3px;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+/* Navigation item style */
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Container style */
+.container {
+    max-width: 1300px;
+    margin: 15px auto;
+    padding: 25px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Home link style */
+.home-link {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    text-decoration: none;
+}
+
+.home-link img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Header (h1) style */
+h1 {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Paragraph style */
+p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* Subheader (h2) style */
+h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #8b771b;
+}
+

@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/login.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="home-link">
+        <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
+    </a>
+    <div class="container">
+        <div class="login-box">
+            <h2>LOG IN</h2><br>
+            <form id="loginForm" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username / Email Id</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username or email id">
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password">
+                    <div class="error-message" id="passwordError"></div>
+                </div><br>
+                <button type="submit">log in</button><br>
+                <p class="forgot-password"><a href="forgotpassword">Forgot Password ?</a></p>
+                <p class="no-account">Don't have an account ? <a href="registration">Register</a></p><br>
+                <hr>
+                <div class="google-signin">
+                    <img src='{% static "images/google.png" %}' alt="Google Logo">
+                    <span>sign in with Google</span>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function validateLoginForm() {
+                let username = document.getElementById('username');
+                let password = document.getElementById('password');
+                let isValid = true;
+    
+                // Reset error messages
+                document.getElementById('usernameError').textContent = '';
+                document.getElementById('passwordError').textContent = '';
+    
+                // Validate Username/Email (No changes here)
+                let usernameError = '';
+                if (!username.value) {
+                    usernameError = 'Username or Email is required.';
+                    isValid = false;
+                } else if (!validateEmail(username.value) && !validateUsername(username.value)) {
+                    usernameError = 'Enter a valid email or username.';
+                    isValid = false;
+                }
+                document.getElementById('usernameError').textContent = usernameError;
+    
+                // Validate Password (Only check for minimum 8 characters)
+                let passwordError = '';
+                if (!password.value) {
+                    passwordError = 'Password is required.';
+                    isValid = false;
+                } else if (password.value.length < 8) {
+                    passwordError = 'Password must be at least 8 characters long.';
+                    isValid = false;
+                }
+                document.getElementById('passwordError').textContent = passwordError;
+    
+                return isValid;
+            }
+    
+            function validateEmail(email) {
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+                return emailPattern.test(email);
+            }
+    
+            function validateUsername(username) {
+                const usernamePattern = /^[a-zA-Z0-9._-]{3,150}$/;
+                return usernamePattern.test(username);
+            }
+    
+            function checkFieldOrder(field) {
+                let username = document.getElementById('username').value;
+                let password = document.getElementById('password').value;
+    
+                if (field === 'password' && !username) {
+                    document.getElementById('usernameError').textContent = 'Please enter Username/Email before entering Password.';
+                    document.getElementById('password').value = '';  // Reset the password field
+                }
+    
+                if (field === 'username' && password) {
+                    document.getElementById('passwordError').textContent = '';
+                }
+            }
+    
+            document.getElementById('username').addEventListener('input', function() {
+                checkFieldOrder('username');
+            });
+    
+            document.getElementById('password').addEventListener('input', function() {
+                checkFieldOrder('password');
+            });
+    
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                if (!validateLoginForm()) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>    
+</body>
+</html>
