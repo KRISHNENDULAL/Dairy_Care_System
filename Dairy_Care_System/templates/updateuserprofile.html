@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile</title>
+    <link rel="stylesheet" href="{% static 'css/updateuserprofile.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Update Profile</h1><br>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="{{ user.username }}" required>
+            </div><br>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            </div><br>
+
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" name="phone" value="{{ user.phone }}" required>
+            </div><br>
+
+            <button type="submit" class="btn">Update</button><br>
+
+        </form><br><br>
+
+        <!-- Display success/error messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- <br><a href="{% url 'userprofile' %}" class="back-link">Back to Profile</a> -->
+    </div>
+</body>
+</html>

@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 
-class User(models.Model):
+class Users_table(models.Model):
     user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=254, unique=True)
@@ -30,8 +30,9 @@ class User(models.Model):
     """ def save(self, *args, **kwargs):
         if not self.pk or not self.password.startswith('pbkdf2_sha256$'):  # Ensures the password is hashed only once
             self.password = make_password(self.password)
-        super(User, self).save(*args, **kwargs) """
+        super(User, self).save(*args, **kwargs)  """
 
     def __str__(self):
         return self.username
     
+

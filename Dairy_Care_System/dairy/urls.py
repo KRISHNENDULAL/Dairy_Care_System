@@ -16,6 +16,10 @@ urlpatterns = [
     path('employeepage',views.employeepage,name='employeepage'),
     path('logout', views.user_logout, name='logout'),
     path('feedbackpage',views.feedbackpage,name='feedbackpage'),
-    path('userprofile',views.userprofile,name='userprofile')
+    path('userprofile',views.userprofile,name='userprofile'),
+    path('productslist',views.productslist,name='productslist'),
+    path('addproducts',views.addproducts,name='addproducts'),
+    path('updateuserprofile',views.updateuserprofile,name='updateuserprofile')
+
 ] 
 

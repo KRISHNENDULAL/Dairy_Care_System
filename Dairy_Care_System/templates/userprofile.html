@@ -5,17 +5,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    <link rel="stylesheet" href="{% static 'css/userprofile.css' %}">
-</head>
-<body><center>
-    <h1>Profile</h1><br><br>
-    <form method="POST">
-        {% csrf_token %}
-        <!-- Your form fields for updating the profile -->
-        <button type="button" onclick="window.location.href='/changepassword';">Change Password</button><br><br>
-        <!-- <button type="submit">Update</button> 
+    <style>
+        /* Apply the background to the entire body */
+        body {
+            background: url('../images/pic.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-        <a href="{% url 'employeepage' %}">Back</a>  -->
-    </form>
-</center></body>
+        /* Navigation bar */
+        .navbar {
+            background-color: black;
+            overflow: hidden;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .navbar a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .nav-links {
+            display: flex;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown .user {
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Adjust the position of the dropdown-content */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            right: 0;
+            top: 100%; /* Position it below the header */
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        /* Show dropdown on hover */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Profile container */
+        .profile-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 60%;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .user-details {
+            font-size: 18px;
+            color: black;
+            margin-bottom: 30px;
+        }
+
+        .user-details p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        /* Button */
+        .btn {
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #555;
+        }
+
+        /* Center content */
+        .center {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="{% url 'updateuserprofile' %}">Update Profile</a>
+            <a href="{% url 'changepassword' %}">Change Password</a>
+        </div>
+        <div class="dropdown">
+            <span class="user">{{ user.username }}</span>
+            <div class="dropdown-content">
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Container -->
+    <div class="profile-container">
+        <h1>Profile</h1>
+
+        <!-- User details -->
+        <div class="user-details">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Phone:</strong> {{ user.phone }}</p>
+            <p><strong>Role:</strong> {{ user.role }}</p>
+        </div>
+
+    </div>
+
+</body>
 </html>
