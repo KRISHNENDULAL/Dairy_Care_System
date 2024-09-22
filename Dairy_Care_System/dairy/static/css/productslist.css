@@ -1,0 +1,125 @@
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+    overflow: hidden;
+    background-color: black;
+    display: flex;
+    align-items: center;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.nav-item.left {
+    color: white;
+    padding: 5px 8px;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+li {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    padding: 10px 12px;
+    transition: background-color 0.3s ease;
+}
+
+li a:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+h1 {
+    color: black;
+    font-size: 80px;
+    margin-top: 100px;
+}
+
+h2 {
+    color: white;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+/* Dropdown styles */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 0;
+    top: 70px;
+    border-radius: 5px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.nav-item:hover .dropdown-content {
+    display: block;
+}
+
+/* Products container styles */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust min width as needed */
+    gap: 20px; /* Space between items */
+    padding: 20px; /* Padding around the container */
+}
+
+.product {
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Prevents overflow of content */
+    display: flex;
+    flex-direction: column; /* Align children vertically */
+    justify-content: space-between; /* Space between items */
+    height: 300px; /* Fixed height for uniformity */
+    text-align: center;
+    background-color: #fff; /* White background for products */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow effect */
+}
+
+.product img {
+    max-width: 100%; /* Responsive image */
+    height: 150px; /* Fixed height for images */
+    object-fit: cover; /* Maintain aspect ratio and cover the area */
+}
+
+.product h3 {
+    font-size: 1.2em; /* Adjust font size */
+    margin: 10px 0; /* Margin for spacing */
+}
+
+.product p {
+    margin: 5px 0; /* Margin for spacing */
+}

@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table
+from .models import Users_table, Products_table, ProductImage
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
 from django.contrib.sites.shortcuts import get_current_site
@@ -12,6 +12,7 @@ import logging
 from django.utils.crypto import get_random_string
 from django.urls import reverse
 from django.contrib.auth import logout 
+from django.core.files.storage import FileSystemStorage
 
 
 def home(request):
@@ -303,23 +304,64 @@ def productslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        
+        # Fetch all products and their images
+        products = Products_table.objects.filter(status=True)  # Only get available products
+        
         context = {
             'username': user.username,  # Pass the username to the template
+            'products': products,        # Pass the products to the template
         }
         return render(request, 'productslist.html', context)
     else:
-        return redirect('login')  # Redirect to login if no user is logged in 
+        return redirect('login')  # Redirect to login if no user is logged in
     
 
-def addproducts(request):
-    return render(request, 'addproducts.html') 
+def productdetails(request, product_id):
+    product = get_object_or_404(Products_table, product_id=product_id)
+    images = product.images.all()  # Get associated images
+    context = {
+        'product': product,
+        'images': images,
+    }
+    return render(request, 'productdetails.html', context)
 
 
-""" def login(request):
+
+def addproducts(request):  
+    if request.method == 'POST':
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        product_quantity = request.POST.get('product_quantity')
+        quantity_unit = request.POST.get('quantity_unit')
+        
+
+        # Create a new product entry
+        product = Products_table(
+            product_name=product_name,
+            product_description=product_description,
+            product_quantity=product_quantity,
+            quantity_unit=quantity_unit
+        )
+        product.save()
+
+        # If a photo was uploaded, create a new ProductImage entry
+        product_photo = request.FILES.get('product_images')  # Ensure this matches your input name
+        if product_photo:
+            ProductImage.objects.create(product=product, image=product_photo)  # Update here
+
+        messages.success(request, f'Product "{product_name}" added successfully!')
+        return redirect('productslist')  # Redirect to the products list page
+
+    return render(request, 'addproducts.html')
+
+
+"""def login(request):
     return render(request, 'login.html')
 
 def registration(request):
-    return render(request, 'registration.html') """
+    return render(request, 'registration.html')
 
 
-
+def addproducts(request): 
+    return render(request, 'addproducts.html') """

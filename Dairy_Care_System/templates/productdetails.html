@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ product.product_name }} - Product Details</title>
+    <link rel="stylesheet" href="{% static 'css/productslist.css' %}">
+</head>
+<body>
+
+<div class="product-detail-container">
+    <h1>{{ product.product_name }}</h1>
+    <div class="images">
+        {% for image in images %}
+            <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
+        {% endfor %}
+    </div>
+    <p><strong>Description:</strong> {{ product.product_description }}</p>
+    <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
+    <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
+    <button class="buy-button">Buy Now</button>
+</div>
+
+<style>
+    .product-detail-container {
+        padding: 20px;
+        text-align: center;
+    }
+    .images img {
+        max-width: 100%;
+        height: auto;
+    }
+    .buy-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: green;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .buy-button:hover {
+        background-color: darkgreen;
+    }
+</style>
+
+</body>
+</html>

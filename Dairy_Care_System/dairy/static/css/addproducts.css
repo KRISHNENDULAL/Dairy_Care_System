@@ -1,0 +1,80 @@
+form {
+    max-width: 400px;
+    width: 100%; /* Ensure form stays within screen size */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px); /* Apply the blur effect */
+    background-color: rgba(255, 255, 255, 0.8); /* Add a subtle white background with opacity */
+    margin-right: 20px; /* Add space on the right side */
+}
+
+h1 {
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="file"], textarea, .quantity-input {
+    width: calc(100% - 20px); /* Adjust width to account for right margin */
+    padding: 10px;
+    margin-bottom: 15px;
+    margin-right: 20px; /* Add space on the right side */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+.quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between the input and the dropdown */
+}
+
+.quantity-input {
+    flex: 2;
+}
+
+.unit-select {
+    flex: 1;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #1f2422;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #373a37;
+}
+
+/* Styling for the back link in the upper left corner */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 30px;
+    color: black;
+    text-decoration: none;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: red;
+    text-align: center; /* Center align the error message */
+    margin-top: 5px;
+}
