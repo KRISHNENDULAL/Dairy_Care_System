@@ -15,6 +15,7 @@ from django.contrib.auth import logout
 from django.core.files.storage import FileSystemStorage
 
 
+
 def home(request):
     return render(request, 'home.html')
 
@@ -300,6 +301,45 @@ def user_logout(request):
     return redirect('home')  # Redirect to home page or login page
 
 
+def addproducts(request): 
+    if request.method == 'POST':
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        product_quantity = request.POST.get('product_quantity')
+        quantity_unit = request.POST.get('quantity_unit')
+        
+        # Get user_id from the session
+        employee_user_id = request.session.get('user_id')  # Assuming 'user_id' is stored in the session for employees
+
+        try:
+            # Fetch the Users_table instance
+            employee = Users_table.objects.get(user_id=employee_user_id)  # Adjust this if your Users_table uses a different field
+            
+        except Users_table.DoesNotExist:
+            messages.error(request, 'Employee not found.')
+            return redirect('productslist')  # Handle user not found
+
+        # Create a new product entry
+        product = Products_table(
+            product_name=product_name,
+            product_description=product_description,
+            product_quantity=product_quantity,
+            quantity_unit=quantity_unit,
+            employee=employee  # Assign the logged-in employee
+        )
+        product.save()
+
+        # If a photo was uploaded, create a new ProductImage entry
+        product_photo = request.FILES.get('product_images')  # Ensure this matches your input name
+        if product_photo:
+            ProductImage.objects.create(product=product, image=product_photo)  # Update here
+
+        # messages.success(request, f'Product "{product_name}" added successfully!')
+        return redirect('productslist')  # Redirect to the products list page
+
+    return render(request, 'addproducts.html')
+
+
 def productslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -327,33 +367,22 @@ def productdetails(request, product_id):
     return render(request, 'productdetails.html', context)
 
 
+def updateproduct(request):
+    products = Products_table.objects.prefetch_related('images').all()
+    products_data = [
+        {
+            'product_name': product.product_name,
+            'product_description': product.product_description,
+            'product_quantity': product.product_quantity,
+            'quantity_unit': product.quantity_unit,
+            'images': [{'image_url': image.image.url} for image in product.images.all()]
+        }
+        for product in products
+    ]
 
-def addproducts(request):  
-    if request.method == 'POST':
-        product_name = request.POST.get('product_name')
-        product_description = request.POST.get('product_description')
-        product_quantity = request.POST.get('product_quantity')
-        quantity_unit = request.POST.get('quantity_unit')
-        
+    return render(request, 'updateproduct.html', {'products': products_data})
+ 
 
-        # Create a new product entry
-        product = Products_table(
-            product_name=product_name,
-            product_description=product_description,
-            product_quantity=product_quantity,
-            quantity_unit=quantity_unit
-        )
-        product.save()
-
-        # If a photo was uploaded, create a new ProductImage entry
-        product_photo = request.FILES.get('product_images')  # Ensure this matches your input name
-        if product_photo:
-            ProductImage.objects.create(product=product, image=product_photo)  # Update here
-
-        messages.success(request, f'Product "{product_name}" added successfully!')
-        return redirect('productslist')  # Redirect to the products list page
-
-    return render(request, 'addproducts.html')
 
 
 """def login(request):
@@ -362,6 +391,8 @@ def addproducts(request):
 def registration(request):
     return render(request, 'registration.html')
 
-
 def addproducts(request): 
-    return render(request, 'addproducts.html') """
+    return render(request, 'addproducts.html') 
+
+def productslist(request):
+    return render(request, 'login.html')  """

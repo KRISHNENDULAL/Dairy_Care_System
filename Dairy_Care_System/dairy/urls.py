@@ -22,7 +22,12 @@ urlpatterns = [
     path('productslist',views.productslist,name='productslist'),
     path('productslist/<int:product_id>/',views.productdetails, name='productdetails'),
     path('addproducts',views.addproducts,name='addproducts'),
+    path('updateproduct',views.updateproduct,name='updateproduct'),
     path('updateuserprofile',views.updateuserprofile,name='updateuserprofile')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
+    
+
+     

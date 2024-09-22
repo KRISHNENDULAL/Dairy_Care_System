@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+    <link rel="stylesheet" href="{% static 'css/updateproduct.css' %}">  <!-- Adjust the path as needed -->
+    <script>
+        function fetchProductDetails() {
+            const productName = document.getElementById('product_name').value;
+            const products = {{ products|safe }};  // Passing products as a JSON object
+
+            const selectedProduct = products.find(product => product.product_name === productName);
+
+            if (selectedProduct) {
+                document.getElementById('product_description').value = selectedProduct.product_description;
+                document.getElementById('product_quantity').value = selectedProduct.product_quantity;
+                document.getElementById('quantity_unit').value = selectedProduct.quantity_unit;
+                document.getElementById('price').value = selectedProduct.price;
+
+                // Display current images
+                const imagesContainer = document.getElementById('current_images');
+                imagesContainer.innerHTML = '';  // Clear previous images
+                selectedProduct.images.forEach(image => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = image.image_url;  // Ensure your image URL is correct
+                    imgElement.alt = 'Product Image';
+                    imgElement.style.width = '100px';
+                    imgElement.style.height = '100px';
+                    imgElement.style.marginRight = '10px';
+                    imagesContainer.appendChild(imgElement);
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Update Product</h1><br>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="product_name">Product Name:</label>
+                <select id="product_name" name="product_name" onchange="fetchProductDetails()" required>
+                    <option value="">Select a product</option>
+                    {% for product in products %}
+                        <option value="{{ product.product_name }}">{{ product.product_name }}</option>
+                    {% endfor %}
+                </select>
+            </div><br>
+
+            <div class="form-group">
+                <label for="product_description">Description:</label>
+                <textarea id="product_description" name="product_description" required></textarea>
+            </div><br>
+
+            <div class="form-group">
+                <label for="product_quantity">Quantity:</label>
+                <input type="number" id="product_quantity" name="product_quantity" required>
+            </div><br>
+
+            <div class="form-group">
+                <label for="quantity_unit">Unit:</label>
+                <input type="text" id="quantity_unit" name="quantity_unit" required>
+            </div><br>
+
+            <div class="form-group">
+                <label for="product_photo">Update Photo:</label>
+                <input type="file" id="product_photo" name="product_photo">
+            </div><br>
+
+            <h3>Current Images:</h3>
+            <div id="current_images"></div>  <!-- Container for current images -->
+            <br>
+
+            <button type="submit" class="btn">Update Product</button><br>
+        </form><br>
+
+        <!-- Display success/error messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <br><a href="{% url 'productslist' %}" class="back-link">Back to Products List</a>
+    </div>
+</body>
+</html>

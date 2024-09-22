@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/addproducts.css' %}">
     <style>
         body {
-            background: url('{% static "images/7.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/addprod.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             font-family: Arial, sans-serif;
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-<a href="{% url 'productslist' %}" class="back-link">BACK</a>
+<a href="{% url 'productslist' %}" class="back-link"><b>BACK</b></a>
 <form id="addProductForm" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <h1>Product Details Entry</h1><br>

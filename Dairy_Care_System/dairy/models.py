@@ -30,10 +30,10 @@ class Users_table(models.Model):
     """def save(self, *args, **kwargs):
         if not self.pk or not self.password.startswith('pbkdf2_sha256$'):  # Ensures the password is hashed only once
             self.password = make_password(self.password)
-        super(User, self).save(*args, **kwargs)  """
+        super(User, self).save(*args, **kwargs) """ 
 
     def __str__(self):
-        return self.username
+        return self.username  
     
 
 class Products_table(models.Model):
@@ -42,6 +42,7 @@ class Products_table(models.Model):
     product_description = models.TextField()           # Product Description
     product_quantity = models.DecimalField(max_digits=10, decimal_places=2)  # Quantity
     quantity_unit = models.CharField(max_length=20)   # Unit of measurement
+    employee = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)         # 1 if available, else 0
     added_at = models.DateTimeField(auto_now_add=True) # Timestamp for when the product is added
     updated_at = models.DateTimeField(auto_now=True)   # Timestamp for when the product is last updated
@@ -61,4 +62,3 @@ class ProductImage(models.Model):
     
 
 
-  
