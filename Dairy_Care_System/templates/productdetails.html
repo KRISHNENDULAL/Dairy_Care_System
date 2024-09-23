@@ -3,45 +3,118 @@
 <html lang="en">
 <head>
     <title>{{ product.product_name }} - Product Details</title>
-    <link rel="stylesheet" href="{% static 'css/productslist.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .product-detail-container {
+            max-width: 800px; /* Max width for the container */
+            margin: 40px auto; /* Center the container */
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px; /* Rounded corners */
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Comic Sans MS', cursive;
+            color: #000000;
+            margin-bottom: 20px; /* Spacing below the title */
+            font-size: 2.5em; /* Larger title */
+            font-weight: bold; /* Bold title */
+        }
+
+        .images {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping of images */
+            gap: 15px; /* Space between images */
+            margin-bottom: 20px; /* Spacing below the image section */
+        }
+
+        .images img {
+            width: 200px; /* Fixed width for uniformity */
+            height: 150px; /* Fixed height for uniformity */
+            object-fit: cover; /* Maintain aspect ratio */
+            border-radius: 8px; /* Rounded corners for images */
+            border: 1px solid #ddd; /* Light border around images */
+            transition: transform 0.3s; /* Smooth hover effect */
+        }
+
+        .images img:hover {
+            transform: scale(1.05); /* Zoom effect on hover */
+        }
+
+        p {
+            color: #000000;
+            margin: 10px 0; /* Spacing between paragraphs */
+            font-size: 1.1em; /* Slightly larger font size */
+        }
+
+        strong {
+            color: #910b0b; /* Darker color for strong text */
+        }
+
+        .buy-button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+        }
+
+        .buy-button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05); /* Slightly enlarge button on hover */
+        }
+
+        @media (max-width: 600px) {
+            .images img {
+                width: 100%; /* Full width on smaller screens */
+                height: auto; /* Maintain aspect ratio */
+            }
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            right: 20px; /* Align to the left */
+            font-size: 25px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+            background-color: #f0f0f0; /* Change background on hover */
+        }
+    </style>
 </head>
 <body>
+    <a href="{% url 'custproductslist' %}" class="back-link"><b>BACK</b></a>
 
-<div class="product-detail-container">
-    <h1>{{ product.product_name }}</h1>
-    <div class="images">
-        {% for image in images %}
-            <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
-        {% endfor %}
+    <div class="product-detail-container">
+        <h1>{{ product.product_name }}</h1>
+        <div class="images">
+            {% for image in images %}
+                <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
+            {% endfor %}
+        </div>
+        <p>{{ product.product_description }}</p>
+        <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
+        <p><strong>Added at:</strong> {{ product.added_at }}</p>
+        <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
+        <button class="buy-button">Buy Now</button>
     </div>
-    <p><strong>Description:</strong> {{ product.product_description }}</p>
-    <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
-    <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
-    <button class="buy-button">Buy Now</button>
-</div>
-
-<style>
-    .product-detail-container {
-        padding: 20px;
-        text-align: center;
-    }
-    .images img {
-        max-width: 100%;
-        height: auto;
-    }
-    .buy-button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: green;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .buy-button:hover {
-        background-color: darkgreen;
-    }
-</style>
 
 </body>
 </html>

@@ -54,11 +54,13 @@ input[type="text"], input[type="email"] {
 }
 
 .back-link {
-    display: inline-block;
-    margin-top: 20px;
-    color: #333;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: black;
     text-decoration: none;
-    font-size: 16px;
+    font-family: 'Comic Sans MS', cursive;
 }
 
 .back-link:hover {
@@ -68,4 +70,15 @@ input[type="text"], input[type="email"] {
 .alert {
     color: green; /* You can change the color based on the message type */
     margin-bottom: 20px;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.success-message {
+    color: green;
+    font-size: 0.875em;
 }

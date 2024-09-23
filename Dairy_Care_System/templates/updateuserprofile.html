@@ -7,25 +7,31 @@
     <title>Update Profile</title>
     <link rel="stylesheet" href="{% static 'css/updateuserprofile.css' %}">
 </head>
+
 <body>
+    <!-- <a href="{% url 'userprofile' %}" class="back-link"><b>BACK</b></a> -->
+
     <div class="container">
         <h1>Update Profile</h1><br>
 
-        <form method="POST">
+        <form method="POST" id="updateProfileForm">
             {% csrf_token %}
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                <div class="error-message" id="usernameError"></div>
             </div><br>
 
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                <div class="error-message" id="emailError"></div>
             </div><br>
 
             <div class="form-group">
                 <label for="phone">Phone Number:</label>
                 <input type="text" id="phone" name="phone" value="{{ user.phone }}" required>
+                <div class="error-message" id="phoneError"></div>
             </div><br>
 
             <button type="submit" class="btn">Update</button><br>
@@ -38,8 +44,91 @@
                 <div class="alert">{{ message }}</div>
             {% endfor %}
         {% endif %}
-
-        <!-- <br><a href="{% url 'userprofile' %}" class="back-link">Back to Profile</a> -->
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById('updateProfileForm');
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+            
+            // Function to show error
+            function showError(message, elementId) {
+                document.getElementById(elementId).textContent = message;
+                document.getElementById(elementId).style.color = 'red'; // You can force the color here for testing
+                }
+
+            // Function to clear error
+            function clearError(elementId) {
+                document.getElementById(elementId).textContent = '';
+            }
+
+            // Function to validate phone number
+            function validatePhoneNumber(phoneNumber) {
+                // Prevent same number repeated 10 times and ensure it follows a valid phone number format (10 digits)
+                return /^\d{10}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
+            }
+
+            // Function to validate username (only alphabets)
+            function validateUsername(username) {
+                return /^[a-zA-Z]+$/.test(username);
+            }
+
+            // General validation for field dependencies
+            function validateFieldsBefore(field, dependentField, errorElementId) {
+                field.addEventListener('focus', function() {
+                    if (dependentField.value.trim() === "") {
+                        showError('Please fill out the previous field before filling this one.', errorElementId);
+                        field.blur(); // Remove focus from the current field
+                    } else {
+                        clearError(errorElementId);
+                    }
+                });
+            }
+
+            // Apply validation for each field
+            validateFieldsBefore(email, username, 'emailError');
+            validateFieldsBefore(phone, email, 'phoneError');
+
+            // Event listener for form submission
+            form.addEventListener('submit', function(event) {
+                let valid = true;
+
+                // Username validation (only alphabets)
+                if (username.value.trim() === "") {
+                    showError('Username is required.', 'usernameError');
+                    valid = false;
+                } else if (!validateUsername(username.value.trim())) {
+                    showError('Username can only contain alphabets.', 'usernameError');
+                    valid = false;
+                } else {
+                    clearError('usernameError');
+                }
+
+                // Email validation
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+                if (!emailPattern.test(email.value.trim())) {
+                    showError('Enter a valid email id.', 'emailError');
+                    valid = false;
+                } else {
+                    clearError('emailError');
+                }
+
+                // Phone validation (10 digits and not the same number repeated 10 times)
+                if (!validatePhoneNumber(phone.value.trim())) {
+                    showError('Phone number must be 10 digits and cannot be the same number repeated.', 'phoneError');
+                    valid = false;
+                } else {
+                    clearError('phoneError');
+                }
+
+                // If any validation fails, prevent form submission
+                if (!valid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

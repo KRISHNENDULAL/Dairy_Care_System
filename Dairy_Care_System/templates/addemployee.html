@@ -17,71 +17,79 @@
             const username = document.getElementById('username');
             const email = document.getElementById('email');
             const phone = document.getElementById('phone');
-    
+
             // Function to show error
-            function showError(elementId, message) {
+            function showError(message, elementId) {
                 const errorElement = document.getElementById(elementId);
                 errorElement.textContent = message;
-                errorElement.style.display = "block"; // Show error message
+                errorElement.style.display = 'block'; // Make it visible
             }
-    
+
             // Function to clear error
             function clearError(elementId) {
                 const errorElement = document.getElementById(elementId);
                 errorElement.textContent = '';
-                errorElement.style.display = "none"; // Hide error message
+                errorElement.style.display = 'none'; // Hide the error message
             }
-    
+
             // Function to validate phone number
             function validatePhoneNumber(phoneNumber) {
-                return /^\d{10}$/.test(phoneNumber);
+                return /^\d{10}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
             }
-    
+
+            // Function to validate username (only alphabets)
+            function validateUsername(username) {
+                return /^[a-zA-Z]+$/.test(username);
+            }
+
             // General validation for field dependencies
-            function validateFieldsBefore(field, fieldErrorId, dependentField) {
+            function validateFieldsBefore(field, dependentField, errorElementId) {
                 field.addEventListener('focus', function() {
                     if (dependentField.value.trim() === "") {
-                        showError(fieldErrorId, `Please fill out the previous field before filling this one.`);
+                        showError('Please fill out the previous field before filling this one.', errorElementId);
                         field.blur(); // Remove focus from the current field
                     } else {
-                        clearError(fieldErrorId);
+                        clearError(errorElementId);
                     }
                 });
             }
-    
+
             // Apply validation for each field
-            validateFieldsBefore(email, 'emailError', username);
-            validateFieldsBefore(phone, 'phoneError', email);
-    
+            validateFieldsBefore(email, username, 'emailError');
+            validateFieldsBefore(phone, email, 'phoneError');
+
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
                 let valid = true;
-    
+
                 // Username validation
                 if (username.value.trim() === "") {
-                    showError('usernameError', 'Username is required.');
+                    showError('Username is required.', 'usernameError');
+                    valid = false;
+                } else if (!validateUsername(username.value.trim())) {
+                    showError('Username can only contain alphabets.', 'usernameError');
                     valid = false;
                 } else {
                     clearError('usernameError');
                 }
-    
+
                 // Email validation
                 const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
                 if (!emailPattern.test(email.value.trim())) {
-                    showError('emailError', 'Enter a valid email id.');
+                    showError('Enter a valid email id.', 'emailError');
                     valid = false;
                 } else {
                     clearError('emailError');
                 }
-    
+
                 // Phone validation
                 if (!validatePhoneNumber(phone.value.trim())) {
-                    showError('phoneError', 'Phone number must be 10 digits.');
+                    showError('Phone number must be 10 digits and cannot be the same number repeated.', 'phoneError');
                     valid = false;
                 } else {
                     clearError('phoneError');
                 }
-    
+
                 // If any validation fails, prevent form submission
                 if (!valid) {
                     event.preventDefault();
@@ -102,21 +110,21 @@
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" placeholder="Enter your username">
-                    <div id="usernameError" class="error-message" style="display: none;"></div>
+                    <div id="usernameError" class="error-message"></div>
                 </div>
                 
                 <!-- Email Field -->
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" placeholder="Enter your email">
-                    <div id="emailError" class="error-message" style="display: none;"></div>
+                    <div id="emailError" class="error-message"></div>
                 </div>
                 
                 <!-- Phone Field -->
                 <div class="form-group">
                     <label for="phone">Phone:</label>
                     <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
-                    <div id="phoneError" class="error-message" style="display: none;"></div>
+                    <div id="phoneError" class="error-message"></div>
                 </div><br>
                 
                 <!-- Submit Button -->

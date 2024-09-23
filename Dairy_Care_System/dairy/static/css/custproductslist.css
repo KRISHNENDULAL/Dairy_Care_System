@@ -102,17 +102,17 @@ h2 {
     overflow: hidden; /* Prevents overflow of content */
     display: flex;
     flex-direction: column; /* Align children vertically */
-    justify-content: space-between; /* Space between items */
-    height: 300px; /* Fixed height for uniformity */
-    text-align: center;
+    justify-content: flex-start; /* Align children at the start to allow dynamic height */
+    padding: 15px;
     background-color: #fff; /* White background for products */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow effect */
 }
 
 .product img {
-    max-width: 100%; /* Responsive image */
-    height: 150px; /* Fixed height for images */
+    width: 100%; /* Full width of the product container */
+    height: 150px; /* Fixed height for uniformity */
     object-fit: cover; /* Maintain aspect ratio and cover the area */
+    border-radius: 4px; /* Rounded corners for the image */
 }
 
 .product h3 {
@@ -122,4 +122,12 @@ h2 {
 
 .product p {
     margin: 5px 0; /* Margin for spacing */
+    font-size: 0.9em;
+    color: #000000;
+}
+
+.product-container-footer {
+    margin-top: auto; /* Push the footer (like the added at date) to the bottom */
+    color: #888;
+    font-size: 0.85em;
 }

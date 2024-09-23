@@ -13,8 +13,8 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 from django.contrib.auth import logout 
 from django.core.files.storage import FileSystemStorage
+from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
-
 
 
 def home(request):
@@ -108,7 +108,8 @@ def resetpassword(request, token):
         return redirect('forgotpassword')
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -236,6 +237,8 @@ def changepassword(request):
     return render(request, 'changepassword.html')
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def customerpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -248,6 +251,8 @@ def customerpage(request):
         return redirect('login')  # Redirect to login if no user is logged in
     
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def employeepage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:

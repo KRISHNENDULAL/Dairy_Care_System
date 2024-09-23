@@ -20,22 +20,28 @@
             const email = document.getElementById('email');
             const phone = document.getElementById('phone');
             const password = document.getElementById('password');
-
+    
             // Function to show error
             function showError(message, elementId) {
                 document.getElementById(elementId).textContent = message;
             }
-
+    
             // Function to clear error
             function clearError(elementId) {
                 document.getElementById(elementId).textContent = '';
             }
-
+    
             // Function to validate phone number
             function validatePhoneNumber(phoneNumber) {
-                return /^\d{10}$/.test(phoneNumber);
+                // Prevent same number repeated 10 times and ensure it follows a valid phone number format (10 digits)
+                return /^\d{10}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
             }
-
+    
+            // Function to validate username (only alphabets)
+            function validateUsername(username) {
+                return /^[a-zA-Z]+$/.test(username);
+            }
+    
             // General validation for field dependencies
             function validateFieldsBefore(field, dependentField, errorElementId) {
                 field.addEventListener('focus', function() {
@@ -47,24 +53,27 @@
                     }
                 });
             }
-
+    
             // Apply validation for each field
             validateFieldsBefore(email, username, 'emailError');
             validateFieldsBefore(phone, email, 'phoneError');
             validateFieldsBefore(password, phone, 'passwordError');
-
+    
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
                 let valid = true;
-
-                // Username validation
+    
+                // Username validation (only alphabets)
                 if (username.value.trim() === "") {
                     showError('Username is required.', 'usernameError');
+                    valid = false;
+                } else if (!validateUsername(username.value.trim())) {
+                    showError('Username can only contain alphabets.', 'usernameError');
                     valid = false;
                 } else {
                     clearError('usernameError');
                 }
-
+    
                 // Email validation
                 const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
                 if (!emailPattern.test(email.value.trim())) {
@@ -73,15 +82,15 @@
                 } else {
                     clearError('emailError');
                 }
-
-                // Phone validation
+    
+                // Phone validation (10 digits and not same number repeated 10 times)
                 if (!validatePhoneNumber(phone.value.trim())) {
-                    showError('Phone number must be 10 digits.', 'phoneError');
+                    showError('Phone number must be 10 digits and cannot be the same number repeated.', 'phoneError');
                     valid = false;
                 } else {
                     clearError('phoneError');
                 }
-
+    
                 // Password validation
                 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
                 if (!passwordPattern.test(password.value.trim())) {
@@ -90,7 +99,7 @@
                 } else {
                     clearError('passwordError');
                 }
-
+    
                 // If any validation fails, prevent form submission
                 if (!valid) {
                     event.preventDefault();
@@ -98,6 +107,7 @@
             });
         });
     </script>
+    
 </head>
 <body>
     <a href="{% url 'home' %}" class="home-link">

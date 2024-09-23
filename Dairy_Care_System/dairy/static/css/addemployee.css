@@ -68,7 +68,7 @@ h2 {
     top: 20px;
     right: 20px;
     font-size: 30px;
-    color: white;
+    color: black;
     text-decoration: none;
     font-family: 'Comic Sans MS', cursive;
 }
@@ -82,10 +82,11 @@ h2 {
     color: red;
     font-size: 0.9em;
     margin-top: 5px;
+    display: none; /* Keep it hidden by default */
 }
 
 /* Success message styling */
 .success-message {
-    color: green;
+    color: rgb(2, 2, 2);
     font-size: 0.875em;
 }

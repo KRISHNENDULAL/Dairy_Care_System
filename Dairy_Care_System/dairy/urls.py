@@ -19,12 +19,12 @@ urlpatterns = [
     path('logout', views.user_logout, name='logout'),
     path('feedbackpage',views.feedbackpage,name='feedbackpage'),
     path('userprofile',views.userprofile,name='userprofile'),
+    path('updateuserprofile',views.updateuserprofile,name='updateuserprofile'),
     path('productslist',views.productslist,name='productslist'),
     path('custproductslist',views.custproductslist,name='custproductslist'),
     path('productslist/<int:product_id>/',views.productdetails, name='productdetails'),
     path('addproducts',views.addproducts,name='addproducts'),
-    path('updateproduct',views.updateproduct,name='updateproduct'),
-    path('updateuserprofile',views.updateuserprofile,name='updateuserprofile')
+    path('updateproduct',views.updateproduct,name='updateproduct')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

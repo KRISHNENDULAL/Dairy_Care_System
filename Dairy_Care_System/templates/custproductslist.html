@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <title>Products Page</title>
-    <link rel="stylesheet" href="{% static 'css/productslist.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custproductslist.css' %}">
     <style>
         body {
             background-size: cover;
@@ -15,7 +15,9 @@
 <!-- Navigation Bar-->
 <ul>
     <div class="header">
-        
+        <div class="nav-item">
+            <li><b><a href="{% url 'home' %}">Your Orders</a></b></li>
+        </div>
         <div class="nav-item">
             <li>
                 <b><a href="#">{{ username }}</a></b>
@@ -35,7 +37,7 @@
                 <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
             {% endfor %}
             <h3>{{ product.product_name }}</h3>
-            <p>Quantity: {{ product.product_quantity }} {{ product.quantity_unit }}</p>
+            <p>{{ product.product_description }}</p>
         </div>
     {% empty %}
         <p>No products available.</p>
