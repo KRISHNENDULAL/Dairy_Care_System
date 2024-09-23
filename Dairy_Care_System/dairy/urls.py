@@ -20,6 +20,7 @@ urlpatterns = [
     path('feedbackpage',views.feedbackpage,name='feedbackpage'),
     path('userprofile',views.userprofile,name='userprofile'),
     path('productslist',views.productslist,name='productslist'),
+    path('custproductslist',views.custproductslist,name='custproductslist'),
     path('productslist/<int:product_id>/',views.productdetails, name='productdetails'),
     path('addproducts',views.addproducts,name='addproducts'),
     path('updateproduct',views.updateproduct,name='updateproduct'),

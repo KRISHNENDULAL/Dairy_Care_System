@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import os
+
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -126,6 +127,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'dairy_care_system', 'static'),
 ]
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
                                                         
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -140,7 +144,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'dairycaresystem25@gmail.com'
-EMAIL_HOST_PASSWORD = '#####'
+EMAIL_HOST_PASSWORD = 'djad ggea twqt hvab'
 DEFAULT_FROM_EMAIL = 'admin@yourdomain.com'
 
 
@@ -155,6 +159,5 @@ STATICFILES_DIRS = [
     # You can add more directories if needed
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 

@@ -15,12 +15,7 @@
 <!-- Navigation Bar-->
 <ul>
     <div class="header">
-        <div class="nav-item">
-            <li><b><a href="{% url 'addproducts' %}">Add Products</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'updateproduct' %}">Update Products</a></b></li>
-        </div>
+        
         <div class="nav-item">
             <li>
                 <b><a href="#">{{ username }}</a></b>
@@ -40,9 +35,7 @@
                 <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
             {% endfor %}
             <h3>{{ product.product_name }}</h3>
-            <p>{{ product.product_description }}</p>
             <p>Quantity: {{ product.product_quantity }} {{ product.quantity_unit }}</p>
-            <p>Added at: {{ product.added_at }}</p>
         </div>
     {% empty %}
         <p>No products available.</p>

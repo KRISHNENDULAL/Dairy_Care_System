@@ -13,6 +13,7 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 from django.contrib.auth import logout 
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -107,6 +108,7 @@ def resetpassword(request, token):
         return redirect('forgotpassword')
 
 
+@login_required(login_url='login')
 def adminpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -117,6 +119,7 @@ def adminpage(request):
         return render(request, 'adminpage.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in 
+    
     
 
 def generate_random_password():
@@ -353,6 +356,23 @@ def productslist(request):
             'products': products,        # Pass the products to the template
         }
         return render(request, 'productslist.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+    
+
+def custproductslist(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        
+        # Fetch all products and their images
+        products = Products_table.objects.filter(status=True)  # Only get available products
+        
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'products': products,        # Pass the products to the template
+        }
+        return render(request, 'custproductslist.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in
     
