@@ -75,6 +75,9 @@ button:hover {
 
 .error-message {
     color: red;
-    text-align: center; /* Center align the error message */
+    font-size: 0.9em;
     margin-top: 5px;
+    display: none; /* Hide by default */
+    text-align: center; /* Center align error messages */
 }
+

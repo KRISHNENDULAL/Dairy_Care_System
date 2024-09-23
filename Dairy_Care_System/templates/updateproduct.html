@@ -11,13 +11,15 @@
             const productName = document.getElementById('product_name').value;
             const products = {{ products|safe }};  // Passing products as a JSON object
 
+            console.log('Selected Product Name:', productName);
+            console.log('Available Products:', products);
+
             const selectedProduct = products.find(product => product.product_name === productName);
 
             if (selectedProduct) {
                 document.getElementById('product_description').value = selectedProduct.product_description;
                 document.getElementById('product_quantity').value = selectedProduct.product_quantity;
                 document.getElementById('quantity_unit').value = selectedProduct.quantity_unit;
-                document.getElementById('price').value = selectedProduct.price;
 
                 // Display current images
                 const imagesContainer = document.getElementById('current_images');
@@ -31,6 +33,12 @@
                     imgElement.style.marginRight = '10px';
                     imagesContainer.appendChild(imgElement);
                 });
+            } else {
+                // Clear fields if no product is selected
+                document.getElementById('product_description').value = '';
+                document.getElementById('product_quantity').value = '';
+                document.getElementById('quantity_unit').value = '';
+                document.getElementById('current_images').innerHTML = ''; // Clear images
             }
         }
     </script>

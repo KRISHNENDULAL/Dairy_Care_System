@@ -18,7 +18,129 @@
             align-items: center;
             min-height: 100vh;
         }
+
+        .error-message {
+            color: red; /* Set error messages to red */
+            text-align: center; /* Center align error messages */
+            margin-top: 5px; /* Add some spacing above the error messages */
+        }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById('addProductForm');
+            const productName = document.getElementById('productName');
+            const productDescription = document.getElementById('productDescription');
+            const productQuantity = document.getElementById('productQuantity');
+            const quantityUnit = document.getElementById('quantityUnit');
+            const productPhoto = document.querySelector('input[name="product_images"]');
+
+            // Function to show error
+            function showError(message, elementId) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.style.display = 'block'; // Make it visible
+            }
+
+            // Function to clear error
+            function clearError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = '';
+                errorElement.style.display = 'none'; // Hide the error message
+            }
+
+            // Function to validate product name (only alphabets)
+            function validateProductName(name) {
+                return /^[a-zA-Z\s]+$/.test(name); // Allow alphabets and spaces
+            }
+
+            // Function to validate description (not exceeding 100 words)
+            function validateDescription(description) {
+                const wordCount = description.trim().split(/\s+/).length;
+                return wordCount <= 100;
+            }
+
+            // Function to validate quantity (integer or decimal)
+            function validateQuantity(quantity) {
+                return /^\d+(\.\d+)?$/.test(quantity); // Allow integers and decimals
+            }
+
+            // General validation for field dependencies
+            function validateFieldsBefore(field, dependentField, errorElementId) {
+                field.addEventListener('focus', function() {
+                    if (dependentField.value.trim() === "") {
+                        showError('Please fill out the previous field before filling this one.', errorElementId);
+                        field.blur(); // Remove focus from the current field
+                    } else {
+                        clearError(errorElementId);
+                    }
+                });
+            }
+
+            // Apply validation for each field
+            validateFieldsBefore(productDescription, productName, 'descriptionError');
+            validateFieldsBefore(productQuantity, productDescription, 'quantityError');
+            validateFieldsBefore(quantityUnit, productQuantity, 'unitError');
+
+            // Event listener for form submission
+            form.addEventListener('submit', function(event) {
+                let valid = true;
+
+                // Product Name validation
+                if (productName.value.trim() === "") {
+                    showError('Product name is required.', 'nameError');
+                    valid = false;
+                } else if (!validateProductName(productName.value.trim())) {
+                    showError('Product name can only contain alphabets.', 'nameError');
+                    valid = false;
+                } else {
+                    clearError('nameError');
+                }
+
+                // Description validation
+                if (productDescription.value.trim() === "") {
+                    showError('Description is required.', 'descriptionError');
+                    valid = false;
+                } else if (!validateDescription(productDescription.value.trim())) {
+                    showError('Description must not exceed 100 words.', 'descriptionError');
+                    valid = false;
+                } else {
+                    clearError('descriptionError');
+                }
+
+                // Quantity validation
+                if (productQuantity.value.trim() === "") {
+                    showError('Quantity is required.', 'quantityError');
+                    valid = false;
+                } else if (!validateQuantity(productQuantity.value.trim())) {
+                    showError('Quantity must be a valid number (integer or decimal).', 'quantityError');
+                    valid = false;
+                } else {
+                    clearError('quantityError');
+                }
+
+                // Check if unit is selected
+                if (quantityUnit.value === "") {
+                    showError('Please select a unit.', 'unitError');
+                    valid = false;
+                } else {
+                    clearError('unitError');
+                }
+
+                // Check if photo is uploaded
+                if (!productPhoto.files.length) {
+                    showError('Please choose a photo to upload.', 'photoError');
+                    valid = false;
+                } else {
+                    clearError('photoError');
+                }
+
+                // If any validation fails, prevent form submission
+                if (!valid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 <a href="{% url 'productslist' %}" class="back-link"><b>BACK</b></a>
@@ -27,15 +149,17 @@
     <h1>Product Details Entry</h1><br>
 
     <label for="productName">Product Name:</label>
-    <input type="text" id="productName" name="product_name" required>
+    <input type="text" id="productName" name="product_name">
+    <div id="nameError" class="error-message"></div>
 
     <label for="productDescription">Description:</label>
-    <textarea id="productDescription" name="product_description" rows="4" required></textarea>
+    <textarea id="productDescription" name="product_description" rows="4"></textarea>
+    <div id="descriptionError" class="error-message"></div>
 
     <label for="productQuantity">Quantity:</label>
     <div class="quantity-container">
-        <input type="text" id="productQuantity" name="product_quantity" class="quantity-input" required>
-        <select id="quantityUnit" name="quantity_unit" class="unit-select" required>
+        <input type="text" id="productQuantity" name="product_quantity" class="quantity-input">
+        <select id="quantityUnit" name="quantity_unit" class="unit-select">
             <option value="" disabled selected>Select Unit</option>
             <option value="litres">Litres</option>
             <option value="ml">Millilitres (ml)</option>
@@ -43,9 +167,12 @@
             <option value="g">Grams (g)</option>
         </select>
     </div>
+    <div id="quantityError" class="error-message"></div>
+    <div id="unitError" class="error-message"></div>
 
     <label for="productPhoto">Upload Photo:</label>
-    <input type="file" name="product_images" required>
+    <input type="file" name="product_images">
+    <div id="photoError" class="error-message"></div> <!-- Added error message for photo upload -->
 
     <button type="submit">Add Product</button>
 </form>
