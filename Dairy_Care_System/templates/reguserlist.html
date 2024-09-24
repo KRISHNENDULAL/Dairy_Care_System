@@ -64,11 +64,18 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.phone }}</td>
                         <td>{{ user.get_role_display }}</td>
-                        <td>{% if not user.status %}false{% else %}true{% endif %}</td>
+                        <td>{% if not user.status %}False{% else %}True{% endif %}</td>
                         <td>{{ user.created_at }}</td>
                         <td>{{ user.updated_at }}</td>
                         <td class="action-btns">
-                            <a href="{% url 'regdeleteuser' user.user_id %}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this user?');"><b>Delete</b></a>
+                            <div class="button-group">
+                                <a href="{% url 'regdeleteuser' user.user_id %}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this user?');"><b>Delete</b></a>
+                                {% if not user.status %}
+                                    <a href="{% url 'restoreuser' user.user_id %}" class="view-btn" onclick="return confirm('Are you sure you want to restore this user?');"><b>Restore</b></a>
+                                {% else %}
+                                    <span>Active</span>
+                                {% endif %}
+                            </div>
                         </td>                        
                     </tr>
                 {% endfor %}

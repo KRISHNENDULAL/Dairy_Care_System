@@ -15,6 +15,7 @@ urlpatterns = [
     path('addemployee', views.addemployee, name='addemployee'),
     path('reguserlist/<str:role>/',views.reguserlist,name='reguserlist'),
     path('regdeleteuser/<int:user_id>/',views.regdeleteuser, name='regdeleteuser'),
+    path('restoreuser/<int:user_id>/',views.restoreuser, name='restoreuser'),
     path('changepassword/', views.changepassword, name='changepassword'),
     path('customerpage',views.customerpage,name='customerpage'),
     path('employeepage',views.employeepage,name='employeepage'),

@@ -261,9 +261,17 @@ def reguserlist(request, role=None):
 
 def regdeleteuser(request, user_id):
     user = get_object_or_404(Users_table, user_id=user_id)
-    user.status = False  # Set status to 0
+    user.status = False  # Set status to inactive
     user.save()  # Save changes to the database
     return redirect('reguserlist', 'all')  # Redirect to the user list page
+
+
+def restoreuser(request, user_id):
+    user = get_object_or_404(Users_table, user_id=user_id)
+    user.status = True  # Set status back to active
+    user.save()  # Save changes to the database
+    return redirect('reguserlist', 'all')  # Redirect to the user list page
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

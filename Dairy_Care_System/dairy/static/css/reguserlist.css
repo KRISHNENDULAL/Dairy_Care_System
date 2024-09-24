@@ -90,7 +90,7 @@ h1 {
     margin: 50px auto;
     padding: 20px;
     width: auto; /* Allow the width to adjust based on content */
-    max-width: 85%;
+    max-width: 90%;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -122,30 +122,28 @@ tr:nth-child(even) {
 }
 
 /* Action Buttons Styling */
-.action-btns a {
-    text-decoration: none;
-    padding: 8px 12px;
-    margin: 0 5px;
-    border-radius: 5px;
+.action-btns {
+    text-align: center; /* Center-align the buttons */
+}
+
+.button-group {
+    display: inline-flex; /* Use flexbox for inline display */
+    gap: 10px; /* Add space between buttons */
+    align-items: center; /* Center buttons vertically if needed */
+}
+
+.view-btn, .delete-btn {
+    padding: 5px 10px; /* Add padding to buttons for better appearance */
+    text-decoration: none; /* Remove underline */
+    color: white; /* Change text color */
+}
+
+.view-btn {
+    background-color: green; /* Green background for Restore button */
+    border-radius: 5px; /* Rounded corners */
 }
 
 .delete-btn {
-    background-color: #dc3545;
-    font-size: 17px;
-    color: white;
-}
-
-.action-btns a:hover {
-    opacity: 0.8;
-}
-
-
-.view-btn {
-    background-color: #007bff;
-    color: white;
-}
-
-.edit-btn {
-    background-color: #ffc107;
-    color: black;
+    background-color: red; /* Red background for Delete button */
+    border-radius: 5px; /* Rounded corners */
 }
