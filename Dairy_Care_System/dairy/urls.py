@@ -25,7 +25,7 @@ urlpatterns = [
     path('custproductslist',views.custproductslist,name='custproductslist'),
     path('productslist/<int:product_id>/',views.productdetails, name='productdetails'),
     path('addproducts',views.addproducts,name='addproducts'),
-    path('updateproduct',views.updateproduct,name='updateproduct')
+    path('editproduct',views.editproduct,name='editproduct')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -142,6 +142,25 @@
             color: #888;
             font-size: 0.85em;
         }
+
+        .update-button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .update-button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05); /* Slightly enlarge button on hover */
+        }
     
     </style>
 </head>
@@ -177,7 +196,8 @@
             <p>{{ product.product_description }}</p>
             <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
-            <p><strong>Added at:</strong> {{ product.added_at }}</p>
+            <p><strong>Added at:</strong> {{ product.added_at }}</p><br><br>
+            <button class="update-button">Update</button>
         </div>
     {% empty %}
         <p>No products available.</p>

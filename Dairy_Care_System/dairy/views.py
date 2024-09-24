@@ -414,21 +414,22 @@ def productdetails(request, product_id):
     return render(request, 'productdetails.html', context)
 
 
-def updateproduct(request):
-    products = Products_table.objects.prefetch_related('images').all()
-    products_data = [
-        {
-            'product_name': product.product_name,
-            'product_description': product.product_description,
-            'product_quantity': product.product_quantity,
-            'quantity_unit': product.quantity_unit,
-            'images': [{'image_url': image.image.url} for image in product.images.all()]
+    
+def editproduct(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        
+        # Fetch all available products and their images
+        products = Products_table.objects.filter(status=True)  # Only get available products
+        
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'products': products,        # Pass the products to the template
         }
-        for product in products
-    ]
-
-    return render(request, 'updateproduct.html', {'products': products_data})
- 
+        return render(request, 'editproduct.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
 
 
 
