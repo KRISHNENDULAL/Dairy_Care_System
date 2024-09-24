@@ -5,8 +5,9 @@
     <title>{{ product.product_name }} - Product Details</title>
     <style>
         body {
+            background: url('{% static "images/prodet.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
         }
@@ -95,7 +96,6 @@
         
         .back-link:hover {
             text-decoration: underline;
-            background-color: #f0f0f0; /* Change background on hover */
         }
     </style>
 </head>

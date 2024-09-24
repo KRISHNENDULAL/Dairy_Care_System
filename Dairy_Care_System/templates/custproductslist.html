@@ -42,7 +42,7 @@
             {% for image in product.images.all %}
                 <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
             {% endfor %}
-            <h3>{{ product.product_name }}</h3>
+            <h3><center>{{ product.product_name }}</center></h3>
             <p>{{ product.product_description }}</p>
         </div>
     {% empty %}

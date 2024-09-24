@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/customerpage.css' %}">
     <style>
         body {
-            background: url('{% static "images/pic" %}') no-repeat center center fixed;
+            background: url('{% static "images/custpg.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
         }
@@ -42,6 +42,20 @@
     </ul>
 
     <center>
-        <h1><b>Customer Dashboard</b></h1>
+<!--         <h1><b>Customer Dashboard</b></h1> -->
+
+        <!-- Message and Quote -->
+    <div class="message">
+        <h1>Welcome, {{ username }}!</h1> <br><br> 
+        We value your trust and aim to deliver the best shopping experience for you.
+    </div><br><br>
+    <div class="quote">
+        "A satisfied customer is the best business strategy of all."
+    </div><br><br><br><br><br><br><br><br>
+
+<footer>
+    <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+</footer>
+
     </center>
 </body>

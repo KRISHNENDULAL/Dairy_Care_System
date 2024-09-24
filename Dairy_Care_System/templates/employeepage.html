@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/employeepage.css' %}">
     <style>
         body {
-            background: url('{% static "images/pic" %}') no-repeat center center fixed;
+            background: url('{% static "images/emppage.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
         }
@@ -49,7 +49,20 @@
 </ul>
 
 <center>
-    <h1><b>Employee Dashboard</b></h1>
+    <!-- <h1><b>Employee Dashboard</b></h1> -->
+
+    <div class="message"></div>
+       <h1> Hello, {{ username }}!</h1><br><br>
+        You are the backbone of the system. Your dedication makes everything possible.
+    </div><br><br>
+    <div class="quote">
+        "The strength of the team is each individual member. The strength of each member is the team."
+    </div><br><br><br><br><br><br><br><br>
+
+<footer>
+    <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+</footer>
+
 </center>
 </body>
 </html>

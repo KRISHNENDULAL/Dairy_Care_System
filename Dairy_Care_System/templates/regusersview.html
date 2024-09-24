@@ -2,20 +2,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Admin Page</title>
-    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="{% static 'css/regusersview.css' %}">
     <style>
         body {
-            background: url('{% static "images/adminpg.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/regview.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
+            font-family: Arial, sans-serif;
         }
+
     </style>
 </head>
 <body>
-    <!-- <a href="{% url 'home' %}" class="home-link">
-        <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
-    </a> -->
 
 <!-- Navigation Bar-->
 <ul>
@@ -52,22 +51,31 @@
     </div>
 </ul>
 
+<div class="container">
+    <h1>Registered User</h1><br><br>
 
-<center>
-    <!-- <h1><b>Admin Dashboard</b></h1> -->
-    <!-- Message and Quote -->
-    <div class="message">
-        <h1>Welcome, {{ username }}!</h1> <br><br> 
-        Manage the system efficiently and effectively to keep everything running smoothly.
-    </div><br><br>
-    <div class="quote">
-        "Leadership is not about being in charge, but about taking care of those in your charge."
-    </div><br><br><br><br><br><br><br><br>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.get_role_display }}</td>
+                <td>{{ user.status }}</td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<footer>
-    <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
-</footer>
-
-</center>
 </body>
 </html>

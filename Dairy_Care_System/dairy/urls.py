@@ -13,6 +13,7 @@ urlpatterns = [
     path('resetpassword/<str:token>/', views.resetpassword, name='resetpassword'),
     path('adminpage',views.adminpage,name='adminpage'),
     path('addemployee', views.addemployee, name='addemployee'),
+    path('regusersview/<str:role>/', views.regusersview, name='regusersview'),
     path('changepassword/', views.changepassword, name='changepassword'),
     path('customerpage',views.customerpage,name='customerpage'),
     path('employeepage',views.employeepage,name='employeepage'),

@@ -238,6 +238,28 @@ def changepassword(request):
 
 
 
+def regusersview(request, role):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        
+        # Fetch users based on the provided role
+        users = Users_table.objects.filter(role=role)
+        
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'users': users,             # Pass the list of users with the specified role
+            'role': role                # Pass the role to the template
+        }
+        
+        return render(request, 'regusersview.html', context)
+    else:
+        return redirect('login')  # Redirect to the login page if no user_id in session
+    
+
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def customerpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
