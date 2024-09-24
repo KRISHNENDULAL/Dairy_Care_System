@@ -39,8 +39,8 @@
         }
 
         .images img {
-            width: 200px; /* Fixed width for uniformity */
-            height: 150px; /* Fixed height for uniformity */
+            width: 250px; /* Fixed width for uniformity */
+            height: 200px; /* Fixed height for uniformity */
             object-fit: cover; /* Maintain aspect ratio */
             border-radius: 8px; /* Rounded corners for images */
             border: 1px solid #ddd; /* Light border around images */
@@ -54,7 +54,7 @@
         p {
             color: #000000;
             margin: 10px 0; /* Spacing between paragraphs */
-            font-size: 1.1em; /* Slightly larger font size */
+            font-size: 1.2em; /* Slightly larger font size */
         }
 
         strong {
@@ -109,10 +109,10 @@
                 <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
             {% endfor %}
         </div>
-        <p>{{ product.product_description }}</p>
+        <p>{{ product.product_description }}</p><br>
         <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
         <p><strong>Added at:</strong> {{ product.added_at }}</p>
-        <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
+        <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p><br>
         <button class="buy-button">Add to Cart</button>
     </div>
 

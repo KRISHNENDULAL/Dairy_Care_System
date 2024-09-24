@@ -32,9 +32,10 @@
                 errorElement.style.display = 'none'; // Hide the error message
             }
 
-            // Function to validate phone number
+            // Function to validate phone number (must start with 6, 7, 8, or 9)
             function validatePhoneNumber(phoneNumber) {
-                return /^\d{10}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
+                // Ensure phone starts with 6, 7, 8, or 9, is 10 digits, and is not the same number repeated 10 times
+                return /^[6-9]\d{9}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
             }
 
             // Function to validate username (only alphabets)
@@ -82,9 +83,9 @@
                     clearError('emailError');
                 }
 
-                // Phone validation
+                // Phone validation (10 digits, starts with 6, 7, 8, or 9, and not the same number repeated)
                 if (!validatePhoneNumber(phone.value.trim())) {
-                    showError('Phone number must be 10 digits and cannot be the same number repeated.', 'phoneError');
+                    showError('Phone number must be 10 digits, start with 6, 7, 8, or 9, and cannot be the same number repeated.', 'phoneError');
                     valid = false;
                 } else {
                     clearError('phoneError');

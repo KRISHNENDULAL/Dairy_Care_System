@@ -237,27 +237,33 @@ def changepassword(request):
     return render(request, 'changepassword.html')
 
 
-
-def regusersview(request, role):
+def reguserlist(request, role=None):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
-        # Fetch users based on the provided role
-        users = Users_table.objects.filter(role=role)
+        if role == 'customer' or role == 'employee':
+            users = Users_table.objects.filter(role=role)
+        elif role == 'all':
+            users = Users_table.objects.filter(role__in=['customer', 'employee'])
+        else:
+            users = []
         
         context = {
-            'username': user.username,  # Pass the username to the template
-            'users': users,             # Pass the list of users with the specified role
-            'role': role                # Pass the role to the template
+            'username': user.username,  # Pass the logged-in username to the template
+            'users': users,  # Pass the list of users based on the role
+            'role': role,    # Pass the role to identify if it’s customer, employee, or all
         }
-        
-        return render(request, 'regusersview.html', context)
+        return render(request, 'reguserlist.html', context)
     else:
-        return redirect('login')  # Redirect to the login page if no user_id in session
-    
+        return redirect('login')  # Redirect to login if no user is logged in
 
+
+def regdeleteuser(request, user_id):
+    user = get_object_or_404(Users_table, user_id=user_id)
+    user.status = False  # Set status to 0
+    user.save()  # Save changes to the database
+    return redirect('reguserlist', 'all')  # Redirect to the user list page
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

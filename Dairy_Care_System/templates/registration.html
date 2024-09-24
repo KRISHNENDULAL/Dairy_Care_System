@@ -31,10 +31,10 @@
                 document.getElementById(elementId).textContent = '';
             }
     
-            // Function to validate phone number
+            // Function to validate phone number (must start with 6, 7, 8, or 9)
             function validatePhoneNumber(phoneNumber) {
-                // Prevent same number repeated 10 times and ensure it follows a valid phone number format (10 digits)
-                return /^\d{10}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
+                // Ensure phone starts with 6, 7, 8, or 9, is 10 digits, and is not the same number repeated 10 times
+                return /^[6-9]\d{9}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
             }
     
             // Function to validate username (only alphabets)
@@ -83,9 +83,9 @@
                     clearError('emailError');
                 }
     
-                // Phone validation (10 digits and not same number repeated 10 times)
+                // Phone validation (10 digits, starts with 6, 7, 8, or 9, and not the same number repeated)
                 if (!validatePhoneNumber(phone.value.trim())) {
-                    showError('Phone number must be 10 digits and cannot be the same number repeated.', 'phoneError');
+                    showError('Phone number must be 10 digits, start with 6, 7, 8, or 9, and cannot be the same number repeated.', 'phoneError');
                     valid = false;
                 } else {
                     clearError('phoneError');
@@ -107,6 +107,7 @@
             });
         });
     </script>
+    
     
 </head>
 <body>

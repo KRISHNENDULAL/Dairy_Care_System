@@ -66,24 +66,24 @@
             function showError(message, elementId) {
                 document.getElementById(elementId).textContent = message;
                 document.getElementById(elementId).style.color = 'red'; // You can force the color here for testing
-                }
-
+            }
+    
             // Function to clear error
             function clearError(elementId) {
                 document.getElementById(elementId).textContent = '';
             }
-
-            // Function to validate phone number
+    
+            // Function to validate phone number (10 digits and starts with 6, 7, 8, or 9)
             function validatePhoneNumber(phoneNumber) {
-                // Prevent same number repeated 10 times and ensure it follows a valid phone number format (10 digits)
-                return /^\d{10}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
+                // Ensure it starts with 6, 7, 8, or 9, is 10 digits, and not repeated digits
+                return /^[6-9]\d{9}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
             }
-
+    
             // Function to validate username (only alphabets)
             function validateUsername(username) {
                 return /^[a-zA-Z]+$/.test(username);
             }
-
+    
             // General validation for field dependencies
             function validateFieldsBefore(field, dependentField, errorElementId) {
                 field.addEventListener('focus', function() {
@@ -95,15 +95,15 @@
                     }
                 });
             }
-
+    
             // Apply validation for each field
             validateFieldsBefore(email, username, 'emailError');
             validateFieldsBefore(phone, email, 'phoneError');
-
+    
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
                 let valid = true;
-
+    
                 // Username validation (only alphabets)
                 if (username.value.trim() === "") {
                     showError('Username is required.', 'usernameError');
@@ -114,7 +114,7 @@
                 } else {
                     clearError('usernameError');
                 }
-
+    
                 // Email validation
                 const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
                 if (!emailPattern.test(email.value.trim())) {
@@ -123,15 +123,15 @@
                 } else {
                     clearError('emailError');
                 }
-
-                // Phone validation (10 digits and not the same number repeated 10 times)
+    
+                // Phone validation (10 digits, not repeated digits, and starting with 6, 7, 8, or 9)
                 if (!validatePhoneNumber(phone.value.trim())) {
-                    showError('Phone number must be 10 digits and cannot be the same number repeated.', 'phoneError');
+                    showError('Phone number must be 10 digits, start with 6, 7, 8, or 9, and cannot be the same number repeated.', 'phoneError');
                     valid = false;
                 } else {
                     clearError('phoneError');
                 }
-
+    
                 // If any validation fails, prevent form submission
                 if (!valid) {
                     event.preventDefault();
@@ -139,5 +139,6 @@
             });
         });
     </script>
+    
 </body>
 </html>

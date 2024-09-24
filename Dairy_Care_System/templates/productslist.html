@@ -102,9 +102,9 @@
         /* Products container styles */
         .products-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust min width as needed */
-            gap: 20px; /* Space between items */
-            padding: 20px; /* Padding around the container */
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
+            gap: 60px; /* Space between items */
+            padding: 60px; /* Padding around the container */
         }
     
         .product {
@@ -116,7 +116,13 @@
             justify-content: flex-start; /* Align children at the start to allow dynamic height */
             padding: 15px;
             background-color: #fff; /* White background for products */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow effect */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+            transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+        }
+
+        .product:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
         }
     
         .product img {
@@ -129,12 +135,14 @@
         .product h3 {
             font-size: 1.2em; /* Adjust font size */
             margin: 10px 0; /* Margin for spacing */
+            text-align: center; /* Centering the product name */
         }
     
         .product p {
             margin: 5px 0; /* Margin for spacing */
-            font-size: 0.9em;
+            font-size: 1.1em;
             color: #000000;
+            text-align: center; /* Centering the product name */
         }
     
         .product-container-footer {
@@ -173,8 +181,8 @@
             {% for image in product.images.all %}
                 <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
             {% endfor %}
-            <h3><center>{{ product.product_name }}</center></h3>
-            <p>{{ product.product_description }}</p>
+            <h3>{{ product.product_name }}</h3>
+            <p>{{ product.product_description }}</p><br>
             <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
             <p><strong>Added at:</strong> {{ product.added_at }}</p>
