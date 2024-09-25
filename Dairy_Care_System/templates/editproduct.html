@@ -5,6 +5,7 @@
     <title>Products Page</title>
     <style>
         body {
+            background: url('{% static "images/prolist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
         }
@@ -127,7 +128,7 @@
     
         .product img {
             width: 100%; /* Full width of the product container */
-            height: 150px; /* Fixed height for uniformity */
+            height: 250px; /* Fixed height for uniformity */
             object-fit: cover; /* Maintain aspect ratio and cover the area */
             border-radius: 4px; /* Rounded corners for the image */
         }
@@ -151,64 +152,42 @@
             font-size: 0.85em;
         }
 
-        .update-button {
-            padding: 12px 24px;
+        .update-button, .delete-button, .restore-button {
+            padding: 10px 25px;
             font-size: 18px;
-            background-color: rgb(215, 194, 6);
-            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .update-button {
+            background-color: #ffc107;
+            color: white;
         }
 
         .update-button:hover {
-            background-color: rgb(126, 116, 21);
-            transform: scale(1.05); /* Slightly enlarge button on hover */
+            background-color: #e0a800;
         }
 
         .delete-button {
-            padding: 12px 24px;
-            font-size: 18px;
-            background-color: red;
+            background-color: #dc3545;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
         }
 
         .delete-button:hover {
-            background-color: darkred;
-            transform: scale(1.05); /* Slightly enlarge button on hover */
+            background-color: #c82333;
         }
 
-
         .restore-button {
-            padding: 12px 24px;
-            font-size: 18px;
-            background-color: green;
+            background-color: #28a745;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
         }
 
         .restore-button:hover {
-            background-color: darkgreen;
-            transform: scale(1.05); /* Slightly enlarge button on hover */
+            background-color: #218838;
         }
-    
+
     </style>
 </head>
 <body>
@@ -243,11 +222,17 @@
             <p>{{ product.product_description }}</p><br>
             <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
+            <p><strong>Added by:</strong> {{ product.employee.username }}</p>
             <p><strong>Added at:</strong> {{ product.added_at }}</p><br><br>
-            <a href="{% url 'updateproduct' product.product_id %}" class="update-button">Edit</a><br>
-            <button type="submit" class="delete-button"><b>Delete</b></button><br>
-            
-            <button type="submit" class="restore-button"><b>Restore</b></button>
+            <div class="button-group" style="display: flex; justify-content: space-between;">
+                <a href="#" class="update-button">Update</a>
+                
+                {% if product.status %}  <!-- Only show delete button if product is active -->
+                    <a href="{% url 'deleteproduct' product.product_id %}" class="delete-button"><b>Delete</b></a>
+                {% else %}
+                    <a href="{% url 'restoreproduct' product.product_id %}" class="restore-button"><b>Restore</b></a>
+                {% endif %}
+            </div>
         </div>
     {% empty %}
         <p>No products available.</p>

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Users_table, Products_table, ProductImage
 from django.core.mail import send_mail
+from django.conf import settings 
 from django.contrib.auth.hashers import make_password
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
@@ -264,6 +265,17 @@ def regdeleteuser(request, user_id):
     user = get_object_or_404(Users_table, user_id=user_id)
     user.status = False  # Set status to inactive
     user.save()  # Save changes to the database
+    # Send email notification
+    subject = 'Account Deactivation Notification from Dairy Care System'
+    message = (f"Hello {user.username},\n\n"
+               "Your account has been deactivated.\n\n"
+               "If you believe this is an error, please contact support.\n\n\n\n"
+               "Disclaimer: This is an automated message. If you did not request this change, "
+               "please contact our support team immediately.")
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [user.email]         
+
+    send_mail(subject, message, from_email, recipient_list)
     return redirect('reguserlist', 'all')  # Redirect to the user list page
 
 
@@ -271,6 +283,17 @@ def restoreuser(request, user_id):
     user = get_object_or_404(Users_table, user_id=user_id)
     user.status = True  # Set status back to active
     user.save()  # Save changes to the database
+    # Prepare email notification
+    subject = 'Account Reactivation Notification from Dairy Care System'
+    message = (f"Hello {user.username},\n\n"
+               "Your account has been reactivated.\n\n"
+               "You can now log in and continue using our services.\n\n\n\n"
+               "Disclaimer: This is an automated message. If you did not request this change, "
+               "please contact our support team immediately.")
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [user.email]
+
+    send_mail(subject, message, from_email, recipient_list)
     return redirect('reguserlist', 'all')  # Redirect to the user list page
 
 
@@ -307,6 +330,7 @@ def feedbackpage(request):
     return render(request, 'feedbackpage.html')
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def userprofile(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -390,8 +414,8 @@ def productslist(request):
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
-        # Fetch all products and their images
-        products = Products_table.objects.filter(status=True)  # Only get available products
+        # Fetch all products and their images, along with the employee who added them
+        products = Products_table.objects.filter(status=True).select_related('employee')  # Assuming 'added_by' is the foreign key to Users_table
         
         context = {
             'username': user.username,  # Pass the username to the template
@@ -447,55 +471,17 @@ def editproduct(request):
         return redirect('login')  # Redirect to login if no user is logged in
 
 
-def get_product_details(request, product_id):
-    product_id = request.GET.get('product_id', None)
-    if product_id:
-        product = Products_table.objects.get(product_id=product_id)
-        data = {
-            'description': product.product_description,
-            'quantity': product.product_quantity,
-            'unit': product.quantity_unit,
-        }
-        return JsonResponse(data)
-    return JsonResponse({'error': 'Product not found'}, status=404)
+def deleteproduct(request, product_id):
+    product = get_object_or_404(Products_table, product_id=product_id)
+    product.status = False  # Set status to 0 (deleted)
+    product.save()
+    return redirect('editproduct')  # Redirect to the product listing page
 
-
-def updateproduct(request, product_id):
-    if request.method == 'POST':
-        product_id = request.POST.get('product')
-        description = request.POST.get('description')
-        quantity = request.POST.get('quantity')
-        unit = request.POST.get('unit')
-
-        product = get_object_or_404(Products_table, product_id=product_id)
-        product.product_description = description
-        product.product_quantity = quantity
-        product.quantity_unit = unit
-        product.save()
-
-        # If it's an AJAX request, return JSON response
-        if request.is_ajax():
-            return JsonResponse({'message': 'Product updated successfully!'})
-
-        # If not AJAX, redirect to a page (like editproduct page)
-        return redirect('editproduct')
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-def delete_product(request, product_id):
-    # Ensure that the request is a POST request
-    if request.method == "POST":
-        # Get the product object or return a 404 error if not found
-        product = get_object_or_404(Products_table, pk=product_id)
-        # Set the product status to 0 (indicating deletion)
-        product.status = 0
-        product.save()  # Save the changes to the database
-        # Redirect to the product list or some other page
-        return redirect('product_list')  # Assuming 'product_list' is the name of the URL for listing products
-
-    # If the request method is not POST, you could handle it differently (optional)
-    return redirect('product_list')
+def restoreproduct(request, product_id):
+    product = get_object_or_404(Products_table, product_id=product_id)
+    product.status = True  # Set status to 1 (active)
+    product.save()
+    return redirect('editproduct')  # Redirect to the product listing page
 
 
 

@@ -64,7 +64,7 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.phone }}</td>
                         <td>{{ user.get_role_display }}</td>
-                        <td>{% if not user.status %}False{% else %}True{% endif %}</td>
+                        <td>{% if not user.status %}Inactive{% else %}Active{% endif %}</td>
                         <td>{{ user.created_at }}</td>
                         <td>{{ user.updated_at }}</td>
                         <td class="action-btns">

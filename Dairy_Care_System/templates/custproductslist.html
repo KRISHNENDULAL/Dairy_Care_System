@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/custproductslist.css' %}">
     <style>
         body {
+            background: url('{% static "images/prolist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
         }
@@ -22,7 +23,7 @@
             <li><b><a href="#">Your Orders</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'feedbackpage' %}">Feedback</a></b></li>
+            <li><b><a href="{% url 'feedbackpage' %}">Your Feedback</a></b></li>
         </div>
         <div class="nav-item">
             <li>
