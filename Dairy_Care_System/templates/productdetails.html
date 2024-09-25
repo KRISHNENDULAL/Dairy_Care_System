@@ -111,7 +111,7 @@
         </div>
         <p>{{ product.product_description }}</p><br>
         <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
-        <p><strong>Added at:</strong> {{ product.added_at }}</p>
+        <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
         <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p><br>
         <button class="buy-button">Add to Cart</button>
     </div>
