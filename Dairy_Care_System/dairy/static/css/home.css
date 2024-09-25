@@ -43,8 +43,8 @@ h2 {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 3px;
-    font-family: 'Comic Sans MS', cursive;
+    padding: 4px;
+    font-family: 'Arial', sans-serif;
 }
 
 .nav-item {

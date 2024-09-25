@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Update Product</h2>
+    <form id="updateProductForm" method="POST" action="{% url 'updateproduct' %}">
+        {% csrf_token %}
+        
+        <!-- Dropdown to select product name -->
+        <label for="product">Product Name:</label>
+        <select id="product" name="product" required>
+            <option value="">Select Product</option>
+            {% for product in products %}
+            <option value="{{ product.id }}">{{ product.name }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <!-- Fields to show and edit product data -->
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea><br><br>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required><br><br>
+
+        <label for="unit">Unit:</label>
+        <input type="text" id="unit" name="unit" required><br><br>
+
+        <!-- No need to update photo -->
+
+        <button type="submit">Update</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // When a product is selected, fetch its data
+            $('#product').on('change', function() {
+                var productId = $(this).val();
+                if (productId) {
+                    $.ajax({
+                        url: '{% url "get_product_details" %}', // Django URL for fetching product data
+                        type: 'GET',
+                        data: {
+                            'product_id': productId
+                        },
+                        success: function(response) {
+                            // Populate the form fields with fetched data
+                            $('#description').val(response.description);
+                            $('#quantity').val(response.quantity);
+                            $('#unit').val(response.unit);
+                        },
+                        error: function() {
+                            alert('Failed to fetch product data. Please try again.');
+                        }
+                    });
+                } else {
+                    // Clear fields if no product is selected
+                    $('#description').val('');
+                    $('#quantity').val('');
+                    $('#unit').val('');
+                }
+            });
+
+            // Form submission for updating product
+            $('#updateProductForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                var formData = $(this).serialize(); // Serialize form data
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        alert('Product updated successfully!');
+                        // Optionally redirect or reset form
+                    },
+                    error: function() {
+                        alert('Failed to update product. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

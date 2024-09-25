@@ -15,6 +15,7 @@ from django.contrib.auth import logout
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 
 def home(request):
@@ -431,19 +432,70 @@ def productdetails(request, product_id):
     
 def editproduct(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        
-        # Fetch all available products and their images
-        products = Products_table.objects.filter(status=True)  # Only get available products
+        products = Products_table.objects.all()  # Fetch all products
         
         context = {
             'username': user.username,  # Pass the username to the template
-            'products': products,        # Pass the products to the template
+            'products': products,       # Pass the products to the template
         }
+        
         return render(request, 'editproduct.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
+
+def get_product_details(request, product_id):
+    product_id = request.GET.get('product_id', None)
+    if product_id:
+        product = Products_table.objects.get(product_id=product_id)
+        data = {
+            'description': product.product_description,
+            'quantity': product.product_quantity,
+            'unit': product.quantity_unit,
+        }
+        return JsonResponse(data)
+    return JsonResponse({'error': 'Product not found'}, status=404)
+
+
+def updateproduct(request, product_id):
+    if request.method == 'POST':
+        product_id = request.POST.get('product')
+        description = request.POST.get('description')
+        quantity = request.POST.get('quantity')
+        unit = request.POST.get('unit')
+
+        product = get_object_or_404(Products_table, product_id=product_id)
+        product.product_description = description
+        product.product_quantity = quantity
+        product.quantity_unit = unit
+        product.save()
+
+        # If it's an AJAX request, return JSON response
+        if request.is_ajax():
+            return JsonResponse({'message': 'Product updated successfully!'})
+
+        # If not AJAX, redirect to a page (like editproduct page)
+        return redirect('editproduct')
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def delete_product(request, product_id):
+    # Ensure that the request is a POST request
+    if request.method == "POST":
+        # Get the product object or return a 404 error if not found
+        product = get_object_or_404(Products_table, pk=product_id)
+        # Set the product status to 0 (indicating deletion)
+        product.status = 0
+        product.save()  # Save the changes to the database
+        # Redirect to the product list or some other page
+        return redirect('product_list')  # Assuming 'product_list' is the name of the URL for listing products
+
+    # If the request method is not POST, you could handle it differently (optional)
+    return redirect('product_list')
 
 
 

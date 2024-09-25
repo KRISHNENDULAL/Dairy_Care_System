@@ -8,7 +8,7 @@
     <style>
         /* Apply the background to the entire body */
         body {
-            background: url('{% static "images/userprofile.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/userprofiles.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -62,7 +62,7 @@
             min-width: 160px;
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             right: 0;
-            top: 100%; /* Position it below the header */
+            top: 100%;
             border-radius: 5px;
             z-index: 1;
         }
@@ -85,12 +85,12 @@
 
         /* Profile container */
         .profile-container {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
             width: 60%;
             margin: 50px auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -102,30 +102,27 @@
 
         .user-details {
             font-size: 18px;
-            color: black;
+            color: #333;
             margin-bottom: 30px;
+            line-height: 1.6;
         }
 
         .user-details p {
-            margin: 10px 0;
-            font-size: 16px;
+            margin: 15px 0;
+            font-size: 18px;
         }
 
-        /* Button */
-        .btn {
-            background-color: #333;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            display: inline-block;
-            text-align: center;
+        .user-details p strong {
+            color: #000;
         }
 
-        .btn:hover {
-            background-color: #555;
+
+        /* Icon styling for labels */
+        .icon {
+            margin-right: 8px;
+            color: #0066cc;
+            font-size: 20px;
+            vertical-align: middle;
         }
 
         /* Center content */
@@ -133,6 +130,22 @@
             text-align: center;
         }
 
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-container {
+                width: 85%;
+                padding: 30px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .navbar a {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -153,16 +166,15 @@
 
     <!-- Profile Container -->
     <div class="profile-container">
-        <h1>Profile</h1>
+        <h1>Profile</h1><br><br>
 
         <!-- User details -->
         <div class="user-details">
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Phone:</strong> {{ user.phone }}</p>
-            <p><strong>Role:</strong> {{ user.role }}</p>
+            <p><i class="icon fas fa-user"></i><strong>Username:</strong> {{ user.username }}</p>
+            <p><i class="icon fas fa-envelope"></i><strong>Email:</strong> {{ user.email }}</p>
+            <p><i class="icon fas fa-phone"></i><strong>Phone:</strong> {{ user.phone }}</p>
+            <p><i class="icon fas fa-user-tag"></i><strong>Role:</strong> {{ user.role }}</p>
         </div>
-
     </div>
 
 </body>

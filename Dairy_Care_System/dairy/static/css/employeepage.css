@@ -14,7 +14,7 @@ ul {
     justify-content: space-between;
     align-items: center;
     padding: 5px;
-    font-family: 'Comic Sans MS', cursive;
+    font-family: 'Arial', sans-serif;
 }
 
 .nav-item.left {
@@ -100,14 +100,14 @@ h3 {
     height: 50px;
 } */
 
-.message {
-    font-size: 60px;
+.messages {
+    font-size: 30px;
     color: #000;
     text-align: center;
     margin-top: 20px;
 }
 
-.quote {
+.quotes {
     font-style: italic;
     font-size: 20px;
     color: black;
@@ -115,11 +115,15 @@ h3 {
     margin-top: 10px;
 }
 
-.quote::before {
+.messages p {
+    font-size: 50px; /* Adjust this as needed */
+}
+
+.quotes::before {
     content: "“";
 }
 
-.quote::after {
+.quotes::after {
     content: "”";
 }
 

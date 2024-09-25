@@ -14,7 +14,7 @@ ul {
     justify-content: space-between;
     align-items: center;
     padding: 5px;
-    font-family: 'Comic Sans MS', cursive;
+    font-family: 'Arial', sans-serif;
 }
 
 .nav-item.left {

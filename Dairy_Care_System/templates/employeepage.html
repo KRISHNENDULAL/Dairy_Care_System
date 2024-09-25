@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <title>Employee Page</title>
-    <link rel="stylesheet" href="{% static 'css/customerpage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/employeepage.css' %}">
     <style>
         body {
             background: url('{% static "images/emppg.png" %}') no-repeat center center fixed;
@@ -28,13 +28,13 @@
             <li><b><a href="{% url 'productslist' %}">Products list</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'home' %}">Animals list</a></b></li>
+            <li><b><a href="#">Animals list</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'home' %}">Milk details</a></b></li>
+            <li><b><a href="#">Milk details</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'home' %}">Equipments details</a></b></li>
+            <li><b><a href="#">Equipments details</a></b></li>
         </div>
         <div class="nav-item">
             <li>
@@ -51,13 +51,13 @@
 <center>
     <!-- <h1><b>Employee Dashboard</b></h1> -->
 
-    <div class="message"></div>
+    <div class="messages"></div>
         <h1>Welcome, {{ username }}!</h1> <br><br> 
-        You are the backbone of the system. Your dedication makes everything possible.
+        <p>You are the backbone of the system. Your dedication makes everything possible.</p>
     </div><br><br>
-    <div class="quote">
+    <div class="quotes">
         The strength of the team is each individual member. The strength of each member is the team.
-    </div><br><br><br><br><br><br><br><br><br><br>
+    </div><br><br><br><br><br><br><br><br><br><br><br><br>
 
 <footer>
     <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
