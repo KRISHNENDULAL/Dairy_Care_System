@@ -17,7 +17,6 @@ from django.core.files.storage import FileSystemStorage
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from decimal import Decimal
 
 
 
@@ -79,7 +78,7 @@ def forgotpassword(request):
                 send_mail(
                     'Dairy Care System - Password Reset Request',
                     f'Hello {user.username},\n\nWe have got a password reset request.\n\nClick the link below to reset your password:\n\n{reset_link}',
-                    'your-email@example.com',  # Use the actual email configured in settings
+                    'dairycaresystem25@gmail.com',  # Use the actual email configured in settings
                     [email],
                     fail_silently=False,
                 )
@@ -374,26 +373,29 @@ def user_logout(request):
 
 def addproducts(request): 
     if request.method == 'POST':
-        product_name = request.POST.get('product_name', '').strip()
-        product_description = request.POST.get('product_description', '').strip()
-        product_quantity = request.POST.get('product_quantity', '').strip()
-        quantity_unit = request.POST.get('quantity_unit', '')
-        price = request.POST.get('price', '').strip()
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        product_quantity = request.POST.get('product_quantity')
+        quantity_unit = request.POST.get('quantity_unit')
+        
+        # Get user_id from the session
+        employee_user_id = request.session.get('user_id')  # Assuming 'user_id' is stored in the session for employees
 
-        if not product_name or not price or not product_quantity:
-            return render(request, 'your_template.html', {'error': 'All fields are required.'})
+        try:
+            # Fetch the Users_table instance
+            employee = Users_table.objects.get(user_id=employee_user_id)  # Adjust this if your Users_table uses a different field
+            
+        except Users_table.DoesNotExist:
+            messages.error(request, 'Employee not found.')
+            return redirect('productslist')  # Handle user not found
 
-    # Convert price to decimal if it is not empty
-        if price:
-            price = decimal.Decimal(price)
-
-    # Create and save the product
+        # Create a new product entry
         product = Products_table(
             product_name=product_name,
             product_description=product_description,
             product_quantity=product_quantity,
             quantity_unit=quantity_unit,
-            price=price,
+            employee=employee  # Assign the logged-in employee
         )
         product.save()
 
@@ -406,6 +408,7 @@ def addproducts(request):
         return redirect('productslist')  # Redirect to the products list page
 
     return render(request, 'addproducts.html')
+
 
 
 def productslist(request):

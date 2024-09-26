@@ -24,7 +24,7 @@
             <form id="loginForm" method="POST">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="username">Username / Email Id</label>
+                    <label for="username">Name / Email Id</label>
                     <input type="text" id="username" name="username" placeholder="Enter your username or email id">
                     <div class="error-message" id="usernameError"></div>
                 </div>
@@ -48,7 +48,8 @@
                 <hr>
                 <div class="google-signin">
                     <img src='{% static "images/google.png" %}' alt="Google Logo">
-                    <span>sign in with Google</span>
+                    <a href="{% url 'social:begin' 'google-oauth2' %}">  Sign in with Google</a>
+                    <!-- <span>sign in with Google</span> -->
                 </div>
             </form>
         </div>

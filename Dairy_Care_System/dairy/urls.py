@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', views.home,name='home'),
     path('login', views.login,name='login'),
+    path('oauth/', include('social_django.urls', namespace='social')),
     path('registration', views.registration,name='registration'),
     path('about', views.about,name='about'),
     path('contactus', views.contactus,name='contactus'),

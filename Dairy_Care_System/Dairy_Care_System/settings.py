@@ -13,10 +13,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+
+SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -39,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dairy'
+    'dairy',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +59,35 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',  
+    'social_core.pipeline.social_auth.social_uid',      
+    'social_core.pipeline.social_auth.auth_allowed',    
+    'social_core.pipeline.social_auth.social_user',     
+    'social_core.pipeline.user.get_username',          
+    'social_core.pipeline.user.create_user',          
+    'explore_app.pipeline.set_role',                     
+    'social_core.pipeline.social_auth.associate_user',  
+    'social_core.pipeline.social_auth.load_extra_data', 
+    'social_core.pipeline.user.user_details',          
+)
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = GOOGLE_OAUTH_CLIENT_ID  
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CLIENT_SECRET
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/complete/google/'
+
 
 ROOT_URLCONF = 'Dairy_Care_System.urls'
 
@@ -144,8 +181,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'dairycaresystem25@gmail.com'
-EMAIL_HOST_PASSWORD = '#####'
-DEFAULT_FROM_EMAIL = 'admin@yourdomain.com'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
+DEFAULT_FROM_EMAIL = 'dairycaresystem25@gmail.com'
 
 
 
