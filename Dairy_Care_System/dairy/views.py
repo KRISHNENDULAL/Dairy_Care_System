@@ -16,7 +16,6 @@ from django.contrib.auth import logout
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 
 
 
@@ -52,6 +51,23 @@ def registration(request):
         user = Users_table(username=username, email=email, phone=phone, password=password)
         user.save()
 
+        # Send email notification
+        subject = '🎉 Welcome to the Dairy Care System! 🎉'
+        message = f"""
+        Hello {username},
+
+        Thank you for registering with us! We are excited to have you on board.
+        Your account has been successfully created, and you can now log in.
+        
+        Important Warning: If you did not register for an account with this email address, please report it to us immediately at dairycaresystem25@gmail.com.
+        If you have any questions or need assistance, feel free to reach out to us.
+        
+        Best regards,
+        The Dairy Care System Team
+        dairycaresystem25@gmail.com
+        """
+        send_mail(subject, message, 'dairycaresystem25@gmail.com', [email])
+
         messages.success(request, 'Registration successful! Please log in.')
         return redirect('login')
 
@@ -76,8 +92,15 @@ def forgotpassword(request):
             # Send the email
             try:
                 send_mail(
-                    'Dairy Care System - Password Reset Request',
-                    f'Hello {user.username},\n\nWe have got a password reset request.\n\nClick the link below to reset your password:\n\n{reset_link}',
+                    '🔒 Dairy Care System - Password Reset Request 🔒',
+                    f'Hello {user.username},\n\n'
+                    'We received a request to reset your password for your Dairy Care System account.\n\n'
+                    'If you did not make this request, you can safely ignore this email.\n\n'
+                    f'To reset your password, please click the link below:\n\n'
+                    f'🔗 Reset Password Link: {reset_link}\n\n'
+                    'If you encounter any issues or need further assistance, feel free to contact our support team.\n\n'
+                    'Best regards,\n'
+                    'The Dairy Care System Team',
                     'dairycaresystem25@gmail.com',  # Use the actual email configured in settings
                     [email],
                     fail_silently=False,
@@ -181,9 +204,29 @@ def addemployee(request):
         login_link = f"http://{domain}/login"
 
         # Send email with login credentials
-        subject = 'Welcome to the Dairy Care System'
-        message = f"Hello {username},\n\nYour account has been created.\nUsername: {username}\nPassword: {password}\nLogin Link: {login_link}\n\nPlease log in and change your password in the profile option."
-        send_mail(subject, message, 'admin@example.com', [email])
+
+        subject = '🎉 Welcome to the Dairy Care System 🎉'
+        message = f"""
+        Hello {username},
+
+        We are pleased to inform you that your account has been successfully created!
+
+        Here are your login credentials:
+        Username: {username}
+        Password: {password}
+
+        🔗 Login Link: Click here to log in {login_link}
+
+        We recommend that you log in and change your password in the profile option to ensure your account's security.
+
+        If you have any questions or need assistance, please do not hesitate to reach out to us.
+
+        Best regards,
+        The Dairy Care System Team
+        dairycaresystem25@gmail.com
+        """
+
+        send_mail(subject, message, 'dairycaresystem25@gmail.com', [email])
 
         return redirect('addemployee')
 
@@ -198,24 +241,30 @@ def login(request):
         # Try to find the user by username or email
         user = Users_table.objects.filter(username=username_or_email).first() or Users_table.objects.filter(email=username_or_email).first()
 
-        if user and user.password == password:
-            # Store user information in session
-            request.session['user_id'] = user.user_id
-            request.session['username'] = user.username
+        # Check if user exists and their account is active
+        if user and user.status == 1:
+            if user.password == password:
+                # Store user information in session
+                request.session['user_id'] = user.user_id
+                request.session['username'] = user.username
 
-            # Redirect based on user role
-            if user.role == 'customer':
-                return redirect('customerpage')
-            elif user.role == 'employee':
-                if user.password == password:  # Assuming the random password is stored in plain text (ideally it should be hashed)
-                    return redirect('employeepage')
-            elif user.role == 'admin':
-                return redirect('adminpage')
+                # Redirect based on user role
+                if user.role == 'customer':
+                    return redirect('customerpage')
+                elif user.role == 'employee':
+                    if user.password == password:  # Assuming the random password is stored in plain text (ideally it should be hashed)
+                        return redirect('employeepage')
+                elif user.role == 'admin':
+                    return redirect('adminpage')
+            else:
+                messages.error(request, 'Invalid credentials')
         else:
-            messages.error(request, 'Invalid username/email or password')
-            return render(request, 'login.html')
+            messages.error(request, 'Your account has been deactivated')
+
+        return render(request, 'login.html')
 
     return render(request, 'login.html')
+
 
 
 def changepassword(request):
@@ -267,12 +316,18 @@ def regdeleteuser(request, user_id):
     user.status = False  # Set status to inactive
     user.save()  # Save changes to the database
     # Send email notification
-    subject = 'Account Deactivation Notification from Dairy Care System'
-    message = (f"Hello {user.username},\n\n"
-               "Your account has been deactivated.\n\n"
-               "If you believe this is an error, please contact support.\n\n\n\n"
-               "Disclaimer: This is an automated message. If you did not request this change, "
-               "please contact our support team immediately.")
+    subject = '⚠️ Account Deactivation Notification - Dairy Care System ⚠️'
+    message = (
+        f"Hello {user.username},\n\n"
+        "We want to inform you that your account has been deactivated.\n\n"
+        "If you believe this action was taken in error, please reach out to our support team at "
+        "dairycaresystem25@gmail.com for assistance.\n\n"
+        "Thank you for being a part of our community. We hope to resolve this matter quickly.\n\n"
+        "Best regards,\n"
+        "The Dairy Care System Team\n\n\n\n\n"
+        "Disclaimer: This is an automated message. If you did not request this change, please contact our support team immediately."
+    )
+
     from_email = settings.EMAIL_HOST_USER
     recipient_list = [user.email]         
 
@@ -285,12 +340,18 @@ def restoreuser(request, user_id):
     user.status = True  # Set status back to active
     user.save()  # Save changes to the database
     # Prepare email notification
-    subject = 'Account Reactivation Notification from Dairy Care System'
-    message = (f"Hello {user.username},\n\n"
-               "Your account has been reactivated.\n\n"
-               "You can now log in and continue using our services.\n\n\n\n"
-               "Disclaimer: This is an automated message. If you did not request this change, "
-               "please contact our support team immediately.")
+    subject = '🎉 Account Reactivation Notification - Dairy Care System 🎉'
+    message = (
+        f"Hello {user.username},\n\n"
+        "We are pleased to inform you that your account has been successfully reactivated.\n\n"
+        "You can now log in and continue enjoying our services without interruption.\n\n"
+        "If you have any questions or need assistance, feel free to reach out to our support team at "
+        "dairycaresystem25@gmail.com.\n\n"
+        "Best regards,\n"
+        "The Dairy Care System Team\n\n\n\n\n"
+        "Disclaimer: This is an automated message. If you did not request this change, please contact our support team immediately."
+    )
+
     from_email = settings.EMAIL_HOST_USER
     recipient_list = [user.email]
 

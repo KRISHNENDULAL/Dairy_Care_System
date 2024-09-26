@@ -1,4 +1,3 @@
-/* Navigation Bar Styles */
 ul {
     list-style-type: none;
     margin: 0;
@@ -14,8 +13,7 @@ ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 5px;
-    padding: 5px 10px;
+    padding: 5px;
     font-family: 'Arial', sans-serif;
 }
 
@@ -49,6 +47,18 @@ li a:hover {
     border-radius: 5px;
 }
 
+h1 {
+    color: black;
+    font-size: 80px;
+    margin-top: 100px;
+}
+
+h2 {
+    color: white;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
 /* Dropdown styles */
 .dropdown-content {
     display: none;
@@ -78,74 +88,92 @@ li a:hover {
     display: block;
 }
 
-/* Container & Table Styling */
-h1 {
-    text-align: center;
-    color: #000000;
-    font-size: 40px;
-    margin-top: 20px;
+/* Products container styles */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
+    gap: 60px; /* Space between items */
+    padding: 60px; /* Padding around the container */
 }
 
-.container {
-    margin: 50px auto;
-    padding: 20px;
-    width: auto; /* Allow the width to adjust based on content */
-    max-width: 90%;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
+.product {
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Prevents overflow of content */
+    display: flex;
+    flex-direction: column; /* Align children vertically */
+    justify-content: flex-start; /* Align children at the start to allow dynamic height */
     padding: 15px;
-    text-align: center;
-    font-size: 17px;
+    background-color: #fff; /* White background for products */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
 }
 
-th {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #356299;
+.product:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.product img {
+    width: 100%; /* Full width of the product container */
+    height: 250px; /* Fixed height for uniformity */
+    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    border-radius: 4px; /* Rounded corners for the image */
+}
+
+.product h3 {
+    font-size: 1.2em; /* Adjust font size */
+    margin: 10px 0; /* Margin for spacing */
+    text-align: center; /* Centering the product name */
+}
+
+.product p {
+    margin: 5px 0; /* Margin for spacing */
+    font-size: 1.1em;
+    color: #000000;
+    text-align: center; /* Centering the product name */
+}
+
+.product-container-footer {
+    margin-top: auto; /* Push the footer (like the added at date) to the bottom */
+    color: #888;
+    font-size: 0.85em;
+}
+
+.update-button, .delete-button, .restore-button {
+    padding: 10px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.update-button {
+    background-color: #ffc107;
     color: white;
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
+.update-button:hover {
+    background-color: #e0a800;
 }
 
-/* Action Buttons Styling */
-.action-btns {
-    text-align: center; /* Center-align the buttons */
+.delete-button {
+    background-color: #dc3545;
+    color: white;
 }
 
-.button-group {
-    display: inline-flex; /* Use flexbox for inline display */
-    gap: 10px; /* Add space between buttons */
-    align-items: center; /* Center buttons vertically if needed */
+.delete-button:hover {
+    background-color: #c82333;
 }
 
-.view-btn, .delete-btn {
-    padding: 5px 10px; /* Add padding to buttons for better appearance */
-    text-decoration: none; /* Remove underline */
-    color: white; /* Change text color */
+.restore-button {
+    background-color: #28a745;
+    color: white;
 }
 
-.view-btn {
-    background-color: green; /* Green background for Restore button */
-    border-radius: 5px; /* Rounded corners */
-}
-
-.delete-btn {
-    background-color: red; /* Red background for Delete button */
-    border-radius: 5px; /* Rounded corners */
+.restore-button:hover {
+    background-color: #218838;
 }
 
 /* Modal Styles */

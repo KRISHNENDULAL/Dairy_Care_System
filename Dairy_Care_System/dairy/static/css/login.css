@@ -48,7 +48,7 @@ h2 {
     border-radius: 5px;
     color: white;
     padding: 10px;
-    font-size: 18px;
+    font-size: 22px;
     cursor: pointer;
     width: 100%;
 }
@@ -96,6 +96,6 @@ h2 {
 
 .error-message {
     color: red;
-    font-size: 0.9em;
+    font-size: 18px;
     margin-top: 5px;
 }

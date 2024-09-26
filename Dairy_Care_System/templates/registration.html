@@ -13,6 +13,51 @@
             font-family: Arial, sans-serif;
         }
     </style>
+    
+    
+    
+</head>
+<body>
+    <a href="{% url 'home' %}" class="home-link">
+        <img src="{% static 'images/homeblue.jpg' %}" alt="Home">
+    </a>
+    <div class="container">
+        <div class="login-box">
+            <h2><b>Register</b></h2>
+            <form id="registrationForm" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Name</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your name">
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email">
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+                    <div class="error-message" id="phoneError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password">
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                <button type="submit">Register</button>
+                <p class="no-account">Already have an account? <a href="login">Log in</a></p>
+                <hr>
+                <div class="google-signin">
+                    <img src='{% static "images/google.png" %}' alt="Google Logo">
+                    <a href="{% url 'social:begin' 'google-oauth2' %}">  Sign in with Google</a>
+                </div>
+            </form>
+            <div class="success-message" id="successMessage"></div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById('registrationForm');
@@ -108,47 +153,5 @@
         });
     </script>
     
-    
-</head>
-<body>
-    <a href="{% url 'home' %}" class="home-link">
-        <img src="{% static 'images/homeblue.jpg' %}" alt="Home">
-    </a>
-    <div class="container">
-        <div class="login-box">
-            <h2><b>Register</b></h2>
-            <form id="registrationForm" method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="username">Name</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your name">
-                    <div class="error-message" id="usernameError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email">
-                    <div class="error-message" id="emailError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
-                    <div class="error-message" id="phoneError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password">
-                    <div class="error-message" id="passwordError"></div>
-                </div>
-                <button type="submit">Register</button>
-                <p class="no-account">Already have an account? <a href="login">Log in</a></p>
-                <hr>
-                <div class="google-signin">
-                    <img src='{% static "images/google.png" %}' alt="Google Logo">
-                    <span>Sign in with Google</span>
-                </div>
-            </form>
-            <div class="success-message" id="successMessage"></div>
-        </div>
-    </div>
 </body>
 </html>
