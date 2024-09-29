@@ -27,6 +27,7 @@
                 <b><a href="#">{{ username }}</a></b>
                 <div class="dropdown-content">
                     <a href="{% url 'userprofile' %}">Profile</a>
+                    <a href="{% url 'adminpage' %}">Back</a>
                     <a href="{% url 'logout' %}">Logout</a>
                 </div>
             </li>
@@ -43,11 +44,13 @@
             <h3>{{ product.product_name }}</h3>
             <p>{{ product.product_description }}</p><br>
             <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
+            <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
             <p><strong>Added by:</strong> {{ product.employee.username }}</p>
-            <p><strong>Added at:</strong> {{ product.added_at }}</p><br><br>
+            <p><strong>Added at:</strong> {{ product.added_at }}</p>
+            <p><strong>Updated at:</strong> {{ product.updated_at }}</p><br><br>
             <div class="button-group" style="display: flex; justify-content: space-between;">
-                <a href="#" class="update-button">Update</a>
+                <a href="{% url 'updateproduct' product.product_id %}" class="update-button">Update</a>
                 
                 {% if product.status %}
                     <a href="#" onclick="openModal('delete', '{% url 'deleteproduct' product.product_id %}', '{{ product.product_name }}');" class="delete-button"><b>Delete</b></a>

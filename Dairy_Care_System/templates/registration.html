@@ -13,9 +13,6 @@
             font-family: Arial, sans-serif;
         }
     </style>
-    
-    
-    
 </head>
 <body>
     <a href="{% url 'home' %}" class="home-link">
@@ -78,7 +75,6 @@
     
             // Function to validate phone number (must start with 6, 7, 8, or 9)
             function validatePhoneNumber(phoneNumber) {
-                // Ensure phone starts with 6, 7, 8, or 9, is 10 digits, and is not the same number repeated 10 times
                 return /^[6-9]\d{9}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
             }
     
@@ -87,6 +83,48 @@
                 return /^[a-zA-Z]+$/.test(username);
             }
     
+            // Function to validate password
+            function validatePassword(password) {
+                const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+                return passwordPattern.test(password);
+            }
+    
+            // Email validation pattern
+            const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+
+            // Live validation functions
+            username.addEventListener('input', function() {
+                if (validateUsername(username.value.trim())) {
+                    clearError('usernameError');
+                } else {
+                    showError('Username can only contain alphabets.', 'usernameError');
+                }
+            });
+
+            email.addEventListener('input', function() {
+                if (emailPattern.test(email.value.trim())) {
+                    clearError('emailError');
+                } else {
+                    showError('Enter a valid email id.', 'emailError');
+                }
+            });
+
+            phone.addEventListener('input', function() {
+                if (validatePhoneNumber(phone.value.trim())) {
+                    clearError('phoneError');
+                } else {
+                    showError('Phone number must be 10 digits, start with 6, 7, 8, or 9, and cannot be the same number repeated.', 'phoneError');
+                }
+            });
+
+            password.addEventListener('input', function() {
+                if (validatePassword(password.value.trim())) {
+                    clearError('passwordError');
+                } else {
+                    showError('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.', 'passwordError');
+                }
+            });
+
             // General validation for field dependencies
             function validateFieldsBefore(field, dependentField, errorElementId) {
                 field.addEventListener('focus', function() {
@@ -103,24 +141,19 @@
             validateFieldsBefore(email, username, 'emailError');
             validateFieldsBefore(phone, email, 'phoneError');
             validateFieldsBefore(password, phone, 'passwordError');
-    
+
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
                 let valid = true;
     
-                // Username validation (only alphabets)
-                if (username.value.trim() === "") {
-                    showError('Username is required.', 'usernameError');
-                    valid = false;
-                } else if (!validateUsername(username.value.trim())) {
+                // Final check before submission
+                if (!validateUsername(username.value.trim())) {
                     showError('Username can only contain alphabets.', 'usernameError');
                     valid = false;
                 } else {
                     clearError('usernameError');
                 }
     
-                // Email validation
-                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
                 if (!emailPattern.test(email.value.trim())) {
                     showError('Enter a valid email id.', 'emailError');
                     valid = false;
@@ -128,7 +161,6 @@
                     clearError('emailError');
                 }
     
-                // Phone validation (10 digits, starts with 6, 7, 8, or 9, and not the same number repeated)
                 if (!validatePhoneNumber(phone.value.trim())) {
                     showError('Phone number must be 10 digits, start with 6, 7, 8, or 9, and cannot be the same number repeated.', 'phoneError');
                     valid = false;
@@ -136,22 +168,18 @@
                     clearError('phoneError');
                 }
     
-                // Password validation
-                const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-                if (!passwordPattern.test(password.value.trim())) {
+                if (!validatePassword(password.value.trim())) {
                     showError('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.', 'passwordError');
                     valid = false;
                 } else {
                     clearError('passwordError');
                 }
     
-                // If any validation fails, prevent form submission
                 if (!valid) {
                     event.preventDefault();
                 }
             });
         });
     </script>
-    
 </body>
 </html>

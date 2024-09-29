@@ -73,14 +73,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',    
     'social_core.pipeline.social_auth.social_user',     
     'social_core.pipeline.user.get_username',          
-    'social_core.pipeline.user.create_user',          
-    'explore_app.pipeline.set_role',                     
+    'social_core.pipeline.user.create_user',                              
     'social_core.pipeline.social_auth.associate_user',  
     'social_core.pipeline.social_auth.load_extra_data', 
     'social_core.pipeline.user.user_details',          
 )
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'customerpage'
 LOGOUT_REDIRECT_URL = '/'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = GOOGLE_OAUTH_CLIENT_ID  
@@ -187,8 +186,8 @@ DEFAULT_FROM_EMAIL = 'dairycaresystem25@gmail.com'
 
 
 # settings.py
-LOGIN_REDIRECT_URL = '/login/'
-LOGOUT_REDIRECT_URL = 'home/'
+# LOGIN_REDIRECT_URL = '/login/'
+# LOGOUT_REDIRECT_URL = 'home/'
 
 
 STATICFILES_DIRS = [

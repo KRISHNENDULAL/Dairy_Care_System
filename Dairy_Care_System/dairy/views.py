@@ -438,6 +438,7 @@ def addproducts(request):
         product_description = request.POST.get('product_description')
         product_quantity = request.POST.get('product_quantity')
         quantity_unit = request.POST.get('quantity_unit')
+        product_price = request.POST.get('product_price')  # Get the price from the POST data
         
         # Get user_id from the session
         employee_user_id = request.session.get('user_id')  # Assuming 'user_id' is stored in the session for employees
@@ -456,6 +457,7 @@ def addproducts(request):
             product_description=product_description,
             product_quantity=product_quantity,
             quantity_unit=quantity_unit,
+            product_price=product_price,  # Add price to the product instance
             employee=employee  # Assign the logged-in employee
         )
         product.save()
@@ -532,6 +534,35 @@ def editproduct(request):
         return render(request, 'editproduct.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+    
+
+
+def updateproduct(request, product_id):
+    product = Products_table.objects.get(product_id=product_id)
+    images = ProductImage.objects.filter(product=product)
+
+    if request.method == 'POST':
+        product.product_name = request.POST.get('product_name')
+        product.product_description = request.POST.get('product_description')
+        product.product_quantity = request.POST.get('product_quantity')
+        product.quantity_unit = request.POST.get('quantity_unit')
+        product.product_price = request.POST.get('product_price')
+        product.save()
+
+        # Handle new image upload
+        product_photo = request.FILES.get('product_images')  # Ensure this matches your input name
+        if product_photo:
+            # Delete existing images
+            ProductImage.objects.filter(product=product).delete()  # Delete all old images
+            ProductImage.objects.create(product=product, image=product_photo)  # Add new image
+
+        return redirect('editproduct')  # Redirect to a detail page after update
+
+    context = {
+        'product': product,
+        'images': images,
+    }
+    return render(request, 'updateproduct.html', context)
 
 
 def deleteproduct(request, product_id):

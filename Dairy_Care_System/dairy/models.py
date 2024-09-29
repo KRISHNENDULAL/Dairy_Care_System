@@ -42,6 +42,7 @@ class Products_table(models.Model):
     product_description = models.TextField()           # Product Description
     product_quantity = models.DecimalField(max_digits=10, decimal_places=2)  # Quantity
     quantity_unit = models.CharField(max_length=20)   # Unit of measurement
+    product_price = models.DecimalField(max_digits=10, decimal_places=2)  # Price field
     employee = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)         # 1 if available, else 0
     added_at = models.DateTimeField(auto_now_add=True) # Timestamp for when the product is added

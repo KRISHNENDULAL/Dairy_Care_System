@@ -11,6 +11,50 @@
             font-family: Arial, sans-serif;
         }
     </style>
+    
+</head>
+<body><br><br><br>
+    <div class="container">
+        <a href="{% url 'adminpage' %}" class="back-link">BACK</a>
+        <div class="login-box">
+            <h2>Add Employee</h2><br>
+            <form id="employeeForm" method="post">
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="username">Name:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your name">
+                    <div id="usernameError" class="error-message"></div>
+                </div>
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email">
+                    <div id="emailError" class="error-message"></div>
+                </div>
+                
+                <!-- Phone Field -->
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
+                    <div id="phoneError" class="error-message"></div>
+                </div><br>
+                
+                <!-- Submit Button -->
+                <button type="submit">Add Employee</button>
+            </form><br><br>
+            
+            <!-- Display success/error messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById('employeeForm');
@@ -59,6 +103,38 @@
             validateFieldsBefore(email, username, 'emailError');
             validateFieldsBefore(phone, email, 'phoneError');
 
+            // Add live validation
+            username.addEventListener('input', function() {
+                if (username.value.trim() === "") {
+                    showError('Username is required.', 'usernameError');
+                } else if (!validateUsername(username.value.trim())) {
+                    showError('Username can only contain alphabets.', 'usernameError');
+                } else {
+                    clearError('usernameError');
+                }
+            });
+
+            email.addEventListener('input', function() {
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+                if (email.value.trim() === "") {
+                    showError('Email is required.', 'emailError');
+                } else if (!emailPattern.test(email.value.trim())) {
+                    showError('Enter a valid email id.', 'emailError');
+                } else {
+                    clearError('emailError');
+                }
+            });
+
+            phone.addEventListener('input', function() {
+                if (phone.value.trim() === "") {
+                    showError('Phone number is required.', 'phoneError');
+                } else if (!validatePhoneNumber(phone.value.trim())) {
+                    showError('Phone number must be 10 digits, start with 6, 7, 8, or 9, and cannot be the same number repeated.', 'phoneError');
+                } else {
+                    clearError('phoneError');
+                }
+            });
+
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
                 let valid = true;
@@ -98,47 +174,6 @@
             });
         });
     </script>
-</head>
-<body><br><br><br>
-    <div class="container">
-        <a href="{% url 'adminpage' %}" class="back-link">BACK</a>
-        <div class="login-box">
-            <h2>Add Employee</h2><br>
-            <form id="employeeForm" method="post">
-                {% csrf_token %}
-                
-                <!-- Username Field -->
-                <div class="form-group">
-                    <label for="username">Name:</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your name">
-                    <div id="usernameError" class="error-message"></div>
-                </div>
-                
-                <!-- Email Field -->
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email">
-                    <div id="emailError" class="error-message"></div>
-                </div>
-                
-                <!-- Phone Field -->
-                <div class="form-group">
-                    <label for="phone">Phone:</label>
-                    <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
-                    <div id="phoneError" class="error-message"></div>
-                </div><br>
-                
-                <!-- Submit Button -->
-                <button type="submit">Add Employee</button>
-            </form><br><br>
-            
-            <!-- Display success/error messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
+    
 </body>
 </html>

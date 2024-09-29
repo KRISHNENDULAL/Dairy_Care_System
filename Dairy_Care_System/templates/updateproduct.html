@@ -1,89 +1,154 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Product</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/updateproduct.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('{% static "images/prolist.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 30px;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 15px;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        input[type="text"],
+        textarea,
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #797f00;
+            color: white;
+            border: none;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #105314;
+            transform: translateY(-2px);
+        }
+
+        .image-preview {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .no-image {
+            color: #f00; /* Red color for no image message */
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .current-images {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .image-container img {
+            margin: 5px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
-    <h2>Update Product</h2>
-    <form id="updateProductForm" method="POST" action="{% url 'updateproduct' %}">
-        {% csrf_token %}
-        
-        <!-- Dropdown to select product name -->
-        <label for="product">Product Name:</label>
-        <select id="product" name="product" required>
-            <option value="">Select Product</option>
-            {% for product in products %}
-            <option value="{{ product.id }}">{{ product.name }}</option>
-            {% endfor %}
-        </select><br><br>
+    <div class="container">
+        <h2>Update Product: {{ product.product_name }}</h2><br>
+        <form method="POST" action="{% url 'updateproduct' product.product_id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required>
 
-        <!-- Fields to show and edit product data -->
-        <label for="description">Description:</label>
-        <textarea id="description" name="description"></textarea><br><br>
+            <label for="product_description">Description:</label>
+            <textarea id="product_description" name="product_description" required>{{ product.product_description }}</textarea>
 
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" required><br><br>
+            <label for="quantity">Quantity:</label>
+            <input type="text" id="quantity" name="product_quantity" value="{{ product.product_quantity }}" required>
 
-        <label for="unit">Unit:</label>
-        <input type="text" id="unit" name="unit" required><br><br>
+            <label for="quantityUnit">Unit:</label>
+            <select id="quantityUnit" name="quantity_unit" class="unit-select" required>
+                <option value="" disabled {% if product.quantity_unit == "" %}selected{% endif %}>Select Unit</option>
+                <option value="litres" {% if product.quantity_unit == 'litres' %}selected{% endif %}>Litres</option>
+                <option value="ml" {% if product.quantity_unit == 'ml' %}selected{% endif %}>Millilitres (ml)</option>
+                <option value="kg" {% if product.quantity_unit == 'kg' %}selected{% endif %}>Kilograms (kg)</option>
+                <option value="g" {% if product.quantity_unit == 'g' %}selected{% endif %}>Grams (g)</option>
+            </select>
 
-        <!-- No need to update photo -->
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="product_price" value="{{ product.product_price }}" required>
 
-        <button type="submit">Update</button>
-    </form>
+            <label for="current_images">Current Images:</label>
+            <div class="current-images">
+                {% if images %}
+                    <div class="image-container">
+                        {% for image in images %}
+                            <img src="{{ image.image.url }}" alt="Product Image" class="image-preview">
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="no-image">No image uploaded.</p>
+                {% endif %}
+            </div>
 
-    <script>
-        $(document).ready(function() {
-            // When a product is selected, fetch its data
-            $('#product').on('change', function() {
-                var productId = $(this).val();
-                if (productId) {
-                    $.ajax({
-                        url: '{% url "get_product_details" %}', // Django URL for fetching product data
-                        type: 'GET',
-                        data: {
-                            'product_id': productId
-                        },
-                        success: function(response) {
-                            // Populate the form fields with fetched data
-                            $('#description').val(response.description);
-                            $('#quantity').val(response.quantity);
-                            $('#unit').val(response.unit);
-                        },
-                        error: function() {
-                            alert('Failed to fetch product data. Please try again.');
-                        }
-                    });
-                } else {
-                    // Clear fields if no product is selected
-                    $('#description').val('');
-                    $('#quantity').val('');
-                    $('#unit').val('');
-                }
-            });
+            <label for="product_images">Upload New Image (Optional):</label>
+            <input type="file" id="product_images" name="product_images">
 
-            // Form submission for updating product
-            $('#updateProductForm').on('submit', function(event) {
-                event.preventDefault(); // Prevent default form submission
-                var formData = $(this).serialize(); // Serialize form data
-
-                $.ajax({
-                    url: $(this).attr('action'), // Form action URL
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        alert('Product updated successfully!');
-                        // Optionally redirect or reset form
-                    },
-                    error: function() {
-                        alert('Failed to update product. Please try again.');
-                    }
-                });
-            });
-        });
-    </script>
+            <button type="submit">Update</button>
+        </form>
+    </div>
 </body>
 </html>
