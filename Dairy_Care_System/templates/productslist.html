@@ -209,6 +209,34 @@
             background-color: darkgreen;
             transform: scale(1.05); /* Slightly enlarge button on hover */
         }
+
+        /* Style for search bar */
+        .search-bar-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .search-bar {
+            padding: 10px;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: #797f00;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-button:hover {
+            background-color: #105314;
+        }
     
     </style>
 </head>
@@ -233,6 +261,16 @@
         </div>
     </div>
 </ul>
+
+<!-- Search Bar -->
+<center>
+    <div class="search-bar-container">
+        <form method="GET" action="{% url 'productslist' %}">
+            <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+</center>
 
 <div class="products-container">
     {% for product in products %}

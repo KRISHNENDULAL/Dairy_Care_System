@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Animal</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Resetting some basic styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f0f0f0, #e2e2e2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            color: #000000;
+            margin-bottom: 25px;
+            font-size: 26px;
+            letter-spacing: 1px;
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+
+        form {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #000000;
+            font-size: 15px;
+        }
+
+        input[type="text"], input[type="date"], input[type="number"], select, .form-control-file {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, .form-control-file:focus {
+            outline: none;
+            border-color: #007bff;
+            background-color: #fff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #042f5d;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .image-preview {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .image-preview img {
+            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 10px; /* Add some space above the image preview */
+            max-width: 300px; /* Limit the width of the preview image */
+            max-height: 300px; /* Limit the height of the preview image */
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+        }
+
+        /* Enhancing the look of the select dropdowns */
+        select {
+            appearance: none;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-chevron-down'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
+            background-color: #f9f9f9;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <center><h2>Add Animal</h2></center>
+        <form method="post" enctype="multipart/form-data" action="{% url 'addanimal' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="animal_name">Animal Name</label>
+                <input type="text" id="animal_name" name="animal_name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="animal_type">Animal Category</label>
+                <select id="animal_type" name="animal_type" class="form-control" required>
+                    <option value="">Select Animal Category</option>
+                    <option value="Cow">Cow</option>
+                    <option value="Goat">Goat</option>
+                    <option value="Buffalo">Buffalo</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="breed">Breed</label>
+                <select id="breed" name="breed" class="form-control" required>
+                    <option value="">Select Breed</option>
+                    <optgroup label="Cow Breeds">
+                        <option value="Holstein">Holstein Friesian</option>
+                        <option value="Jersey">Jersey</option>
+                        <option value="Ayrshire">Vechur cow</option>
+                        <option value="Ayrshire">Red Sindhi</option>
+                        <option value="Ayrshire">Kuri</option>
+                    </optgroup>
+                    <optgroup label="Goat Breeds">
+                        <option value="Boer">Jamunapari</option>
+                        <option value="Boer">Malabari</option>
+                        <option value="Boer">Boer</option>
+                        <option value="Alpine">Alpine</option>
+                        <option value="Nubian">Nubian</option>
+                    </optgroup>
+                    <optgroup label="Buffalo Breeds">
+                        <option value="Murrah">Murrah</option>
+                        <option value="Jaffarabadi">Jaffarabadi</option>
+                        <option value="Nili Ravi">Nili Ravi</option>
+                        <option value="Jaffarabadi">Pandharpuri</option>
+                        <option value="Jaffarabadi">Surti</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date_of_birth">Date of Birth</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" class="form-control" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="milk_capacity">Milk Capacity (liters/day)</label>
+                <input type="number" id="milk_capacity" name="milk_capacity" step="0.1" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="animal_images">Upload Animal Images</label>
+                <input type="file" id="animal_images" name="animal_images" class="form-control-file" multiple onchange="previewImages()">
+            </div>
+
+            <div class="image-preview" id="imagePreview"></div><br><br>
+
+            <button type="submit" class="btn btn-primary">Add Animal</button>
+        </form>
+    </div>
+
+    <script src="{% static 'js/validation.js' %}"></script>
+    <script>
+        function previewImages() {
+            var preview = document.getElementById('imagePreview');
+            preview.innerHTML = ''; // Clear any existing images
+            var files = document.getElementById('animal_images').files;
+            
+            if (files) {
+                Array.from(files).forEach(function(file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var img = document.createElement('img');
+                        img.src = e.target.result;
+                        preview.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

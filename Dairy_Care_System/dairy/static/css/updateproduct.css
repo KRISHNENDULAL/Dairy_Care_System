@@ -1,15 +1,20 @@
 .container {
     max-width: 600px;
-    margin: auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-left: 100px;
+    background: rgba(251, 238, 214, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    float: left; /* Aligns the container to the right */
+}
+
+h1, h2 {
+    text-align: center;
+    color: #000000;
 }
 
 h1 {
-    text-align: center;
-    color: #333;
+    margin-bottom: 20px;
 }
 
 .form-group {
@@ -18,9 +23,10 @@ h1 {
 
 label {
     display: block;
-    margin-bottom: 5px;
+    font-size: 15px;
+    margin: 10px 0 5px;
     font-weight: bold;
-    color: #555;
+    color: #000000;
 }
 
 input[type="text"],
@@ -29,10 +35,12 @@ input[type="file"],
 select,
 textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     box-sizing: border-box;
+    margin-bottom: 15px;
+    font-size: 16px;
     transition: border-color 0.3s;
 }
 
@@ -44,21 +52,25 @@ textarea:focus {
     outline: none;
 }
 
-button.btn {
-    background-color: #4CAF50;
+button {
+    background-color: #797f00;
     color: white;
-    padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+    font-size: 18px;
+    margin: 10px 0;
     cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
     width: 100%;
-    font-size: 16px;
-    transition: background-color 0.3s;
 }
 
-button.btn:hover {
-    background-color: #45a049;
+button:hover {
+    background-color: #105314;
+    transform: translateY(-2px);
 }
+
 
 .alert {
     background-color: #f44336;
@@ -77,14 +89,49 @@ button.btn:hover {
     height: auto;
 }
 
+/* Styling for the back link in the upper left corner */
 .back-link {
-    display: inline-block;
-    margin-top: 20px;
+    position: absolute;
+    top: 20px;
+    right: 90px;
+    font-size: 30px;
+    color: black;
     text-decoration: none;
-    color: #4CAF50;
-    font-weight: bold;
+    font-family: 'Comic Sans MS', cursive;
 }
 
 .back-link:hover {
     text-decoration: underline;
+}
+
+.image-preview {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: block;
+}
+
+.no-image {
+    color: #f00; /* Red color for no image message */
+    font-weight: bold;
+    text-align: center;
+}
+
+.current-images {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.image-container img {
+    margin: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }

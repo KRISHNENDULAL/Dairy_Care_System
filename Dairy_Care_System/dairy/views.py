@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage
+from .models import Users_table, Products_table, ProductImage, Animals_table, AnimalImages
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password
@@ -476,36 +476,58 @@ def addproducts(request):
 
 def productslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
-        # Fetch all products and their images, along with the employee who added them
-        products = Products_table.objects.filter(status=True).select_related('employee')  # Assuming 'added_by' is the foreign key to Users_table
+        # Get the search query from the GET request (if any)
+        search_query = request.GET.get('search', '')
+        
+        # If a search query exists, filter products based on the search term and their status
+        if search_query:
+            products = Products_table.objects.filter(product_name__icontains=search_query, status=True).select_related('employee')
+        else:
+            # Fetch all available products and the related employee who added them
+            products = Products_table.objects.filter(status=True).select_related('employee')
         
         context = {
             'username': user.username,  # Pass the username to the template
-            'products': products,        # Pass the products to the template
+            'products': products,       # Pass the filtered or all products to the template
+            'search_query': search_query,  # Pass the search query to retain the input value in the search bar
         }
+        
         return render(request, 'productslist.html', context)
+    
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
     
 
 def custproductslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
-        # Fetch all products and their images
-        products = Products_table.objects.filter(status=True)  # Only get available products
+        search_query = request.GET.get('search', '')  # Get the search query from the GET request
+        
+        # If a search query exists, filter the products based on the search term
+        if search_query:
+            products = Products_table.objects.filter(product_name__icontains=search_query, status=True)
+        else:
+            # Fetch all available products if no search query is provided
+            products = Products_table.objects.filter(status=True)
         
         context = {
             'username': user.username,  # Pass the username to the template
-            'products': products,        # Pass the products to the template
+            'products': products,       # Pass the filtered or all products to the template
+            'search_query': search_query,  # Pass the search query to the template (optional for retaining input value)
         }
         return render(request, 'custproductslist.html', context)
+    
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
     
 
 def productdetails(request, product_id):
@@ -521,19 +543,31 @@ def productdetails(request, product_id):
     
 def editproduct(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    
+
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        products = Products_table.objects.all()  # Fetch all products
-        
+
+        # Get the search query from the GET request (if any)
+        search_query = request.GET.get('search', '')
+
+        # If a search query exists, filter products based on the search term
+        if search_query:
+            products = Products_table.objects.filter(product_name__icontains=search_query)
+        else:
+            # Fetch all products if no search query is provided
+            products = Products_table.objects.all()
+
         context = {
             'username': user.username,  # Pass the username to the template
-            'products': products,       # Pass the products to the template
+            'products': products,       # Pass the filtered or all products to the template
+            'search_query': search_query,  # Pass the search query to retain the input value in the search bar
         }
-        
+
         return render(request, 'editproduct.html', context)
+
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
     
 
 
@@ -576,6 +610,68 @@ def restoreproduct(request, product_id):
     product.status = True  # Set status to 1 (active)
     product.save()
     return redirect('editproduct')  # Redirect to the product listing page
+
+
+
+def animalslist(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        
+        # Fetch all animals with their related images
+        animals = Animals_table.objects.prefetch_related('animal_images').all()
+        
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'animals': animals,          # Pass the list of animals to the template
+        }
+        return render(request, 'animalslist.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+
+def addanimal(request):
+    if request.method == 'POST':
+        # Fetch form data
+        animal_name = request.POST.get('animal_name')
+        animal_category = request.POST.get('animal_type')
+        breed = request.POST.get('breed')
+        date_of_birth = request.POST.get('date_of_birth') if request.POST.get('date_of_birth') else None
+        gender = request.POST.get('gender')
+        milk_capacity = request.POST.get('milk_capacity') if request.POST.get('milk_capacity') else None
+        
+        # Fetch the currently logged-in user as 'added_by' (assuming the user is logged in)
+        added_by = Users_table.objects.get(user_id=request.session.get('user_id'))  # Ensure the user is fetched from session
+
+        # Create a new animal record
+        animal = Animals_table.objects.create(
+            animal_name=animal_name,
+            animal_category=animal_category,
+            breed=breed,
+            date_of_birth=date_of_birth,
+            gender=gender,
+            milk_capacity=milk_capacity,
+            added_by=added_by  # Ensure added_by is correctly assigned
+        )
+
+        # Handle multiple file uploads
+        if request.FILES.getlist('animal_images'):
+            for img in request.FILES.getlist('animal_images'):
+                animal_image = AnimalImages(
+                    animal=animal,
+                    animal_image=img
+                )
+                animal_image.save()
+
+        # Add a success message
+        # messages.success(request, 'Animal added successfully!')
+
+        # Redirect to the animals list page
+        return redirect('animalslist')
+
+    # If GET request, render the form page
+    return render(request, 'addanimal.html')
+
 
 
 

@@ -81,3 +81,15 @@ button:hover {
     text-align: center; /* Center align error messages */
 }
 
+.error-message {
+    color: red; /* Set error messages to red */
+    text-align: center; /* Center align error messages */
+    margin-top: 5px; /* Add some spacing above the error messages */
+}
+
+.image-preview {
+    margin-top: 10px; /* Add some space above the image preview */
+    max-width: 300px; /* Limit the width of the preview image */
+    max-height: 300px; /* Limit the height of the preview image */
+    display: none; /* Hide the image by default */
+}

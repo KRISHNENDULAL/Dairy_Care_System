@@ -31,7 +31,10 @@ urlpatterns = [
     path('editproduct', views.editproduct, name='editproduct'),
     path('updateproduct/<int:product_id>/', views.updateproduct, name='updateproduct'),
     path('deleteproduct/<int:product_id>/',views.deleteproduct, name='deleteproduct'),
-    path('restoreproduct/<int:product_id>/',views.restoreproduct, name='restoreproduct')
+    path('restoreproduct/<int:product_id>/',views.restoreproduct, name='restoreproduct'),
+    path('animalslist',views.animalslist,name='animalslist'),
+    path('addanimal', views.addanimal, name='addanimal'),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

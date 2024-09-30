@@ -132,3 +132,63 @@ footer {
     margin-top: 20px;
     color: black;
 }
+
+/* Style for side navigation */
+.sidenav {
+    height: 100%; /* Full-height */
+    width: 0; /* Initial width of 0 (hidden) */
+    position: fixed; /* Fixed position */
+    z-index: 1; /* Sit on top */
+    top: 0;
+    left: 0;
+    background-color: #111; /* Black background color */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    transition: 0.5s; /* Transition effect for smooth opening/closing */
+    padding-top: 60px; /* Padding on top */
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #ffffff;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* Hamburger icon inside the navigation bar */
+.hamburger {
+    font-size: 30px;
+    cursor: pointer;
+    padding: 2px;
+    color: white;
+}
+
+
+/* When the side navigation is opened */
+#mySidenav {
+    width: 0;
+}
+
+/* When the navigation bar is expanded */
+#mySidenav.open {
+    width: 250px;
+}
+
+/* Main content (optional: can shift to the right when the sidebar opens) */
+body.active {
+    margin-left: 250px;
+    transition: margin-left 0.5s;
+}

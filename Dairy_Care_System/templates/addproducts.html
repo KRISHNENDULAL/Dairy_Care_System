@@ -19,11 +19,6 @@
             min-height: 100vh;
         }
 
-        .error-message {
-            color: red; /* Set error messages to red */
-            text-align: center; /* Center align error messages */
-            margin-top: 5px; /* Add some spacing above the error messages */
-        }
     </style>
     
 </head>
@@ -60,8 +55,11 @@
     <div id="priceError" class="error-message"></div>
 
     <label for="productPhoto">Upload Photo:</label>
-    <input type="file" name="product_images">
+    <input type="file" name="product_images" accept="image/*">
     <div id="photoError" class="error-message"></div> <!-- Added error message for photo upload -->
+    
+    <!-- Image preview element -->
+    <img id="imagePreview" class="image-preview" alt="Selected Image Preview"><br><br>
 
     <button type="submit">Add Product</button>
 </form>
@@ -75,6 +73,7 @@
         const quantityUnit = document.getElementById('quantityUnit');
         const productPrice = document.getElementById('productPrice');
         const productPhoto = document.querySelector('input[name="product_images"]');
+        const imagePreview = document.getElementById('imagePreview');
 
         // Function to show error
         function showError(message, elementId) {
@@ -168,8 +167,16 @@
         productPhoto.addEventListener('change', function() {
             if (!productPhoto.files.length) {
                 showError('Please choose a photo to upload.', 'photoError');
+                imagePreview.style.display = 'none'; // Hide the image preview if no file
             } else {
                 clearError('photoError');
+                const file = productPhoto.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result; // Set the image source to the file
+                    imagePreview.style.display = 'block'; // Show the image preview
+                }
+                reader.readAsDataURL(file); // Read the file as a data URL
             }
         });
 
@@ -211,6 +218,11 @@
                 valid = false;
             }
 
+            if (productPrice.value.trim() === "" || !validatePrice(productPrice.value.trim())) {
+                showError('Price is required and must be between 1 and 2000.', 'priceError');
+                valid = false;
+            }
+
             if (quantityUnit.value === "") {
                 showError('Please select a unit.', 'unitError');
                 valid = false;
@@ -221,18 +233,12 @@
                 valid = false;
             }
 
-            if (productPrice.value.trim() === "" || !validatePrice(productPrice.value.trim())) {
-                showError('Please enter a valid price.', 'priceError');
-                valid = false;
-            }
-
-            // If any validation fails, prevent form submission
+            // Prevent form submission if any field is invalid
             if (!valid) {
                 event.preventDefault();
             }
         });
     });
 </script>
-
 </body>
 </html>

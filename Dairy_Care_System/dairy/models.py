@@ -63,3 +63,46 @@ class ProductImage(models.Model):
     
 
 
+class Animals_table(models.Model):
+    animal_id = models.AutoField(primary_key=True)
+    animal_name = models.CharField(max_length=100)
+    animal_category = models.CharField(max_length=50)  # E.g., Cow, Buffalo, etc.
+    breed = models.CharField(max_length=100, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)  # Gender of the animal
+    milk_capacity = models.FloatField(blank=True, null=True)  # Milk capacity in liters per day
+    added_by = models.ForeignKey(Users_table, on_delete=models.SET_NULL, null=True)  # Employee managing the animal
+    status = models.BooleanField(default=True)  # Active or inactive
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.animal_name
+
+
+# Animal Images Table (Multiple images can be associated with each animal)
+class AnimalImages(models.Model):
+    image_id = models.AutoField(primary_key=True)
+    animal = models.ForeignKey(Animals_table, related_name='images', on_delete=models.CASCADE)  # ForeignKey to the Animals_table
+    animal_image = models.ImageField(upload_to='animal_images/')  # Image upload path
+    uploaded_at = models.DateTimeField(auto_now_add=True)  # Date when the image was uploaded
+
+    def __str__(self):
+        return f"Image for {self.animal.animal_name}"
+
+
+class AnimalHealth_table(models.Model):
+    health_id = models.AutoField(primary_key=True)
+    animal = models.ForeignKey(Animals_table, related_name='health_records', on_delete=models.CASCADE)  # ForeignKey to the Animals_table
+    checkup_date = models.DateField()  # Date of the health checkup
+    health_status = models.TextField()  # Details about the current health status
+    vaccinations = models.CharField(max_length=255, blank=True, null=True)  # List of vaccinations (comma-separated)
+    treatment_details = models.TextField(blank=True, null=True)  # Details of any treatments or medication
+    veterinarian_name = models.CharField(max_length=100)  # Name of the vet who performed the checkup
+    next_checkup_date = models.DateField(blank=True, null=True)  # Date for the next health checkup
+    added_by = models.ForeignKey(Users_table, on_delete=models.SET_NULL, null=True)  # Employee who recorded the health information
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Health record for {self.animal.animal_name} on {self.checkup_date}"

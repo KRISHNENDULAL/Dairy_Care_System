@@ -35,6 +35,16 @@
     </div>
 </ul>
 
+<!-- Search Bar -->
+<center>
+    <div class="search-bar-container">
+        <form method="GET" action="{% url 'editproduct' %}">
+            <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+</center>
+
 <div class="products-container">
     {% for product in products %}
         <div class="product">
