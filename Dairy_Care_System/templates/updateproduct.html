@@ -9,28 +9,36 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: url('{% static "images/2.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/updateproduct.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             padding: 20px;
         }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
     </style>
+    
 </head>
 <body>
     <a href="{% url 'productslist' %}" class="back-link"><b>BACK</b></a>
     <div class="container">
         <h2>Update Product: {{ product.product_name }}</h2><br>
-        <form method="POST" action="{% url 'updateproduct' product.product_id %}" enctype="multipart/form-data">
+        <form method="POST" action="{% url 'updateproduct' product.product_id %}" enctype="multipart/form-data" onsubmit="return validateForm()">
             {% csrf_token %}
-            
+
             <label for="product_name">Product Name:</label>
             <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" required>
+            <span class="error" id="productNameError"></span>
 
             <label for="product_description">Description:</label>
             <textarea id="product_description" name="product_description" required>{{ product.product_description }}</textarea>
+            <span class="error" id="productDescriptionError"></span>
 
             <label for="quantity">Quantity:</label>
             <input type="text" id="quantity" name="product_quantity" value="{{ product.product_quantity }}" required>
+            <span class="error" id="quantityError"></span>
 
             <label for="quantityUnit">Unit:</label>
             <select id="quantityUnit" name="quantity_unit" class="unit-select" required>
@@ -40,9 +48,11 @@
                 <option value="kg" {% if product.quantity_unit == 'kg' %}selected{% endif %}>Kilograms (kg)</option>
                 <option value="g" {% if product.quantity_unit == 'g' %}selected{% endif %}>Grams (g)</option>
             </select>
+            <span class="error" id="quantityUnitError"></span>
 
             <label for="price">Price:</label>
             <input type="text" id="price" name="product_price" value="{{ product.product_price }}" required>
+            <span class="error" id="priceError"></span>
 
             <label for="current_images">Current Images:</label>
             <div class="current-images">
@@ -60,8 +70,11 @@
             <label for="product_images">Upload New Image (Optional):</label>
             <input type="file" id="product_images" name="product_images"><br>
 
+            <span class="error" id="functionalDependencyError"></span>
             <button type="submit">Update</button>
         </form>
     </div>
+
+    
 </body>
 </html>

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/animalslist.css' %}">
     <style>
         body {
-            background: url('{% static "images/emppg.png" %}') no-repeat center center fixed;
+            background: url('{% static "images/animalslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
         }
@@ -85,8 +85,9 @@
 
         .animal-card img {
             width: 100%; /* Full width of the animal container */
-            height: 150px; /* Fixed height for uniformity */
-            object-fit: cover; /* Maintain aspect ratio and cover the area */
+            height: auto; /* Maintain aspect ratio */
+            max-height: 150px; /* Optional: limit height for uniformity */
+            object-fit: contain; /* Ensure the entire image is displayed */
             border-radius: 4px; /* Rounded corners for the image */
         }
 
@@ -128,9 +129,9 @@
 
 <!-- Animal Details Section -->
 <div class="animal-container">
-    {% for animal in animal %}
+    {% for animal in animals %}
     <div class="animal-card">
-        {% if animal.images.exists %}  <!-- Use 'exists' to check if there are images -->
+        {% if animal.images.exists %}  <!-- Check if there are images -->
             <img src="{{ animal.images.first.animal_image.url }}" alt="{{ animal.animal_name }}"> <!-- Display the first image -->
         {% else %}
             <img src="{% static 'images/default_animal_image.png' %}" alt="Default Image"> <!-- Placeholder if no image -->
@@ -138,12 +139,10 @@
         <h3><strong>{{ animal.animal_name }}</strong></h3>
         <p><strong>Category:</strong> {{ animal.animal_category }}</p>
         <p><strong>Breed:</strong> {{ animal.breed }}</p>
-        <p><strong>Age:</strong> {{ animal.age }} years</p>
+        <p><strong>Age:</strong> {{ animal.age_in_years }} years</p>
         <p><strong>Gender:</strong> {{ animal.gender }}</p>
         <p><strong>Milk Capacity:</strong> {{ animal.milk_capacity }} liters</p>
     </div>
-    {% empty %}
-    <p>No animals found.</p>
     {% endfor %}
 </div>
 

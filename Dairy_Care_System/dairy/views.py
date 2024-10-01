@@ -16,6 +16,7 @@ from django.contrib.auth import logout
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 
@@ -619,15 +620,24 @@ def animalslist(request):
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
         # Fetch all animals with their related images
-        animals = Animals_table.objects.prefetch_related('animal_images').all()
+        animals = Animals_table.objects.prefetch_related('images').all()  # Use the correct related name
         
+        # Calculate the age of each animal in years based on date_of_birth
+        for animal in animals:
+            # Assuming 'date_of_birth' is the field that indicates the animal's birthdate
+            if animal.date_of_birth:
+                current_date = timezone.now().date()  # Get the current date
+                animal_age_years = (current_date - animal.date_of_birth).days // 365  # Calculate age in years
+                animal.age_in_years = animal_age_years  # Add a custom attribute to hold the age
+
         context = {
             'username': user.username,  # Pass the username to the template
-            'animals': animals,          # Pass the list of animals to the template
+            'animals': animals,         # Pass the list of animals to the template
         }
         return render(request, 'animalslist.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
 
 
 def addanimal(request):
@@ -639,11 +649,14 @@ def addanimal(request):
         date_of_birth = request.POST.get('date_of_birth') if request.POST.get('date_of_birth') else None
         gender = request.POST.get('gender')
         milk_capacity = request.POST.get('milk_capacity') if request.POST.get('milk_capacity') else None
-        
-        # Fetch the currently logged-in user as 'added_by' (assuming the user is logged in)
-        added_by = Users_table.objects.get(user_id=request.session.get('user_id'))  # Ensure the user is fetched from session
 
-        # Create a new animal record
+        # Fetch the currently logged-in user's ID as 'added_by'
+        by_user_id = request.session.get('user_id')  # Get the user_id from session
+        
+        # Get the Users_table instance corresponding to the user_id
+        added_by_user = get_object_or_404(Users_table, pk=by_user_id)
+
+        # Create a new animal record with the user instance in the added_by field
         animal = Animals_table.objects.create(
             animal_name=animal_name,
             animal_category=animal_category,
@@ -651,7 +664,7 @@ def addanimal(request):
             date_of_birth=date_of_birth,
             gender=gender,
             milk_capacity=milk_capacity,
-            added_by=added_by  # Ensure added_by is correctly assigned
+            added_by=added_by_user  # Assign the user instance, not the raw ID
         )
 
         # Handle multiple file uploads
@@ -663,14 +676,12 @@ def addanimal(request):
                 )
                 animal_image.save()
 
-        # Add a success message
-        # messages.success(request, 'Animal added successfully!')
-
-        # Redirect to the animals list page
+        # Redirect to the animals list page after successfully adding the animal
         return redirect('animalslist')
 
     # If GET request, render the form page
     return render(request, 'addanimal.html')
+
 
 
 
