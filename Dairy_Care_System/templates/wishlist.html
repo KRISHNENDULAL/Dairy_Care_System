@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Wishlist</title>
+    <style>
+        body {
+            background: url('{% static "images/wishlist_bg.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wishlist-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-family: 'Comic Sans MS', cursive;
+            color: #000000;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .wishlist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .wishlist-item img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+
+        .wishlist-item p {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .remove-button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .remove-button:hover {
+            background-color: darkred;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 25px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'custproductslist' %}" class="back-link"><b>BACK</b></a>
+
+    <div class="wishlist-container">
+        <h1>Your Wishlist</h1>
+
+        {% for item in wishlist %}
+        <div class="wishlist-item">
+            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}">
+            <p>{{ item.product.product_name }}</p>
+            <form method="post" action="{% url 'removewishlist' item.id %}">
+                {% csrf_token %}
+                <button type="submit" class="remove-button">Remove</button>
+            </form>
+        </div>
+        {% empty %}
+        <p>No items in your wishlist.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

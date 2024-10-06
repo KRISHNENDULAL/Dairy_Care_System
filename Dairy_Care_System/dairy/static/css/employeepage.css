@@ -11,21 +11,18 @@ ul {
 .header {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    padding: 5px;
+    margin: 0 5px;
+    padding: 5px 10px;
     font-family: 'Arial', sans-serif;
-}
-
-.nav-item.left {
-    color: white;
-    padding: 5px 8px;
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: white;
 }
 
 li {
@@ -53,11 +50,6 @@ h1 {
     margin-top: 100px;
 }
 
-h3 {
-    color: black;
-    font-size: 20px;
-    margin-left: 10px;
-}
 
 /* Dropdown styles */
 .dropdown-content {
@@ -88,26 +80,14 @@ h3 {
     display: block;
 }
 
-/* .home-link {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    text-decoration: none;
-}
-
-.home-link img {
-    width: 50px;
-    height: 50px;
-} */
-
-.messages {
+.message {
     font-size: 30px;
     color: #000;
     text-align: center;
     margin-top: 20px;
 }
 
-.quotes {
+.quote {
     font-style: italic;
     font-size: 20px;
     color: black;
@@ -115,15 +95,11 @@ h3 {
     margin-top: 10px;
 }
 
-.messages p {
-    font-size: 50px; /* Adjust this as needed */
-}
-
-.quotes::before {
+.quote::before {
     content: "“";
 }
 
-.quotes::after {
+.quote::after {
     content: "”";
 }
 
@@ -133,22 +109,21 @@ footer {
     color: black;
 }
 
-/* Style for side navigation */
+/* Side navigation (Always Visible) */
 .sidenav {
     height: 100%; /* Full-height */
-    width: 0; /* Initial width of 0 (hidden) */
+    width: 100px; /* Fixed width to keep the sidebar always visible */
     position: fixed; /* Fixed position */
     z-index: 1; /* Sit on top */
     top: 0;
     left: 0;
-    background-color: #111; /* Black background color */
+    background-color: #000000; /* Black background color */
     overflow-x: hidden; /* Disable horizontal scroll */
-    transition: 0.5s; /* Transition effect for smooth opening/closing */
-    padding-top: 60px; /* Padding on top */
+    padding-top: 20px; /* Padding on top */
 }
 
 .sidenav a {
-    padding: 8px 8px 8px 32px;
+    padding: 8px 8px 15px 20px;
     text-decoration: none;
     font-size: 25px;
     color: #ffffff;
@@ -160,35 +135,13 @@ footer {
     color: #f1f1f1;
 }
 
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
-
-/* Hamburger icon inside the navigation bar */
-.hamburger {
-    font-size: 30px;
-    cursor: pointer;
-    padding: 2px;
-    color: white;
-}
-
-
-/* When the side navigation is opened */
+/* Remove the open/close functionality */
 #mySidenav {
-    width: 0;
+    width: 250px; /* Sidebar always visible */
 }
 
-/* When the navigation bar is expanded */
-#mySidenav.open {
-    width: 250px;
-}
-
-/* Main content (optional: can shift to the right when the sidebar opens) */
-body.active {
+/* Adjust the body margin to make space for the sidebar */
+body {
     margin-left: 250px;
-    transition: margin-left 0.5s;
 }
+

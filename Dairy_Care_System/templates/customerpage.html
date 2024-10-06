@@ -9,36 +9,25 @@
             background: url('{% static "images/custpg.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
+            margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
         }
     </style>
 </head>
 <body>
 
-    <!-- Side Navigation -->
+    <!-- Side Navigation (Always Visible)-->
     <div id="mySidenav" class="sidenav">
-        <a>Hi! {{ username }}</a><br><br>
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a><br><br>
+        <a href="#">Dairy Care System</a><br><br><br>
         <a href="{% url 'custproductslist' %}">Products List</a><br>
         <a href="#">Your Orders</a><br>
         <a href="{% url 'feedbackpage' %}">Your Feedback</a><br>
     </div>
 
-    <!-- Navigation Bar -->
+    <!-- Navigation Bar-->
     <ul>
         <div class="header">
-            <!-- Hamburger Icon -->
-            <span class="hamburger" onclick="openNav()">&#9776;</span>
-
-            <!-- <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}">Products list</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="#">Your Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'feedbackpage' %}">Your Feedback</a></b></li>
-            </div> -->
-            
+            <!-- name -->
+            <!-- <span class="name">Dairy Care System</span> -->
             <div class="nav-item">
                 <li>
                     <b><a href="#">{{ username }}</a></b>
@@ -52,7 +41,7 @@
     </ul>
 
     <center>
-<!--         <h1><b>Customer Dashboard</b></h1> -->
+    <!-- <h1><b>Customer Dashboard</b></h1> -->
 
         <!-- Message and Quote -->
     <div class="message">
@@ -63,22 +52,11 @@
         A satisfied customer is the best business strategy of all.
     </div><br><br><br><br><br><br><br><br><br><br><br><br>
 
-<footer>
-    <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
-</footer>
+    <footer>
+        <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+    </footer>
 
     </center>
-
-    <!-- JavaScript to toggle the side navigation -->
-    <script>
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-        }
-
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-        }
-    </script>
 
 </body>
 </html>

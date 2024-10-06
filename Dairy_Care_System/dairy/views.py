@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage, Animals_table, AnimalImages
+from .models import Users_table, Products_table, ProductImage, WishlistItem, Animals_table, AnimalImages
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password
@@ -390,7 +390,16 @@ def employeepage(request):
 
 
 def feedbackpage(request):
-    return render(request, 'feedbackpage.html')
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context = {
+            'username': user.username,  # Pass the username to the template
+        }
+        return render(request, 'feedbackpage.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in 
+    
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -532,13 +541,49 @@ def custproductslist(request):
     
 
 def productdetails(request, product_id):
+    # Fetch the product based on product_id
     product = get_object_or_404(Products_table, product_id=product_id)
-    images = product.images.all()  # Get associated images
+    
+    # Get associated images for the product
+    images = ProductImage.objects.filter(product=product)
+    
+    # Context to pass to the template
     context = {
         'product': product,
         'images': images,
     }
+    
     return render(request, 'productdetails.html', context)
+
+
+def wishlist(request):
+    wishlist = WishlistItem.objects.filter(user_id=request.user_id)
+    return render(request, 'wishlist.html', {'wishlist': wishlist})
+
+# View to add a product to the wishlist
+def addwishlist(request, product_id):
+    # Get the product using the product_id
+    product = get_object_or_404(Products_table, product_id=product_id)
+
+    # Assuming you have a way to identify the user; if not, handle accordingly
+    user = request.user if request.user.is_authenticated else None
+
+    # Check if the user is authenticated and add to wishlist
+    if user:
+        # Create a new wishlist item
+        WishlistItem.objects.create(user=user, product=product)
+        
+        # Optionally, you can set a success message here
+        # messages.success(request, 'Product added to wishlist!')
+
+    # Redirect to the product details page or wherever you'd like
+    return redirect('productdetails', product_id=product_id)
+
+# View to remove a product from the wishlist
+def removewishlist(request, item_id):
+    wishlist_item = get_object_or_404(WishlistItem, id=item_id, user_id=request.user_id)
+    wishlist_item.delete()
+    return redirect('wishlist')
 
 
     

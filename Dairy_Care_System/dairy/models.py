@@ -62,6 +62,15 @@ class ProductImage(models.Model):
         return f"Image {self.image_id} for {self.product.product_name}"
     
 
+class WishlistItem(models.Model):
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.product_name}"
+    
+
 
 class Animals_table(models.Model):
     animal_id = models.AutoField(primary_key=True)
