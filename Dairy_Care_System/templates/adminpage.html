@@ -12,6 +12,7 @@
             margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
         }
     </style>
+    
 </head>
 <body>
 
@@ -29,12 +30,10 @@
     <!-- Navigation Bar-->
     <ul>
         <div class="header">
-            <!-- name -->
-            <!-- <span class="name">Dairy Care System</span> -->
             <div class="nav-item">
                 <li>
-                    <b><a href="#">{{ username }}</a></b>
-                    <div class="dropdown-content">
+                    <b><a href="#" class="username" onclick="toggleDropdown()">{{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
                         <a href="{% url 'userprofile' %}">Profile</a>
                         <a href="{% url 'logout' %}">Logout</a>
                     </div>
@@ -45,7 +44,7 @@
 
     <center>
         <div class="message">
-            <h1>Welcome, {{ username }}!</h1> <br><br> 
+            <h1>Welcome, {{ username }}!</h1><br><br> 
             Manage the system efficiently and effectively to keep everything running smoothly.
         </div><br><br>
         <div class="quote">
@@ -56,6 +55,28 @@
             <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
         </footer>
     </center>
+
+    <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+    </script>
 
 </body>
 </html>

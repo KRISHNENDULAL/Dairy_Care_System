@@ -68,11 +68,12 @@
                         <td>{{ user.updated_at }}</td>
                         <td class="action-btns">
                             <div class="button-group">
-                                <a href="#" class="delete-btn" onclick="openModal('delete', '{{ user.username }}', '{% url 'regdeleteuser' user.user_id %}');"><b>Delete</b></a>
-                                {% if not user.status %}
-                                    <a href="#" class="view-btn" onclick="openModal('restore', '{{ user.username }}', '{% url 'restoreuser' user.user_id %}');"><b>Restore</b></a>
+                                <!-- Show delete button only if user is active -->
+                                {% if user.status %}
+                                    <a href="#" class="delete-btn" onclick="openModal('delete', '{{ user.username }}', '{% url 'regdeleteuser' user.user_id %}');"><b>Delete</b></a>
                                 {% else %}
-                                    <span>Active</span>
+                                    <!-- Show restore button only if user is inactive -->
+                                    <a href="#" class="view-btn" onclick="openModal('restore', '{{ user.username }}', '{% url 'restoreuser' user.user_id %}');"><b>Restore</b></a>
                                 {% endif %}
                             </div>
                         </td>                        
@@ -103,9 +104,9 @@
         var confirmBtn = document.getElementById("confirm-btn");
 
         if (actionType === 'delete') {
-            message.innerHTML = "Are you sure you want to delete the user <strong>" + username + "</strong> and deactivate their account?";
+            message.innerHTML = "Are you sure you want to delete the user <strong>" + username + "</strong> and <strong>deactivate</strong> their account?";
         } else if (actionType === 'restore') {
-            message.innerHTML = "Are you sure you want to restore the user <strong>" + username + "</strong> and reactivate their account?";
+            message.innerHTML = "Are you sure you want to restore the user <strong>" + username + "</strong> and <strong>reactivate</strong> their account?";
         }
 
         // Set the confirm button to redirect to the action's URL

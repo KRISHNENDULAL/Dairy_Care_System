@@ -10,6 +10,94 @@
             background-size: cover;
             margin: 0;
         }
+
+        /* Style for modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.6); /* Black with opacity */
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto; /* Centered vertically and horizontally */
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%; /* Modal width */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        .modal-body {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-confirm, .btn-cancel {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-confirm.delete {
+            background-color: green; /* Red for delete */
+        }
+
+        .btn-confirm.restore {
+            background-color: green; /* Green for restore */
+        }
+
+        .btn-cancel {
+            background-color: red;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            opacity: 0.9;
+        }
+
+        .btn-cancel:hover {
+            background-color: red;
+        }
+
+        .button-group a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .delete-button {
+            background-color: red;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .restore-button {
+            background-color: green;
+            color: white;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -45,6 +133,7 @@
     </div>
 </center>
 
+<!-- Product List -->
 <div class="products-container">
     {% for product in products %}
         <div class="product">
@@ -79,7 +168,8 @@
     <div class="modal-content">
         <div class="modal-header">Dairy Care System</div>
         <div class="modal-body">
-            <p id="modal-message" id="modal-message"></div>
+            <p id="modal-message"></p>
+        </div>
         <div class="modal-footer">
             <button id="confirm-btn" class="btn-confirm">Confirm</button>
             <button onclick="closeModal()" class="btn-cancel">Cancel</button>
@@ -95,9 +185,13 @@
         var confirmBtn = document.getElementById("confirm-btn");
 
         if (actionType === 'delete') {
-            message.innerHTML = "Are you sure you want to delete the product <strong>" + productName + "</strong> and modify its status to <strong> Not Available </strong> ?";
+            message.innerHTML = "Are you sure you want to delete the product <strong>" + productName + "</strong> and change its status to <strong>Not Available</strong>?";
+            confirmBtn.classList.remove('restore');
+            confirmBtn.classList.add('delete'); // Red for delete
         } else if (actionType === 'restore') {
-            message.innerHTML = "Are you sure you want to restore the product <strong>" + productName + "</strong> and remodify its status to <strong>Available </strong> ?";
+            message.innerHTML = "Are you sure you want to restore the product <strong>" + productName + "</strong> and set its status to <strong>Available</strong>?";
+            confirmBtn.classList.remove('delete');
+            confirmBtn.classList.add('restore'); // Green for restore
         }
 
         confirmBtn.onclick = function() {
@@ -122,5 +216,3 @@
 
 </body>
 </html>
-
-

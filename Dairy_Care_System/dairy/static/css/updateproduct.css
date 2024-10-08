@@ -135,3 +135,11 @@ button:hover {
     border-radius: 5px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
+.error {
+    color: red;
+    font-size: 15px;
+    text-align: center; /* Centers the error message */
+    display: block;
+    margin-top: 5px;
+}

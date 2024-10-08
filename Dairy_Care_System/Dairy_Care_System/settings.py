@@ -184,16 +184,16 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 DEFAULT_FROM_EMAIL = 'dairycaresystem25@gmail.com'
 
 
-
-# settings.py
-# LOGIN_REDIRECT_URL = '/login/'
-# LOGOUT_REDIRECT_URL = 'home/'
-
-
 STATICFILES_DIRS = [
     BASE_DIR / "static",
     # You can add more directories if needed
 ]
 
+# settings.py
+# Redirect to the login page if not authenticated
+LOGIN_URL = '/login/'  # Ensure this points to your custom login URL
 
+# After login, redirect to the user homepage or a relevant page
+LOGIN_REDIRECT_URL = '/customerpage/'  # Adjust this to where users should land after login
+LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
 

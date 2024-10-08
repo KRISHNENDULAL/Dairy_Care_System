@@ -3,7 +3,7 @@ from django.contrib import messages
 from .models import Users_table, Products_table, ProductImage, WishlistItem, Animals_table, AnimalImages
 from django.core.mail import send_mail
 from django.conf import settings 
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -437,9 +437,14 @@ def updateuserprofile(request):
     return render(request, 'updateuserprofile.html', context)
 
 
-def user_logout(request):
-    logout(request)
-    return redirect('home')  # Redirect to home page or login page
+# def user_logout(request):
+#     logout(request)
+#     return redirect('home')  # Redirect to home page or login page
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def logout(request):
+    request.session.flush()  # This clears the session data
+    return redirect('home')
 
 
 def addproducts(request): 
@@ -541,52 +546,70 @@ def custproductslist(request):
     
 
 def productdetails(request, product_id):
-    # Fetch the product based on product_id
     product = get_object_or_404(Products_table, product_id=product_id)
-    
-    # Get associated images for the product
-    images = ProductImage.objects.filter(product=product)
-    
-    # Context to pass to the template
+    images = product.images.all()  # Get associated images
+
+    if request.method == 'POST':
+        if 'add_to_wishlist' in request.POST:
+            user_id = request.session.get('user_id')
+            if user_id:
+                user = Users_table.objects.get(user_id=user_id)
+                wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
+
+                if created:
+                    messages.success(request, 'Product added to wishlist!')
+                else:
+                    messages.info(request, 'Product is already in your wishlist.')
+            else:
+                messages.error(request, 'You need to log in to add to your wishlist.')
+
     context = {
         'product': product,
         'images': images,
     }
-    
     return render(request, 'productdetails.html', context)
 
 
+
+# View to display the wishlist page
 def wishlist(request):
-    wishlist = WishlistItem.objects.filter(user_id=request.user_id)
-    return render(request, 'wishlist.html', {'wishlist': wishlist})
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = get_object_or_404(Users_table, user_id=user_id)  # Fetch the user object using user_id
 
-# View to add a product to the wishlist
-def addwishlist(request, product_id):
-    # Get the product using the product_id
-    product = get_object_or_404(Products_table, product_id=product_id)
+        if request.method == 'POST':
+            product_id = request.POST.get('remove_product_id')  # Get the product ID from the form
+            print("Product ID to remove:", product_id)  # Debugging line
+            if product_id:
+                try:
+                    wishlist_item = WishlistItem.objects.get(user=user, product_id=product_id)
+                    wishlist_item.delete()  # Remove the product from the wishlist
+                    print("Wishlist item removed:", wishlist_item)  # Debugging line
+                    messages.success(request, 'Product removed from your wishlist.')
+                except WishlistItem.DoesNotExist:
+                    print("Wishlist item does not exist.")  # Debugging line
+                    messages.error(request, 'This product is not in your wishlist.')
+            return redirect('wishlist')  # Redirect to avoid form resubmission
 
-    # Assuming you have a way to identify the user; if not, handle accordingly
-    user = request.user if request.user.is_authenticated else None
+        # Fetch the wishlist items for the user
+        wishlist_items = WishlistItem.objects.filter(user=user).select_related('product')
 
-    # Check if the user is authenticated and add to wishlist
-    if user:
-        # Create a new wishlist item
-        WishlistItem.objects.create(user=user, product=product)
-        
-        # Optionally, you can set a success message here
-        # messages.success(request, 'Product added to wishlist!')
+        context = {
+            'wishlist': wishlist_items,  # Pass the wishlist items to the template
+            'username': user.username,   # Pass the username to the template
+            'error': None
+        }
+    else:
+        messages.error(request, "You need to log in to view your wishlist.")
+        context = {
+            'wishlist': [],
+            'username': None,
+            'error': "You need to log in to view your wishlist."
+        }
 
-    # Redirect to the product details page or wherever you'd like
-    return redirect('productdetails', product_id=product_id)
-
-# View to remove a product from the wishlist
-def removewishlist(request, item_id):
-    wishlist_item = get_object_or_404(WishlistItem, id=item_id, user_id=request.user_id)
-    wishlist_item.delete()
-    return redirect('wishlist')
+    return render(request, 'wishlist.html', context)
 
 
-    
 def editproduct(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
 

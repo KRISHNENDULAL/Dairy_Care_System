@@ -129,8 +129,24 @@
         <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
         <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
         <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p><br>
-        <button onclick="location.href='{% url 'addwishlist' product.product_id %}'" class="wish-button">Wishlist</button>
+        <!-- Add to Wishlist Form -->
+        <!-- Add to Wishlist Form -->
+<form method="POST" action="{% url 'productdetails' product.product_id %}">
+    {% csrf_token %}
+    <button type="submit" name="add_to_wishlist" class="btn add-to-wishlist-btn">Add to Wishlist</button>
+</form>
         <button class="buy-button">Add to Cart</button>
+
+        <div class="container">
+            <!-- Message display block -->
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
     </div>
 
 </body>

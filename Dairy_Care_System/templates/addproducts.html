@@ -66,16 +66,15 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const form = document.getElementById('addProductForm');
-        const productName = document.getElementById('productName');
-        const productDescription = document.getElementById('productDescription');
-        const productQuantity = document.getElementById('productQuantity');
+        const form = document.querySelector('form'); // Select the form element
+        const productName = document.getElementById('product_name');
+        const productDescription = document.getElementById('product_description');
+        const productQuantity = document.getElementById('quantity');
         const quantityUnit = document.getElementById('quantityUnit');
-        const productPrice = document.getElementById('productPrice');
-        const productPhoto = document.querySelector('input[name="product_images"]');
-        const imagePreview = document.getElementById('imagePreview');
+        const productPrice = document.getElementById('price');
+        const productPhoto = document.getElementById('product_images');
 
-        // Function to show error
+        // Function to show error and center it
         function showError(message, elementId) {
             const errorElement = document.getElementById(elementId);
             errorElement.textContent = message;
@@ -89,23 +88,23 @@
             errorElement.style.display = 'none'; // Hide the error message
         }
 
-        // Function to validate product name (only alphabets)
+        // Validate product name (only alphabets)
         function validateProductName(name) {
             return /^[a-zA-Z\s]+$/.test(name); // Allow alphabets and spaces
         }
 
-        // Function to validate description (not exceeding 100 words)
+        // Validate description (not exceeding 100 words)
         function validateDescription(description) {
             const wordCount = description.trim().split(/\s+/).length;
             return wordCount <= 100;
         }
 
-        // Function to validate quantity (integer or decimal)
+        // Validate quantity (integer or decimal)
         function validateQuantity(quantity) {
             return /^\d+(\.\d+)?$/.test(quantity); // Allow integers and decimals
         }
 
-        // Function to validate price (between 1 and 2000, allowing integers and decimals)
+        // Validate price (between 1 and 2000, allowing integers and decimals)
         function validatePrice(price) {
             return /^\d+(\.\d+)?$/.test(price) && parseFloat(price) >= 1 && parseFloat(price) <= 2000;
         }
@@ -113,22 +112,22 @@
         // Live validation for product name
         productName.addEventListener('input', function() {
             if (productName.value.trim() === "") {
-                showError('Product name is required.', 'nameError');
+                showError('Product name is required.', 'productNameError');
             } else if (!validateProductName(productName.value.trim())) {
-                showError('Product name can only contain alphabets.', 'nameError');
+                showError('Product name can only contain alphabets.', 'productNameError');
             } else {
-                clearError('nameError');
+                clearError('productNameError');
             }
         });
 
         // Live validation for description
         productDescription.addEventListener('input', function() {
             if (productDescription.value.trim() === "") {
-                showError('Description is required.', 'descriptionError');
+                showError('Description is required.', 'productDescriptionError');
             } else if (!validateDescription(productDescription.value.trim())) {
-                showError('Description must not exceed 100 words.', 'descriptionError');
+                showError('Description must not exceed 100 words.', 'productDescriptionError');
             } else {
-                clearError('descriptionError');
+                clearError('productDescriptionError');
             }
         });
 
@@ -148,7 +147,7 @@
             if (productPrice.value.trim() === "") {
                 showError('Price is required.', 'priceError');
             } else if (!validatePrice(productPrice.value.trim())) {
-                showError('Please enter a valid price.', 'priceError');
+                showError('Please enter a valid price between 1 and 2000.', 'priceError');
             } else {
                 clearError('priceError');
             }
@@ -157,46 +156,20 @@
         // Live validation for unit selection
         quantityUnit.addEventListener('change', function() {
             if (quantityUnit.value === "") {
-                showError('Please select a unit.', 'unitError');
+                showError('Please select a unit.', 'quantityUnitError');
             } else {
-                clearError('unitError');
+                clearError('quantityUnitError');
             }
         });
 
         // Live validation for photo upload
         productPhoto.addEventListener('change', function() {
             if (!productPhoto.files.length) {
-                showError('Please choose a photo to upload.', 'photoError');
-                imagePreview.style.display = 'none'; // Hide the image preview if no file
+                showError('Please choose a photo to upload.', 'productImageError');
             } else {
-                clearError('photoError');
-                const file = productPhoto.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result; // Set the image source to the file
-                    imagePreview.style.display = 'block'; // Show the image preview
-                }
-                reader.readAsDataURL(file); // Read the file as a data URL
+                clearError('productImageError');
             }
         });
-
-        // General validation for field dependencies
-        function validateFieldsBefore(field, dependentField, errorElementId) {
-            field.addEventListener('focus', function() {
-                if (dependentField.value.trim() === "") {
-                    showError('Please fill out the previous field before filling this one.', errorElementId);
-                    field.blur(); // Remove focus from the current field
-                } else {
-                    clearError(errorElementId);
-                }
-            });
-        }
-
-        // Apply validation for each field
-        validateFieldsBefore(productDescription, productName, 'descriptionError');
-        validateFieldsBefore(productQuantity, productDescription, 'quantityError');
-        validateFieldsBefore(quantityUnit, productQuantity, 'unitError');
-        validateFieldsBefore(productPrice, productQuantity, 'priceError');
 
         // Event listener for form submission
         form.addEventListener('submit', function(event) {
@@ -204,12 +177,12 @@
 
             // Final validation checks before submission
             if (productName.value.trim() === "" || !validateProductName(productName.value.trim())) {
-                showError('Product name is required and can only contain alphabets.', 'nameError');
+                showError('Product name is required and can only contain alphabets.', 'productNameError');
                 valid = false;
             }
 
             if (productDescription.value.trim() === "" || !validateDescription(productDescription.value.trim())) {
-                showError('Description is required and must not exceed 100 words.', 'descriptionError');
+                showError('Description is required and must not exceed 100 words.', 'productDescriptionError');
                 valid = false;
             }
 
@@ -224,12 +197,12 @@
             }
 
             if (quantityUnit.value === "") {
-                showError('Please select a unit.', 'unitError');
+                showError('Please select a unit.', 'quantityUnitError');
                 valid = false;
             }
 
             if (!productPhoto.files.length) {
-                showError('Please choose a photo to upload.', 'photoError');
+                showError('Please choose a photo to upload.', 'productImageError');
                 valid = false;
             }
 
@@ -240,5 +213,6 @@
         });
     });
 </script>
+
 </body>
 </html>

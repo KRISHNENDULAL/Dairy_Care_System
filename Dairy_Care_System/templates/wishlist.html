@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Wishlist</title>
+    <title>Your Wishlist</title>
     <style>
         body {
             background: url('{% static "images/wishlist_bg.jpg" %}') no-repeat center center fixed;
@@ -10,6 +10,83 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 5px;
+            overflow: hidden;
+            background-color: black;
+            display: flex;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .nav-item.left {
+            color: white;
+            padding: 5px 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        li {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        li a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            right: 0;
+            top: 70px;
+            border-radius: 5px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .nav-item:hover .dropdown-content {
+            display: block;
         }
 
         .wishlist-container {
@@ -44,7 +121,18 @@
             margin-right: 20px;
         }
 
-        .wishlist-item p {
+        .wishlist-item-content {
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wishlist-item-details {
+            flex-grow: 1;
+        }
+
+        .wishlist-item-details p {
             margin: 0;
             font-size: 1.2em;
         }
@@ -57,7 +145,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-left: auto;
+            margin-left: 20px;
         }
 
         .remove-button:hover {
@@ -80,23 +168,66 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'custproductslist' %}" class="back-link"><b>BACK</b></a>
+
+    <!-- Navigation Bar-->
+    <ul>
+        <div class="header">
+            <div class="nav-item">
+                <li><b><a href="{% url 'custproductslist' %}">Products list</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'wishlist' %}">Your Wishlist</a></b></li>
+            </div>  
+            <div class="nav-item">
+                <li><b><a href="#">Your Orders</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'feedbackpage' %}">Your Feedback</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li>
+                    <b><a href="#">{{ username }}</a></b>
+                    <div class="dropdown-content">
+                        <a href="{% url 'userprofile' %}">Profile</a>
+                        <a href="{% url 'customerpage' %}">Home</a>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul>
+
+    <center><h1>Your Wishlist</h1></center>
 
     <div class="wishlist-container">
-        <h1>Your Wishlist</h1>
-
         {% for item in wishlist %}
         <div class="wishlist-item">
-            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}">
-            <p>{{ item.product.product_name }}</p>
-            <form method="post" action="{% url 'removewishlist' item.id %}">
-                {% csrf_token %}
-                <button type="submit" class="remove-button">Remove</button>
-            </form>
+            <!-- Product image -->
+            {% if item.product.images.first %}
+                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}">
+            {% else %}
+                <img src="{% static 'images/default_product_image.jpg' %}" alt="{{ item.product.product_name }}">
+            {% endif %}
+
+            <!-- Product details and remove button -->
+            <div class="wishlist-item-content">
+                <div class="wishlist-item-details">
+                    <h2>{{ item.product.product_name }}</h2>
+                    <p>{{ item.product.product_description }}</p><br>
+                    <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br>
+                    <p><strong>Price:</strong> Rs. {{ item.product.product_price }}</p><br><br>
+                </div>
+                <form method="POST" action="{% url 'wishlist' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="remove_product_id" value="{{ item.product.id }}">
+                    <button type="submit" class="remove-button">Remove</button>
+                </form>
+            </div>
         </div>
         {% empty %}
-        <p>No items in your wishlist.</p>
+        <p>Your wishlist is empty.</p>
         {% endfor %}
     </div>
+
 </body>
 </html>
