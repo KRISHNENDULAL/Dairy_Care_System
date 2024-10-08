@@ -11,6 +11,9 @@
             margin: 0;
         }
     </style>
+
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
 <!-- Navigation Bar-->
@@ -30,10 +33,11 @@
         </div>
         <div class="nav-item">
             <li>
-                <b><a href="#">{{ username }}</a></b>
-                <div class="dropdown-content">
+                <b><a href="#" class="username" onclick="toggleDropdown()">{{ username }}</a></b>
+                <div class="dropdown-content" id="dropdown-content">
                     <a href="{% url 'userprofile' %}">Profile</a>
-                    <a href="{% url 'logout' %}">Logout</a>
+                    <!-- Change Logout link to trigger a custom SweetAlert -->
+                    <a href="#" onclick="confirmLogout()">Logout</a>
                 </div>
             </li>
         </div>
@@ -62,6 +66,50 @@
         <p>No products available.</p>
     {% endfor %}
 </div>
+
+<!-- Add SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Toggle dropdown on click
+    function toggleDropdown() {
+        var dropdown = document.getElementById("dropdown-content");
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        } else {
+            dropdown.style.display = "block";
+        }
+    }
+
+    // Close the dropdown if clicked outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('.username')) {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            }
+        }
+    }
+
+    // Custom SweetAlert2 logout confirmation
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of the system!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to logout URL
+                window.location.href = "{% url 'logout' %}";
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
