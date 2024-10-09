@@ -153,9 +153,9 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'animalslist' %}" class="back-link"><b>BACK</b></a>
+    <a href="{% url 'animalslist' %}" class="back-link"><b>&larr; BACK</b></a>
     <div class="container">
-        <center><h2>Add Animal</h2></center>
+        <center><h2>Add Animal Details</h2></center>
         <form method="post" enctype="multipart/form-data" action="{% url 'addanimal' %}">
             {% csrf_token %}
 

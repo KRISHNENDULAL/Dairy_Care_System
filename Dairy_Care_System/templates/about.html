@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Page</title>
     <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
     <style>
         body {
             background: url('{% static "images/about.jpg" %}') no-repeat center center fixed;
@@ -15,27 +16,31 @@
     </style>
 </head>
 <body> 
-    <a href="{% url 'home' %}" class="home-link">
+    <!-- <a href="{% url 'home' %}" class="home-link">
         <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
-    </a>
+    </a> -->
 
     <!-- Navigation Bar -->
 <ul>
+    <a href="{% url 'home' %}">
+        <i class="fas fa-home home-icon"></i>
+    </a>
+
     <div class="header">
         <div class="nav-item">
-            <li><b><a href="{% url 'about' %}">About</a></b></li>
+            <li><b><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'registration' %}">Register</a></b></li>
+            <li><b><a href="{% url 'registration' %}"><i class="fas fa-user-plus"></i> Register</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'login' %}">Login</a></b></li>
+            <li><b><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'contactus' %}">Contact Us</a></b></li>
+            <li><b><a href="{% url 'contactus' %}"><i class="fas fa-envelope"></i> Contact Us</a></b></li>
         </div>
     </div>
-</ul>
+</ul><br><br><br>
 
 <div class="container">
     <h1><u><strong>Dairy Care System</strong></u></h1>

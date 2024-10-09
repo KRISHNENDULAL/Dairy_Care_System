@@ -53,7 +53,7 @@ def registration(request):
         user.save()
 
         # Send email notification
-        subject = '🎉 Welcome to the Dairy Care System! 🎉'
+        subject = 'Welcome to the Dairy Care System! 🎉'
         message = f"""
         Hello {username},
 
@@ -93,7 +93,7 @@ def forgotpassword(request):
             # Send the email
             try:
                 send_mail(
-                    '🔒 Dairy Care System - Password Reset Request 🔒',
+                    'Dairy Care System - Password Reset Request 🔒',
                     f'Hello {user.username},\n\n'
                     'We received a request to reset your password for your Dairy Care System account.\n\n'
                     'If you did not make this request, you can safely ignore this email.\n\n'
@@ -206,7 +206,7 @@ def addemployee(request):
 
         # Send email with login credentials
 
-        subject = '🎉 Welcome to the Dairy Care System 🎉'
+        subject = 'Welcome to the Dairy Care System 🎉'
         message = f"""
         Hello {username},
 
@@ -290,6 +290,7 @@ def changepassword(request):
     return render(request, 'changepassword.html')
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def reguserlist(request, role=None):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -317,7 +318,7 @@ def regdeleteuser(request, user_id):
     user.status = False  # Set status to inactive
     user.save()  # Save changes to the database
     # Send email notification
-    subject = '⚠️ Account Deactivation Notification - Dairy Care System ⚠️'
+    subject = 'Account Deactivation Notification - Dairy Care System ⚠️'
     message = (
         f"Hello {user.username},\n\n"
         "We want to inform you that your account has been deactivated.\n\n"
@@ -341,7 +342,7 @@ def restoreuser(request, user_id):
     user.status = True  # Set status back to active
     user.save()  # Save changes to the database
     # Prepare email notification
-    subject = '🎉 Account Reactivation Notification - Dairy Care System 🎉'
+    subject = 'Account Reactivation Notification - Dairy Care System 🎉'
     message = (
         f"Hello {user.username},\n\n"
         "We are pleased to inform you that your account has been successfully reactivated.\n\n"
@@ -388,7 +389,7 @@ def employeepage(request):
         return redirect('login')  # Redirect to login if no user is logged in 
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def feedbackpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -489,6 +490,7 @@ def addproducts(request):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def productslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     
@@ -517,7 +519,7 @@ def productslist(request):
         return redirect('login')  # Redirect to login if no user is logged in
 
     
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def custproductslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     
@@ -570,8 +572,7 @@ def productdetails(request, product_id):
     return render(request, 'productdetails.html', context)
 
 
-
-# View to display the wishlist page
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def wishlist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -602,9 +603,10 @@ def wishlist(request):
 
         return render(request, 'wishlist.html', {'wishlist': wishlist_items, 'username': user.username})
     else:
-        return redirect('loginpage')
+        return redirect('login')
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def editproduct(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
 
@@ -633,7 +635,6 @@ def editproduct(request):
         return redirect('login')  # Redirect to login if no user is logged in
 
     
-
 
 def updateproduct(request, product_id):
     product = Products_table.objects.get(product_id=product_id)
@@ -676,7 +677,7 @@ def restoreproduct(request, product_id):
     return redirect('editproduct')  # Redirect to the product listing page
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def animalslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:

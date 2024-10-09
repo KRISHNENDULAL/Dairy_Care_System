@@ -13,7 +13,6 @@ ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px;
     font-family: 'Arial', sans-serif;
 }
 
@@ -83,7 +82,6 @@ li a:hover {
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .feedback-box {
@@ -95,10 +93,10 @@ li a:hover {
 }
 
 .feedback-box h2 {
+    margin-top: 0; /* Remove any top margin to bring the heading closer to the header */
     font-size: 48px;
     color: white;
-    margin-bottom: 70px;
-    font-family: Arial, sans-serif;
+    font-family: Copperplate, Papyrus, fantasy;
 }
 
 .feedback-box label {

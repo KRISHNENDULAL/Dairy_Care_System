@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <title>Products Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             background: url('{% static "images/prolist.jpg" %}') no-repeat center center fixed;
@@ -247,18 +248,21 @@
 <ul>
     <div class="header">
         <div class="nav-item">
-            <li><b><a href="{% url 'addproducts' %}">Add Products</a></b></li>
+            <li><b><a href="{% url 'addproducts' %}"><i class="fa fa-cart-plus"></i> Add Products</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'editproduct' %}">All Products List</a></b></li>
+            <li><b><a href="{% url 'editproduct' %}"><i class="fas fa-tags"></i> All Products List</a></b></li>
         </div>
         <div class="nav-item">
             <li>
-                <b><a href="#" class="username" onclick="toggleDropdown()">{{ username }}</a></b>
+                <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                 <div class="dropdown-content" id="dropdown-content">
-                    <a href="{% url 'userprofile' %}">Profile</a>
+                    <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                    <!-- <a href="{% if request.session.user_role == 'admin' %}{% url 'adminpage' %}{% elif request.session.user_role == 'employee' %}{% url 'employeepage' %}{% else %}{% url 'customerpage' %}{% endif %}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>                                       -->
                     <!-- Change Logout link to trigger a custom SweetAlert -->
-                    <a href="#" onclick="confirmLogout()">Logout</a>
+                    <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </li>
         </div>
@@ -323,7 +327,7 @@
     function confirmLogout() {
         Swal.fire({
             title: 'Are you sure?',
-            text: "You will be logged out of the system!",
+            text: "You will be logged out of Dairy Care System!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

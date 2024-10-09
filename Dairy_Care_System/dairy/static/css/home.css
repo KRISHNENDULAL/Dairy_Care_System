@@ -3,12 +3,14 @@ ul {
     margin: 0;
     padding: 5px;
     overflow: hidden;
-    background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
+    background: rgba(255, 255, 255, 0.3); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Apply blur effect to background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
 }
 
 li {
     float: right;
-    margin-right: 10px;
+    margin-right: 20px; /* Increase this value for more space */
     font-size: 20px;
 }
 
@@ -18,13 +20,15 @@ li a {
     text-align: center;
     text-decoration: none;
     padding: 10px 12px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform to transition */
 }
 
 li a:hover {
     background-color: #ddd;
     border-radius: 5px;
+    transform: scale(1.1); /* Scale up the item on hover */
 }
+
 
 h1 {
     color: black;
@@ -53,7 +57,7 @@ h2 {
     align-items: center;
 }
 
-.home-link {
+/* .home-link {
     position: absolute;
     top: 5px;
     left: 20px;
@@ -63,6 +67,15 @@ h2 {
 .home-link img {
     width: 50px;
     height: 50px;
+} */
+
+/* Home Icon Style */
+.home-icon {
+    color: #000000; /* Color for the home icon */
+    margin-left: 20px; /* Space from the left edge */
+    margin-top: 10px; /* Space from the top of the header */
+    float: left; /* Aligns the icon to the left */
+    font-size: 30px; /* Increase the size of the icon (adjust as needed) */
 }
 
 footer {
@@ -70,3 +83,27 @@ footer {
     margin-top: 20px;
     color: black;
 }
+
+
+/* .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    text-decoration: none;
+    color: black;
+    transition: transform 0.3s ease; 
+}
+
+.nav-text {
+    display: none;
+    text-align: center; 
+    font-size: 14px; 
+}
+
+.nav-item:hover {
+    transform: scale(1.1); 
+}
+
+.nav-item:hover .nav-text {
+    display: block; 
+} */

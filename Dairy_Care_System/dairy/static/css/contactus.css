@@ -1,9 +1,14 @@
 ul {
     list-style-type: none;
-    margin: 0;
-    padding: 5px;
+    margin: 0; /* Remove default margin */
+    padding: 5px; /* You can adjust this as needed */
     overflow: hidden;
     background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
+    position: fixed; /* Fix the header to the top */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left of the viewport */
+    right: 0; /* Align to the right of the viewport */
+    z-index: 1000; /* Ensure it stays above other content */
 }
 
 li {
@@ -18,17 +23,18 @@ li a {
     text-align: center;
     text-decoration: none;
     padding: 10px 12px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform to transition */
 }
 
 li a:hover {
     background-color: #ddd;
     border-radius: 5px;
+    transform: scale(1.1); /* Scale up the item on hover */
 }
 
 .container {
     max-width: 600px;
-    margin: 100px auto;
+    margin: 100px auto; /* Adjust this margin if needed for content spacing */
     background: #ffffff;
     padding: 40px;
     border-radius: 8px;
@@ -39,6 +45,7 @@ h1 {
     text-align: center;
     color: black;
     font-size: 40px;
+    margin-top: 10px;
     margin-bottom: 20px;
     font-family: Copperplate, Papyrus, fantasy;
 }
@@ -74,16 +81,13 @@ p.description {
     align-items: center;
 }
 
-.home-link {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    text-decoration: none;
-}
-
-.home-link img {
-    width: 50px;
-    height: 50px;
+/* Home Icon Style */
+.home-icon {
+    color: #000000; /* Color for the home icon */
+    margin-left: 20px; /* Space from the left edge */
+    margin-top: 10px; /* Space from the top of the header */
+    float: left; /* Aligns the icon to the left */
+    font-size: 30px; /* Increase the size of the icon (adjust as needed) */
 }
 
 footer {

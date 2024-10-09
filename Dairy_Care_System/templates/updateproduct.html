@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'productslist' %}" class="back-link"><b>BACK</b></a>
+    <a href="{% url 'productslist' %}" class="back-link"><b>&larr; BACK</b></a>
     <div class="container">
         <h2>Update Product: {{ product.product_name }}</h2><br>
         <form id="updateProductForm" method="POST" action="{% url 'updateproduct' product.product_id %}" enctype="multipart/form-data">
