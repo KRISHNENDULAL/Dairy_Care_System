@@ -4,6 +4,13 @@
 <head>
     <title>{{ product.product_name }} - Product Details</title>
     <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background: url('{% static "images/prodet.jpg" %}') no-repeat center center fixed;
             background-size: cover;
@@ -12,142 +19,272 @@
             padding: 0;
         }
 
-        .product-detail-container {
-            max-width: 800px; /* Max width for the container */
-            margin: 40px auto; /* Center the container */
+        /* Container styling */
+        .product-page-container {
+            max-width: 1100px;
+            margin: 100px auto;
             padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 10px; /* Rounded corners */
-            text-align: center;
-        }
-
-        h1 {
-            font-family: 'Comic Sans MS', cursive;
-            color: #000000;
-            margin-bottom: 10px; /* Spacing below the title */
-            font-size: 2.5em; /* Larger title */
-            font-weight: bold; /* Bold title */
-        }
-
-        .images {
+            background-color: rgb(226, 233, 235);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap; /* Allow wrapping of images */
-            gap: 15px; /* Space between images */
-            margin-bottom: 20px; /* Spacing below the image section */
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
 
-        .images img {
-            width: 300px; /* Fixed width for uniformity */
-            height: 250px; /* Fixed height for uniformity */
-            object-fit: cover; /* Maintain aspect ratio */
-            border-radius: 8px; /* Rounded corners for images */
-            border: 1px solid #ddd; /* Light border around images */
-            transition: transform 0.3s; /* Smooth hover effect */
+        /* Left section: Product images */
+        .product-images {
+            flex: 1;
+            margin-right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%; /* Full width of the available space */
+            height: 450px; /* Fixed height for the container */
+            background-color: rgb(221, 219, 219); /* White background */
+            display: flex;
+            justify-content: center; /* Center the image horizontally */
+            align-items: center; /* Center the image vertically */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow */
         }
 
-        .images img:hover {
-            transform: scale(1.05); /* Zoom effect on hover */
+        .main-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Ensure the image fits within the container */
+            border-radius: 8px;
         }
 
-        p {
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: #ff9900;
+        }
+
+        /* Right section: Product details */
+        .product-details {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 28px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #b12704;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .product-description {
+            font-size: 16px;
             color: #000000;
-            margin: 10px 0; /* Spacing between paragraphs */
-            font-size: 1.2em; /* Slightly larger font size */
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
 
-        strong {
-            color: #910b0b; /* Darker color for strong text */
+        .availability {
+            color: #228b22;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Reviews and Ratings */
+        /* .rating-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            color: #ff9900;
+            font-size: 18px;
+            margin-right: 10px;
+        }  */
+
+        .reviews {
+            font-size: 14px;
+            color: #007185;
+        }
+
+        .reviews a {
+            text-decoration: none;
+            color: #007185;
+        }
+
+        /* Buttons */
+        .product-actions {
+            display: flex;
+            gap: 80px;
+            margin-top: auto; /* Push buttons to the bottom of the column */
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .buy-button {
-            padding: 12px 24px;
-            font-size: 18px;
             background-color: green;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
         }
 
         .buy-button:hover {
-            background-color: darkgreen;
-            transform: scale(1.05); /* Slightly enlarge button on hover */
+            background-color: rgb(15, 156, 15);
+            transform: scale(1.02);
         }
 
         .wish-button {
-            padding: 12px 24px;
-            font-size: 18px;
-            background-color: rgb(175, 0, 0);
+            background-color: red;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
         }
 
         .wish-button:hover {
-            background-color: rgb(255, 0, 0);
-            transform: scale(1.05); /* Slightly enlarge button on hover */
+            background-color: #ec2929;
+            transform: scale(1.02);
         }
 
-        @media (max-width: 600px) {
-            .images img {
-                width: 100%; /* Full width on smaller screens */
-                height: auto; /* Maintain aspect ratio */
+        .btn i {
+            font-size: 20px;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 768px) {
+            .product-page-container {
+                flex-direction: column;
+            }
+
+            .product-images {
+                margin-right: 0;
             }
         }
 
+        /* Back to products */
         .back-link {
             position: absolute;
             top: 20px;
             right: 20px; /* Align to the left */
-            font-size: 25px;
+            font-size: 30px;
             color: black;
             text-decoration: none;
             font-family: 'Comic Sans MS', cursive;
         }
-        
+
         .back-link:hover {
             text-decoration: underline;
+        }
+
+        .success-message {
+            margin-top: 15px;
+            color: rgb(0, 0, 128);
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <a href="{% url 'custproductslist' %}" class="back-link"><b>BACK</b></a>
 
-    <div class="product-detail-container">
-        <h1>{{ product.product_name }}</h1>
-        <div class="images">
-            {% for image in images %}
-                <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
-            {% endfor %}
-        </div>
-        <p>{{ product.product_description }}</p><br>
-        <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
-        <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
-        <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p><br>
-        <!-- Add to Wishlist Form -->
-        <!-- Add to Wishlist Form -->
-<form method="POST" action="{% url 'productdetails' product.product_id %}">
-    {% csrf_token %}
-    <button type="submit" name="add_to_wishlist" class="btn add-to-wishlist-btn">Add to Wishlist</button>
-</form>
-        <button class="buy-button">Add to Cart</button>
+    <a href="{% url 'custproductslist' %}" class="back-link">&larr; Back</a>
 
-        <div class="container">
-            <!-- Message display block -->
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    <div class="container">
+
+        <div class="product-page-container">
+            <!-- Left section: Product images -->
+            <div class="product-images">
+                <img src="{{ images.0.image.url }}" alt="{{ product.product_name }}" class="main-image">
+
+                <!-- <div class="thumbnail-container">
+                    {% for image in images %}
+                        <img src="{{ image.image.url }}" alt="{{ product.product_name }}" class="thumbnail" onclick="changeMainImage(this)">
                     {% endfor %}
-                </ul>
-            {% endif %}
+                </div> -->
+            </div>
 
+            <!-- Right section: Product details -->
+            <div class="product-details">
+                <h1 class="product-title">{{ product.product_name }}</h1><br>
+
+                <!-- <div class="rating-container">
+                    <span class="stars">
+                        &#9733; &#9733; &#9733; &#9733; &#9734;
+                    </span>
+                    <span class="reviews">
+                        <a href="#">145 customer reviews</a>
+                    </span>
+                </div> -->
+
+                <p class="product-price">Rs. {{ product.product_price }}</p><br>
+
+                <p class="product-description">{{ product.product_description }}</p>
+
+                <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p><br>
+
+                <p><strong>Status:</strong> {{ product.status|yesno:"In stock,Not Available" }}</p>
+
+                <div class="product-actions">
+                    <form method="POST" action="{% url 'productdetails' product.product_id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="add_to_wishlist" class="btn wish-button">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </button>
+                    </form>
+
+                    <button class="btn buy-button">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                </div><br><br>
+
+                <!-- Display success message if it exists -->
+{% if messages %}
+<div class="success-message">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+            </div>
+        </div>
     </div>
 
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+        function changeMainImage(thumbnail) {
+            document.querySelector('.main-image').src = thumbnail.src;
+            document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+    </script>
 </body>
 </html>

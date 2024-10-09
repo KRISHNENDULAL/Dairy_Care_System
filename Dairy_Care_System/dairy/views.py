@@ -557,9 +557,9 @@ def productdetails(request, product_id):
                 wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
 
                 if created:
-                    messages.success(request, 'Product added to wishlist!')
+                    messages.success(request, f'{product.product_name} added to wishlist successfully!')
                 else:
-                    messages.info(request, 'Product is already in your wishlist.')
+                    messages.info(request, f'{product.product_name} is already in your wishlist.')
             else:
                 messages.error(request, 'You need to log in to add to your wishlist.')
 
@@ -578,36 +578,31 @@ def wishlist(request):
         user = get_object_or_404(Users_table, user_id=user_id)  # Fetch the user object using user_id
 
         if request.method == 'POST':
-            product_id = request.POST.get('remove_product_id')  # Get the product ID from the form
-            print("Product ID to remove:", product_id)  # Debugging line
+            print("POST data:", request.POST)  # Debugging the entire POST data
+            product_id = request.POST.get('remove_product_id')  # Get product ID
+            print("Product ID received in POST request:", product_id)
+
             if product_id:
                 try:
-                    wishlist_item = WishlistItem.objects.get(user=user, product_id=product_id)
-                    wishlist_item.delete()  # Remove the product from the wishlist
-                    print("Wishlist item removed:", wishlist_item)  # Debugging line
-                    messages.success(request, 'Product removed from your wishlist.')
-                except WishlistItem.DoesNotExist:
-                    print("Wishlist item does not exist.")  # Debugging line
-                    messages.error(request, 'This product is not in your wishlist.')
-            return redirect('wishlist')  # Redirect to avoid form resubmission
+                    wishlist_item = WishlistItem.objects.filter(user=user, product_id=product_id).first()
+                    if wishlist_item:
+                        wishlist_item.delete()
+                        print("Wishlist item deleted successfully.")
+                    else:
+                        print("Wishlist item not found for this user.")
+                except Exception as e:
+                    print("Error while deleting wishlist item:", e)
+            else:
+                print("No product ID provided in the POST request.")
 
-        # Fetch the wishlist items for the user
+            return redirect('wishlist')
+
         wishlist_items = WishlistItem.objects.filter(user=user).select_related('product')
+        print("Wishlist items retrieved for the user:", wishlist_items)
 
-        context = {
-            'wishlist': wishlist_items,  # Pass the wishlist items to the template
-            'username': user.username,   # Pass the username to the template
-            'error': None
-        }
+        return render(request, 'wishlist.html', {'wishlist': wishlist_items, 'username': user.username})
     else:
-        messages.error(request, "You need to log in to view your wishlist.")
-        context = {
-            'wishlist': [],
-            'username': None,
-            'error': "You need to log in to view your wishlist."
-        }
-
-    return render(request, 'wishlist.html', context)
+        return redirect('loginpage')
 
 
 def editproduct(request):
