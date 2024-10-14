@@ -173,19 +173,19 @@
         }
 
         .btn-update {
-            background-color: #28a745;
+            background-color: #016e1b;
         }
 
         .btn-update:hover {
-            background-color: #218838;
+            background-color: #22ad40;
         }
 
         .btn-remove {
-            background-color: red;
+            background-color: rgb(255, 0, 0);
         }
 
         .btn-remove:hover {
-            background-color: red;
+            background-color: rgb(168, 3, 3);
         }
 
         .total {
@@ -313,18 +313,19 @@
             <tbody>
                 {% for item in cart_items %}
                 <tr>
-                    <td data-label="Product">
+                    <td data-label="Product"><strong>
                         <div class="product-name">
                             <!-- Display the product image if available -->
                             <img src="{{ item.product.images.first.image.url }}" >
-                            {{ item.product.product_name }}
+                            <a href="{% url 'productdetails' item.product.product_id %}" style="text-decoration: underline; color: #000000;">
+                            {{ item.product.product_name }}</a>
                         </div>
-                    </td>
+                    </strong></td>
                     <td>
                         <form method="POST" action="{% url 'update_cart' item.cart_id %}">
                             {% csrf_token %}
                             <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                            <button type="submit">Update</button>
+                            <button class="btn btn-update" type="submit">Update</button>
                         </form>
                     </td>
                     <td data-label="Price">₹{{ item.product.product_price }}</td>
@@ -352,8 +353,8 @@
 
         {% else %}
         <div class="empty-cart">
-            <p>Your cart is currently empty.</p><br>
-            <a href="{% url 'custproductslist' %}">Continue Shopping</a>
+            <strong></b><p>Your cart is currently empty.</p><br>
+            <a href="{% url 'custproductslist' %}">Continue Shopping</a></strong>
         </div>
         {% endif %}
     </div>

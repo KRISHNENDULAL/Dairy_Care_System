@@ -238,15 +238,71 @@
         .search-button:hover {
             background-color: #105314;
         }
-    
+
+        /* Hamburger icon inside the navigation bar */
+/* .hamburger {
+    font-size: 30px;
+    cursor: pointer;
+    padding: 2px;
+    color: white;
+}
+
+
+.sidebar {
+    height: 100%;
+    width: 250px; 
+    position: fixed; 
+    z-index: 1; 
+    top: 0; 
+    left: -250px; 
+    background-color: #111; 
+    overflow-x: hidden; 
+    transition: 0.5s; 
+    padding-top: 60px; 
+}
+
+.sidebar a {
+    padding: 8px 8px 8px 32px; 
+    text-decoration: none; 
+    font-size: 25px; 
+    color: white; 
+    display: block; 
+    transition: 0.3s; 
+}
+
+.sidebar a:hover {
+    color: #f1f1f1; 
+}
+
+.closebtn {
+    font-size: 36px; 
+    margin-left: 10px; 
+    color: white; 
+}    */
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
+
+    <!-- Sidebar -->
+<!-- <div id="sidebar" class="sidebar">
+    <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
+    <a href="#">Dairy Care System</a>
+    <br><br>
+    <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i> Users List</a><br>
+    <a href="{% url 'productslist' %}"><i class="fas fa-tags"></i> Products List</a><br>
+    <a href="{% url 'productstock' %}"><i class="fas fa-boxes"></i> Stock List</a><br>
+    <a href="{% url 'animalslist' %}"><i class="fas fa-paw"></i> Animals List</a><br>
+</div> -->
+
+
 <!-- Navigation Bar-->
 <ul>
     <div class="header">
+        <!-- Hamburger Icon -->
+        <!-- <span class="hamburger" onclick="openNav()">&#9776;</span> -->
+
         <div class="nav-item">
             <li><b><a href="{% url 'addproducts' %}"><i class="fa fa-cart-plus"></i> Add Products</a></b></li>
         </div>
@@ -341,6 +397,17 @@
             }
         });
     }
+
+    // Open the sidebar
+function openNav() {
+    document.getElementById("sidebar").style.left = "0"; // Show sidebar
+}
+
+// Close the sidebar
+function closeNav() {
+    document.getElementById("sidebar").style.left = "-250px"; // Hide sidebar
+}
+
 </script>
 
 </body>

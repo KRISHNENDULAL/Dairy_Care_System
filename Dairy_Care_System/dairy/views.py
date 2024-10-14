@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage, WishlistItem, Cart, Animals_table, AnimalImages
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, Cart, Animals_table, AnimalImages
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -461,16 +461,57 @@ def employeepage(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def feedbackpage(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')  
+    
     if user_id:
-        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)  
+        # Fetch products with status 1 to display in the dropdown
+        products = Products_table.objects.filter(status=1)  
+
+        if request.method == 'POST':
+            product_id = request.POST.get('product')
+            rating = request.POST.get('star')
+            feedback_text = request.POST.get('feedback')
+
+            # Handle overall site feedback
+            if product_id == 'feedback':
+                feedback = Feedback_table.objects.create(
+                    user=user,
+                    product=None,  # No product associated for site feedback
+                    rating=rating,
+                    feedback_text=feedback_text
+                )
+            # Handle product-specific feedback
+            else:
+                product = get_object_or_404(Products_table, pk=product_id)
+                feedback = Feedback_table.objects.create(
+                    user=user,
+                    product=product,
+                    rating=rating,
+                    feedback_text=feedback_text
+                )
+
+            feedback.save()
+            messages.success(request, 'Thank you! Your feedback has been submitted successfully.')
+            return redirect('feedbackpage')  # Redirect after submission
+
+        # Pass username and products to the template
         context = {
-            'username': user.username,  # Pass the username to the template
+            'username': user.username,  
+            'products': products,
         }
         return render(request, 'feedbackpage.html', context)
+
     else:
-        return redirect('login')  # Redirect to login if no user is logged in 
-    
+        # Redirect to login if no user is logged in
+        return redirect('login')
+
+
+def feedbackreview(request):
+    feedback_list = Feedback_table.objects.all().order_by('-created_at')
+    return render(request, 'feedbackreview.html', {'feedback_list': feedback_list})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

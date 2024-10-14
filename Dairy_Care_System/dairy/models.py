@@ -70,7 +70,7 @@ class WishlistItem(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.product_name}"
-    
+
 
 
 class Animals_table(models.Model):
@@ -135,3 +135,14 @@ class Cart(models.Model):
     def get_total_price(self):
         return self.quantity * self.product.product_price  # Calculate the total price
     
+
+class Feedback_table(models.Model):
+    feedback_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)  # Customer providing the feedback
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE)  # Product being reviewed
+    rating = models.IntegerField()  # Rating out of 5
+    feedback_text = models.TextField(blank=True, null=True)  # Optional feedback text
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp for when the feedback was submitted
+
+    def __str__(self):
+        return f"Feedback by {self.user.username} for {self.product.product_name}"

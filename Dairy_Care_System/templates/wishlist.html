@@ -215,7 +215,8 @@
             <!-- Product details and remove button -->
             <div class="wishlist-item-content">
                 <div class="wishlist-item-details">
-                    <h2>{{ item.product.product_name }}</h2>
+                    <a href="{% url 'productdetails' item.product.product_id %}" style="text-decoration: underline; color: #000000;">
+                    <h2>{{ item.product.product_name }}</h2></a>
                     <p>{{ item.product.product_description }}</p><br>
                     <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br>
                     <p><strong>Price:</strong> Rs. {{ item.product.product_price }}</p><br><br>

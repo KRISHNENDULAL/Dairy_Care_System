@@ -74,10 +74,10 @@
                             <div class="button-group">
                                 <!-- Show delete button only if user is active -->
                                 {% if user.status %}
-                                    <a href="#" class="delete-btn" onclick="openModal('delete', '{{ user.username }}', '{% url 'regdeleteuser' user.user_id %}');"><i class="fas fa-trash"></i> <b>Delete</b></a>
+                                    <a href="#" class="delete-btn" onclick="openModal('delete', '{{ user.username }}', '{% url 'regdeleteuser' user.user_id %}');"><i class="fas fa-trash"></i> <b>Deactivate</b></a>
                                 {% else %}
                                     <!-- Show restore button only if user is inactive -->
-                                    <a href="#" class="view-btn" onclick="openModal('restore', '{{ user.username }}', '{% url 'restoreuser' user.user_id %}');"><i class="fas fa-undo"></i> <b>Restore</b></a>
+                                    <a href="#" class="view-btn" onclick="openModal('restore', '{{ user.username }}', '{% url 'restoreuser' user.user_id %}');"><i class="fas fa-undo"></i> <b>Reactivate</b></a>
                                 {% endif %}
                             </div>
                         </td>                        
