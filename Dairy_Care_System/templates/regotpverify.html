@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Verify OTP</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: url("{% static 'images/mailverify.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container for content and footer */
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 5px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.8);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 5px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
+        }
+
+        .header li {
+            float: right;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .header li a {
+            display: block;
+            color: black;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 12px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .header li a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+            transform: scale(1.1);
+        }
+
+        /* Header style */
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;        
+            padding: 4px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Navigation item style */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .home-icon {
+            color: #000000;
+            margin-left: 20px;
+            margin-top: 10px;
+            float: left;
+            font-size: 30px;
+        }
+
+        .verify-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #07407d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .login-link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #1a07c6;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<ul>
+    <a href="{% url 'home' %}">
+        <i class="fas fa-home home-icon"></i>
+    </a>
+
+    <div class="header">
+        <li><b><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></b></li>
+        <li><b><a href="{% url 'regmailverify' %}"><i class="fas fa-user-plus"></i> Register</a></b></li>
+        <li><b><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></b></li>
+        <li><b><a href="{% url 'contactus' %}"><i class="fas fa-envelope"></i> Contact Us</a></b></li>
+    </div>
+</ul>
+
+<!-- Content Section -->
+<div class="content">
+    <div class="verify-container">
+        <h2>Verify Your OTP</h2><br>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="otp">Enter OTP:</label>
+                <input type="text" id="otp" name="otp" placeholder="Enter OTP sent to your email" required>
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <button type="submit">Verify OTP</button>
+        </form><br>
+        <div class="login-link">
+            <p>Already have an account?<a href="{% url 'login' %}"> Login</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const otpInput = document.getElementById("otp");
+        const errorMessage = document.getElementById("error-message");
+
+        // Live validation on input event
+        otpInput.addEventListener("input", validateOTP);
+
+        // Validate OTP when the form is submitted
+        document.querySelector("form").addEventListener("submit", function (event) {
+            if (!validateOTP()) {
+                event.preventDefault(); // Prevent form submission if invalid
+                showError("Please enter a valid OTP.");
+            }
+        });
+
+        // Validate OTP function
+        function validateOTP() {
+            const otpValue = otpInput.value.trim();
+            if (otpValue === "") {
+                showError("OTP is required.");
+                return false;
+            } else if (otpValue.length !== 4 || isNaN(otpValue)) {
+                showError("Please enter a valid 4-digit OTP.");
+                return false;
+            } else {
+                hideError();
+                return true;
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = "block";
+            otpInput.style.borderColor = "red";
+        }
+
+        // Hide error message
+        function hideError() {
+            errorMessage.textContent = "";
+            errorMessage.style.display = "none";
+            otpInput.style.borderColor = "";
+        }
+    });
+</script>
+
+</body>
+</html>

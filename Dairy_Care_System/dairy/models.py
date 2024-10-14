@@ -116,3 +116,22 @@ class AnimalHealth_table(models.Model):
 
     def __str__(self):
         return f"Health record for {self.animal.animal_name} on {self.checkup_date}"
+
+
+
+class Cart(models.Model):
+    cart_id = models.AutoField(primary_key=True)  # Unique identifier for the cart item
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)  # Link to the user who added the product to the cart
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE)  # Link to the product added to the cart
+    quantity = models.PositiveIntegerField(default=1)  # Quantity of the product
+    added_at = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when a product is added to the cart
+
+    class Meta:
+        unique_together = ('user', 'product')  # Prevents the same user adding the same product more than once
+
+    def __str__(self):
+        return f"{self.quantity} of {self.product.product_name} in cart"
+
+    def get_total_price(self):
+        return self.quantity * self.product.product_price  # Calculate the total price
+    

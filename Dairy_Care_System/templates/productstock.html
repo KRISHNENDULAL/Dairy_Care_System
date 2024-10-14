@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Details</title>
+    <style>
+        /* General Body Styling */
+        body {
+            background: url("{% static 'images/cbcbcb.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* Back Link Styling */
+        .back-link {
+            font-family: 'Comic Sans MS', cursive;
+            display: inline-block;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 5px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 25px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Title Styling */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 32px;
+            margin-top: 20px;
+            font-family: 'Trebuchet MS', sans-serif;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Table shadow */
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table, th, td {
+            border: none;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        td {
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f3f3f3;
+        }
+
+        /* Hover Effect */
+        tr:hover td {
+            background-color: #eaeaea;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            table, th, td {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .back-link {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body><br><br><br>
+
+    <a href="{% url 'adminpage' %}" class="back-link">&larr; BACK</a>
+    
+    <h1><u>Stock Details</u></h1><br>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity (Stock)</th>
+                <th>Added By</th>
+                <th>Added At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.product_quantity }} {{ product.quantity_unit }}</td>
+                <td>{{ product.employee.username }}</td> 
+                <td>{{ product.added_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ product.updated_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center;">No products available in stock.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

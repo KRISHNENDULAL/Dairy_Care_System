@@ -287,7 +287,7 @@
             {% endfor %}
             <h3>{{ product.product_name }}</h3>
             <p>{{ product.product_description }}</p><br>
-            <p><strong>Quantity:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
+            <p><strong>Stock:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
             <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
             <p><strong>Added by:</strong> {{ product.employee.username }}</p>

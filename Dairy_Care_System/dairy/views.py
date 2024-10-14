@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage, WishlistItem, Animals_table, AnimalImages
+from .models import Users_table, Products_table, ProductImage, WishlistItem, Cart, Animals_table, AnimalImages
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -30,6 +30,71 @@ def about(request):
 
 def contactus(request):
     return render(request, 'contactus.html')
+
+
+otp_storage = {}
+
+def send_otp_email(user_email):
+    otp = random.randint(1000, 9999)  # Generate a random OTP
+    otp_storage[user_email] = otp  # Store the OTP for later verification
+
+    subject = 'Dairy Care System - Email Verification'
+    message = f"""
+    Dear User,
+
+    Thank you for registering with Dairy Care System. 
+    To complete your email verification, please use the following One-Time Password (OTP):
+
+    OTP: {otp}
+
+    This OTP is valid for the next 10 minutes. Please do not share it with anyone. If you did not request this, please ignore this email.
+
+    Regards,
+    Dairy Care System Team
+    dairycaresystem25@gmail.com
+    """
+    from_email = 'dairycaresystem25@gmail.com'  # Your system email
+    recipient_list = [user_email]
+
+    send_mail(subject, message, from_email, recipient_list)
+
+
+def regmailverify(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        if Users_table.objects.filter(username=email).exists():
+            messages.info(request, "Email is already registered. Please log in.")
+            return redirect('login')
+
+        send_otp_email(email)
+
+        request.session['user_email'] = email
+
+        return redirect('regotpverify')
+
+    return render(request, 'regmailverify.html')
+
+def regotpverify(request):
+    email = request.session.get('user_email') 
+
+    if not email:
+        messages.error(request, "Session expired. Please enter your email again.")
+        return redirect('enter_email')
+
+    if request.method == 'POST':
+        otp_input = request.POST.get('otp')
+
+        if otp_storage.get(email) and otp_storage[email] == int(otp_input):
+          
+            del otp_storage[email]
+            request.session['verified_email'] = email
+
+            return redirect('registration')
+        else:
+            messages.error(request, "Invalid OTP. Please try again.")
+
+    return render(request, 'regotpverify.html')
 
 
 def registration(request):
@@ -72,7 +137,12 @@ def registration(request):
         messages.success(request, 'Registration successful! Please log in.')
         return redirect('login')
 
-    return render(request, 'registration.html')
+    else:
+        # Pre-fill the email field with the verified email from the session
+        verified_email = request.session.get('verified_email', '')
+        context = {'verified_email': verified_email}
+        return render(request, 'registration.html', context)
+
 
 
 def forgotpassword(request):
@@ -677,6 +747,14 @@ def restoreproduct(request, product_id):
     return redirect('editproduct')  # Redirect to the product listing page
 
 
+def productstock(request):
+    # Fetch all products from the Products_table
+    products = Products_table.objects.all()
+
+    # Pass the products to the template
+    return render(request, 'productstock.html', {'products': products})
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def animalslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
@@ -747,6 +825,74 @@ def addanimal(request):
     return render(request, 'addanimal.html')
 
 
+# Add a product to the cart
+def add_to_cart(request, product_id):
+    if request.method == 'POST':
+        # Get the quantity from the form submission (input field)
+        quantity = int(request.POST.get('quantity', 1))  # Default to 1 if not specified
+
+    product = get_object_or_404(Products_table, pk=product_id)
+    user_id = request.session['user_id']
+    user = get_object_or_404(Users_table, pk=user_id)
+
+    # Check if the product is already in the cart
+    cart_item, created = Cart.objects.get_or_create(
+        user=user,  # Assuming the user is logged in
+        product=product,
+        defaults={'quantity': quantity}  # Default quantity if the item is being added for the first time
+    )
+
+    if not created:  # If the item already exists in the cart, just update the quantity
+        cart_item.quantity += quantity
+        cart_item.save()
+
+    return redirect('viewcart')  # Redirect to the cart view after adding the item
+
+# View the cart
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def viewcart(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch cart items for the logged-in user
+        cart_items = Cart.objects.filter(user=user)
+        
+        # Calculate the total price of the cart
+        total_price = sum([item.get_total_price() for item in cart_items])
+        
+        # Pass the username, cart items, and total price to the template
+        context = {
+            'username': user.username,  # User's username
+            'cart_items': cart_items,    # Cart items for the user
+            'total_price': total_price   # Total price of the items in the cart
+        }
+        return render(request, 'viewcart.html', context)
+    
+    else:
+        # Redirect to login if no user is logged in
+        return redirect('login')
+
+
+# Update the quantity of a product in the cart
+def update_cart(request, cart_id):
+    if request.method == 'POST':
+        cart_item = get_object_or_404(Cart, pk=cart_id)
+        quantity = int(request.POST.get('quantity', 1))
+
+        if quantity > 0:
+            cart_item.quantity = quantity
+            cart_item.save()
+
+        return redirect('viewcart')
+
+# Delete a product from the cart
+def delete_from_cart(request, cart_id):
+    cart_item = get_object_or_404(Cart, pk=cart_id)
+    cart_item.delete()
+    return redirect('viewcart')
 
 
 

@@ -7,7 +7,11 @@ urlpatterns = [
     path('', views.home,name='home'),
     path('login', views.login,name='login'),
     path('oauth/', include('social_django.urls', namespace='social')),
+    
+    path('regmailverify', views.regmailverify, name='regmailverify'),
+    path('regotpverify', views.regotpverify, name='regotpverify'),
     path('registration', views.registration,name='registration'),
+
     path('about', views.about,name='about'),
     path('contactus', views.contactus,name='contactus'),
     path('forgotpassword',views.forgotpassword,name='forgotpassword'),
@@ -25,10 +29,16 @@ urlpatterns = [
     path('userprofile',views.userprofile,name='userprofile'),
     path('updateuserprofile',views.updateuserprofile,name='updateuserprofile'),
     path('productslist',views.productslist,name='productslist'),
+    path('productstock',views.productstock,name='productstock'),
     path('custproductslist',views.custproductslist,name='custproductslist'),
 
     path('productslist/<int:product_id>/', views.productdetails, name='productdetails'),
     path('wishlist', views.wishlist, name='wishlist'),
+
+    path('viewcart', views.viewcart, name='viewcart'),
+    path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/update/<int:cart_id>/', views.update_cart, name='update_cart'),
+    path('cart/delete/<int:cart_id>/', views.delete_from_cart, name='delete_from_cart'),
 
     path('addproducts',views.addproducts,name='addproducts'),
     path('editproduct', views.editproduct, name='editproduct'),
