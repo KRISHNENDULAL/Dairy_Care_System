@@ -74,17 +74,11 @@ button:hover {
 }
 
 .error-message {
-    color: red;
-    font-size: 0.9em;
-    margin-top: 5px;
-    display: none; /* Hide by default */
-    text-align: center; /* Center align error messages */
-}
-
-.error-message {
     color: red; /* Set error messages to red */
     text-align: center; /* Center align error messages */
+    font-size: 0.9em;
     margin-top: 5px; /* Add some spacing above the error messages */
+    display: block; /* Hide by default */
 }
 
 .image-preview {

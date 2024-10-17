@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/customerpage.css' %}">
     <style>
         body {
-            background: url('{% static "images/custpg.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/customerpage.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
@@ -46,7 +46,7 @@
                     <div class="dropdown-content" id="dropdown-content">
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <!-- Change Logout link to trigger a custom SweetAlert -->
-                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="#" onclick="confirmLogout()" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </li>
             </div>

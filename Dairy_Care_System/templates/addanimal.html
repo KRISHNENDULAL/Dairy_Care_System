@@ -252,5 +252,127 @@
             }
         }
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        const animalName = document.getElementById("animal_name");
+        const animalType = document.getElementById("animal_type");
+        const breed = document.getElementById("breed");
+        const dateOfBirth = document.getElementById("date_of_birth");
+        const milkCapacity = document.getElementById("milk_capacity");
+        const animalImages = document.getElementById("animal_images");
+
+        // Regex to allow only alphabets in name
+        const nameRegex = /^[A-Za-z\s]+$/;
+
+        // Function to display error message
+        function showError(input, message) {
+            const formGroup = input.parentElement;
+            const error = document.createElement('small');
+            error.style.color = 'red';
+            error.textContent = message;
+            if (formGroup.querySelector('small')) {
+                formGroup.querySelector('small').remove(); // Remove existing error
+            }
+            formGroup.appendChild(error);
+        }
+
+        // Function to clear error message
+        function clearError(input) {
+            const formGroup = input.parentElement;
+            if (formGroup.querySelector('small')) {
+                formGroup.querySelector('small').remove(); // Remove error if present
+            }
+        }
+
+        // Validate name field
+        animalName.addEventListener("input", function() {
+            if (!nameRegex.test(animalName.value.trim())) {
+                showError(animalName, "Name must contain only alphabets");
+            } else {
+                clearError(animalName);
+            }
+        });
+
+        // Validate category selection
+        animalType.addEventListener("change", function() {
+            if (animalType.value === "") {
+                showError(animalType, "Please select an animal category");
+            } else {
+                clearError(animalType);
+            }
+        });
+
+        // Validate breed selection
+        breed.addEventListener("change", function() {
+            if (breed.value === "") {
+                showError(breed, "Please select a breed");
+            } else {
+                clearError(breed);
+            }
+        });
+
+        // Validate date of birth selection
+        dateOfBirth.addEventListener("change", function() {
+            if (dateOfBirth.value === "") {
+                showError(dateOfBirth, "Please select a date of birth");
+            } else {
+                clearError(dateOfBirth);
+            }
+        });
+
+        // Validate milk capacity (must be a number or float)
+        milkCapacity.addEventListener("input", function() {
+            if (isNaN(milkCapacity.value) || milkCapacity.value < 0) {
+                showError(milkCapacity, "Milk capacity must be a positive number or float");
+            } else {
+                clearError(milkCapacity);
+            }
+        });
+
+        // Validate at least one image is selected
+        animalImages.addEventListener("change", function() {
+            if (animalImages.files.length === 0) {
+                showError(animalImages, "Please select at least one photo");
+            } else {
+                clearError(animalImages);
+            }
+        });
+
+        // Form submit validation
+        form.addEventListener("submit", function(e) {
+            // Prevent form submission if any field is invalid
+            if (!nameRegex.test(animalName.value.trim())) {
+                showError(animalName, "Name must contain only alphabets");
+                e.preventDefault();
+            }
+
+            if (animalType.value === "") {
+                showError(animalType, "Please select an animal category");
+                e.preventDefault();
+            }
+
+            if (breed.value === "") {
+                showError(breed, "Please select a breed");
+                e.preventDefault();
+            }
+
+            if (dateOfBirth.value === "") {
+                showError(dateOfBirth, "Please select a date of birth");
+                e.preventDefault();
+            }
+
+            if (isNaN(milkCapacity.value) || milkCapacity.value < 0) {
+                showError(milkCapacity, "Milk capacity must be a positive number or float");
+                e.preventDefault();
+            }
+
+            if (animalImages.files.length === 0) {
+                showError(animalImages, "Please select at least one photo");
+                e.preventDefault();
+            }
+        });
+    });
+</script>
 </body>
 </html>

@@ -118,8 +118,8 @@ li a:hover {
 }
 
 .feedback-box button {
-    background-color: #C7BEBE;
-    color: black;
+    background-color: #000000;
+    color: rgb(255, 255, 255);
     border: none;
     border-radius: 20px;
     font-size: 24px;
@@ -129,6 +129,6 @@ li a:hover {
 }
 
 .feedback-box button:hover {
-    background-color: #B0A5A5;
+    background-color: #5f5757;
 }
 

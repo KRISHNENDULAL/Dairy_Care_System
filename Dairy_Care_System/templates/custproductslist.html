@@ -6,9 +6,61 @@
     <link rel="stylesheet" href="{% static 'css/custproductslist.css' %}">
     <style>
         body {
-            background: url('{% static "images/prolist.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/productslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
+        }
+
+        .hamburger {
+            font-size: 30px;
+            cursor: pointer;
+            padding: 2px;
+            color: white;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px; 
+            position: fixed; 
+            z-index: 1; 
+            top: 0; 
+            left: -250px; 
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            backdrop-filter: blur(10px); /* Blur effect */
+            overflow-x: hidden; 
+            transition: 0.5s; 
+            padding-top: 10px; 
+        }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px; 
+            text-decoration: none; 
+            font-size: 25px; 
+            color: white; 
+            display: block; 
+            transition: 0.3s; 
+        }
+
+        .sidebar a:hover {
+            color: #000000; 
+        }
+
+        /* .closebtn {
+            font-size: 36px; 
+            margin-right: 10px; 
+            color: white; 
+        } */
+
+        /* Header for navigation and search */
+        .header {
+            margin-left: 0;
+            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
+        }
+
+        /* Main content should also shift with sidebar */
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
         }
     </style>
 
@@ -17,101 +69,138 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
-<!-- Navigation Bar-->
-<ul>
-    <div class="header">
-        <div class="nav-item">
-            <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <a href="#">Dairy Care System</a><br><br><br><br>
+        <!-- <a href="#" class="closebtn" onclick="toggleNav()">&times;</a><br><br> -->
+        <a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a><br>
+        <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
+        <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
+        <a href="{% url 'feedbackpage' %}"><i class="fas fa-comment"></i> Your Feedback</a><br>
+    </div>
+
+    <!-- Navigation Bar-->
+    <ul>
+        <div class="header">
+            <!-- Hamburger Icon -->
+            <span class="hamburger" onclick="toggleNav()">&#9776;</span>
+            <!-- <div class="nav-item">
+                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Your Feedback</a></b></li>
+            </div> -->
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="{% url 'customerpage' %}"><i class="fas fa-home"></i> Dashboard</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
         </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a></b></li>
+    </ul>
+
+    <div class="main-content">
+    <!-- Search Bar -->
+    <center>
+        <div class="search-bar-container">
+            <form method="GET" action="{% url 'custproductslist' %}">
+                <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+                <button type="submit" class="search-button">Search</button>
+            </form>
         </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Your Feedback</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li>
-                <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                <div class="dropdown-content" id="dropdown-content">
-                    <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                    <a href="{% url 'customerpage' %}"><i class="fas fa-home"></i> Dashboard</a>
-                    <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </center>
+
+    <!-- Main content that shifts when the sidebar opens -->
+    
+        <div class="products-container">
+            {% for product in products %}
+                <div class="product" onclick="window.location.href='{% url 'productdetails' product.product_id %}'" style="cursor: pointer;">
+                    {% for image in product.images.all %}
+                        <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
+                    {% endfor %}
+                    <h3>{{ product.product_name }}</h3>
+                    <p>{{ product.product_description }}</p>
                 </div>
-            </li>
+            {% empty %}
+                <p>No products available.</p>
+            {% endfor %}
         </div>
     </div>
-</ul>
 
-<!-- Search Bar -->
-<center>
-<div class="search-bar-container">
-    <form method="GET" action="{% url 'custproductslist' %}">
-        <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
-        <button type="submit" class="search-button">Search</button>
-    </form>
-</div></center>
+    <!-- Add SweetAlert2 and Font Awesome JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
-<div class="products-container">
-    {% for product in products %}
-        <div class="product" onclick="window.location.href='{% url 'productdetails' product.product_id %}'" style="cursor: pointer;">
-            {% for image in product.images.all %}
-                <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
-            {% endfor %}
-            <h3>{{ product.product_name }}</h3>
-            <p>{{ product.product_description }}</p>
-        </div>
-    {% empty %}
-        <p>No products available.</p>
-    {% endfor %}
-</div>
-
-<!-- Add SweetAlert2 and Font Awesome JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-
-<script>
-    // Toggle dropdown on click
-    function toggleDropdown() {
-        var dropdown = document.getElementById("dropdown-content");
-        if (dropdown.style.display === "block") {
-            dropdown.style.display = "none";
-        } else {
-            dropdown.style.display = "block";
-        }
-    }
-
-    // Close the dropdown if clicked outside of it
-    window.onclick = function(event) {
-        if (!event.target.matches('.username')) {
+    <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
             var dropdown = document.getElementById("dropdown-content");
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
             }
         }
-    }
 
-    // Custom SweetAlert2 logout confirmation
-    function confirmLogout() {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You will be logged out of Dairy Care System!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, logout',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Redirect to logout URL
-                window.location.href = "{% url 'logout' %}";
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
             }
-        });
-    }
-</script>
+        }
+
+        // Custom SweetAlert2 logout confirmation
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to logout URL
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+
+        // Toggle the sidebar and shrink/expand the content and header when the hamburger icon is clicked
+        function toggleNav() {
+            var sidebar = document.getElementById("sidebar");
+            var header = document.getElementsByClassName("header")[0]; // Get the header
+            var mainContent = document.getElementsByClassName("main-content")[0]; // Get the main content
+
+            if (sidebar.style.left === "0px") {
+                // If the sidebar is open, close it
+                sidebar.style.left = "-250px"; 
+                header.style.marginLeft = "0"; // Reset header margin
+                mainContent.style.marginLeft = "0"; // Reset content margin
+            } else {
+                // If the sidebar is closed, open it
+                sidebar.style.left = "0";
+                header.style.marginLeft = "250px"; // Shrink header when sidebar appears
+                mainContent.style.marginLeft = "250px"; // Shrink content when sidebar appears
+            }
+        }
+    </script>
 
 </body>
 </html>

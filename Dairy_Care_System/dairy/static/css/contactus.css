@@ -35,6 +35,7 @@ li a:hover {
 .container {
     max-width: 600px;
     margin: 100px auto; /* Adjust this margin if needed for content spacing */
+    backdrop-filter: blur(30px); /* Blur effect */
     background: #ffffff;
     padding: 40px;
     border-radius: 8px;

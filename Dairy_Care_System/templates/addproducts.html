@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/addproducts.css' %}">
     <style>
         body {
-            background: url('{% static "images/addprod.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/addproduct.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             font-family: Arial, sans-serif;
@@ -59,9 +59,17 @@
     <div id="photoError" class="error-message"></div> <!-- Added error message for photo upload -->
     
     <!-- Image preview element -->
-    <img id="imagePreview" class="image-preview" alt="Selected Image Preview"><br><br>
+    <img id="imagePreview" class="image-preview" alt="Selected Image Preview"><br>
 
-    <button type="submit">Add Product</button>
+    <button type="submit">Add Product</button><br><br>
+
+    {% if messages %}
+    <div class="error-messages">
+        {% for message in messages %}
+            <div class="error-message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
 </form>
 
 <script>
@@ -135,9 +143,9 @@
         // Live validation for quantity
         productQuantity.addEventListener('input', function() {
             if (productQuantity.value.trim() === "") {
-                showError('Quantity is required.', 'quantityError');
+                showError('Stock is required.', 'quantityError');
             } else if (!validateQuantity(productQuantity.value.trim())) {
-                showError('Quantity must be a valid number.', 'quantityError');
+                showError('Stock must be a valid number.', 'quantityError');
             } else {
                 clearError('quantityError');
             }
@@ -214,7 +222,7 @@
             }
 
             if (productQuantity.value.trim() === "" || !validateQuantity(productQuantity.value.trim())) {
-                showError('Quantity is required and must be a valid number.', 'quantityError');
+                showError('Stock is required and must be a valid number.', 'quantityError');
                 valid = false;
             }
 

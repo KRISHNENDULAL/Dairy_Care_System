@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            background: url('{% static "images/background.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/wishlist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -92,9 +92,11 @@
 
         h1 {
             color: #000000;
+            background-color: #ffffff;
             font-family: Copperplate, Papyrus, fantasy;
-            font-size: 36px;
-            margin-top: 50px;
+            font-size: 45px;
+            font-weight: bold;
+            margin-top: 40px;
             margin-bottom: 30px;
         }
 
@@ -167,16 +169,81 @@
         .back-link:hover {
             text-decoration: underline;
         }
+
+        .hamburger {
+            font-size: 30px;
+            cursor: pointer;
+            padding: 2px;
+            color: white;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px; 
+            position: fixed; 
+            z-index: 1; 
+            top: 0; 
+            left: -250px; 
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            backdrop-filter: blur(10px); /* Blur effect */
+            overflow-x: hidden; 
+            transition: 0.5s; 
+            padding-top: 10px; 
+        }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px; 
+            text-decoration: none; 
+            font-size: 25px; 
+            color: white; 
+            font-family: 'Arial', sans-serif;
+            display: block; 
+            transition: 0.3s; 
+        }
+
+        .sidebar a:hover {
+            color: #000000; 
+        }
+
+        /* .closebtn {
+            font-size: 36px; 
+            margin-right: 10px; 
+            color: white; 
+        } */
+
+        /* Header for navigation and search */
+        .header {
+            margin-left: 0;
+            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
+        }
+
+        /* Main content should also shift with sidebar */
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
+        }   
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
 
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <a href="#">Dairy Care System</a><br><br><br><br>
+        <!-- <a href="#" class="closebtn" onclick="toggleNav()">&times;</a><br><br> -->
+        <a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a><br>
+        <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
+        <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
+        <a href="{% url 'feedbackpage' %}"><i class="fas fa-comment"></i> Your Feedback</a><br>
+    </div>
+
     <!-- Navigation Bar-->
     <ul>
         <div class="header">
-            <div class="nav-item">
+            <!-- Hamburger Icon -->
+            <span class="hamburger" onclick="toggleNav()">&#9776;</span>
+            <!-- <div class="nav-item">
                 <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
             </div>
             <div class="nav-item">
@@ -187,7 +254,7 @@
             </div>
             <div class="nav-item">
                 <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Your Feedback</a></b></li>
-            </div>
+            </div> -->
             <div class="nav-item">
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
@@ -201,6 +268,8 @@
         </div>
     </ul>
 
+    <!-- Main content that shifts when the sidebar opens -->
+    <div class="main-content">
     <center><h1><strong>Your Wishlist</strong></h1>
 
         {% for item in wishlist %}
@@ -218,7 +287,7 @@
                     <a href="{% url 'productdetails' item.product.product_id %}" style="text-decoration: underline; color: #000000;">
                     <h2>{{ item.product.product_name }}</h2></a>
                     <p>{{ item.product.product_description }}</p><br>
-                    <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br>
+                    <!-- <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br> -->
                     <p><strong>Price:</strong> Rs. {{ item.product.product_price }}</p><br><br>
                 </div>
                 <form method="POST" action="{% url 'wishlist' %}">
@@ -274,6 +343,25 @@
                     window.location.href = "{% url 'logout' %}";
                 }
             });
+        }
+
+        // Toggle the sidebar and shrink/expand the content and header when the hamburger icon is clicked
+        function toggleNav() {
+            var sidebar = document.getElementById("sidebar");
+            var header = document.getElementsByClassName("header")[0]; // Get the header
+            var mainContent = document.getElementsByClassName("main-content")[0]; // Get the main content
+
+            if (sidebar.style.left === "0px") {
+                // If the sidebar is open, close it
+                sidebar.style.left = "-250px"; 
+                header.style.marginLeft = "0"; // Reset header margin
+                mainContent.style.marginLeft = "0"; // Reset content margin
+            } else {
+                // If the sidebar is closed, open it
+                sidebar.style.left = "0";
+                header.style.marginLeft = "250px"; // Shrink header when sidebar appears
+                mainContent.style.marginLeft = "250px"; // Shrink content when sidebar appears
+            }
         }
     </script>
 

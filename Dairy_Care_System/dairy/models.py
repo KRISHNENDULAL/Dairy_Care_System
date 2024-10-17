@@ -124,6 +124,7 @@ class Cart(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)  # Link to the user who added the product to the cart
     product = models.ForeignKey(Products_table, on_delete=models.CASCADE)  # Link to the product added to the cart
     quantity = models.PositiveIntegerField(default=1)  # Quantity of the product
+    quantity_unit = models.CharField(max_length=20)   # Unit of measurement
     added_at = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when a product is added to the cart
 
     class Meta:

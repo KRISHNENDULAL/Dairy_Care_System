@@ -12,7 +12,7 @@
         }
 
         body {
-            background: url('{% static "images/prodet.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/productdetails.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -119,12 +119,14 @@
 
         .quantity-input {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: row; /* Arrange items in a row */
+            gap: 10px; /* Space between quantity input and unit dropdown */
+            align-items: center; /* Align vertically in the center */
         }
 
-        .quantity-input input {
-            width: 50px;
+        .quantity-input input,
+        .unit-select {
+            width: 120px; /* Adjust width of both the input and the dropdown */
             padding: 5px;
             text-align: center;
         }
@@ -205,19 +207,26 @@
             <div class="product-details">
                 <h1 class="product-title">{{ product.product_name }}</h1><br>
 
-                <p class="product-price">Rs. {{ product.product_price }}</p><br>
+                <p class="product-price">Rs. {{ product.product_price }} (per 500g)</p><br>
 
                 <p class="product-description">{{ product.product_description }}</p>
 
-                <p><strong>Stock:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p><br>
-
                 <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p><br>
 
-                <!-- Quantity selection -->
+                <!-- Quantity and Unit Input (in the same line) -->
                 <div class="quantity-input">
-                    <label for="quantity"><strong>Select Quantity:</strong></label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.product_quantity }}">
-                </div><br>
+                    <label for="quantity"><strong>Enter Quantity:</strong></label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" placeholder="Quantity">
+
+                    <select id="quantityUnit" name="quantity_unit" class="unit-select">
+                        <option value="" disabled selected>Select Unit</option>
+                        <option value="litres">Litres (l)</option>
+                        <option value="ml">Millilitres (ml)</option>
+                        <option value="kg">Kilograms (kg)</option>
+                        <option value="g">Grams (g)</option>
+                    </select>
+                </div>
+                <br>
 
                 <div class="product-actions">
                     <form method="POST" action="{% url 'productdetails' product.product_id %}">
@@ -229,7 +238,11 @@
 
                     <form method="POST" action="{% url 'add_to_cart' product.product_id %}">
                         {% csrf_token %}
+                        <!-- Hidden field for quantity (updated via JavaScript) -->
                         <input type="hidden" name="quantity" id="cart-quantity" value="1">
+                        <!-- Hidden field for unit (updated via JavaScript) -->
+                        <input type="hidden" name="unit" id="cart-unit" value="">
+                        
                         <button type="submit" class="btn buy-button">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
@@ -251,10 +264,15 @@
     <!-- Font Awesome for icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
+    <!-- JavaScript to update hidden fields with entered quantity and selected unit -->
     <script>
-        // Update the hidden input field with the selected quantity
+        // Update the hidden input fields with the entered quantity and selected unit
         document.getElementById('quantity').addEventListener('input', function() {
             document.getElementById('cart-quantity').value = this.value;
+        });
+
+        document.getElementById('quantityUnit').addEventListener('change', function() {
+            document.getElementById('cart-unit').value = this.value;
         });
     </script>
 </body>

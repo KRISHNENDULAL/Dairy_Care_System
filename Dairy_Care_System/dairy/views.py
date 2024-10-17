@@ -559,6 +559,8 @@ def logout(request):
     return redirect('home')
 
 
+from django.db.models import Q  # Import Q for case-insensitive query
+
 def addproducts(request): 
     if request.method == 'POST':
         product_name = request.POST.get('product_name')
@@ -567,13 +569,17 @@ def addproducts(request):
         quantity_unit = request.POST.get('quantity_unit')
         product_price = request.POST.get('product_price')  # Get the price from the POST data
         
+        # Check if product with the same name (case-insensitive) already exists
+        if Products_table.objects.filter(product_name__iexact=product_name).exists():
+            messages.error(request, 'Product with this name already exists.')
+            return render(request, 'addproducts.html')  # Return to the same form with an error message
+        
         # Get user_id from the session
         employee_user_id = request.session.get('user_id')  # Assuming 'user_id' is stored in the session for employees
 
         try:
             # Fetch the Users_table instance
-            employee = Users_table.objects.get(user_id=employee_user_id)  # Adjust this if your Users_table uses a different field
-            
+            employee = Users_table.objects.get(user_id=employee_user_id)
         except Users_table.DoesNotExist:
             messages.error(request, 'Employee not found.')
             return redirect('productslist')  # Handle user not found
@@ -584,20 +590,21 @@ def addproducts(request):
             product_description=product_description,
             product_quantity=product_quantity,
             quantity_unit=quantity_unit,
-            product_price=product_price,  # Add price to the product instance
-            employee=employee  # Assign the logged-in employee
+            product_price=product_price,
+            employee=employee
         )
         product.save()
 
         # If a photo was uploaded, create a new ProductImage entry
-        product_photo = request.FILES.get('product_images')  # Ensure this matches your input name
+        product_photo = request.FILES.get('product_images')
         if product_photo:
-            ProductImage.objects.create(product=product, image=product_photo)  # Update here
+            ProductImage.objects.create(product=product, image=product_photo)
 
-        # messages.success(request, f'Product "{product_name}" added successfully!')
-        return redirect('productslist')  # Redirect to the products list page
+        messages.success(request, f'Product "{product_name}" added successfully!')
+        return redirect('productslist')
 
     return render(request, 'addproducts.html')
+
 
 
 

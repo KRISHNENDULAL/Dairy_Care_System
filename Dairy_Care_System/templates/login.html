@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
     <style>
         body {
-            background: url('{% static "images/logins.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/login.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
         }
@@ -39,7 +39,7 @@
                     <input type="password" id="password" name="password" placeholder="Enter your password">
                     <div class="error-message" id="passwordError"></div>
                 </div><br>
-                <button type="submit">log in</button><br><br>
+                <button type="submit" id="login">log in</button><br><br>
                 
                 {% if messages %}
                 <div class="error-message" id="formError">
@@ -74,10 +74,10 @@
                 // Validate Username/Email (No changes here)
                 let usernameError = '';
                 if (!username.value) {
-                    usernameError = 'Username or Email is required.';
+                    usernameError = 'Name or Email is required.';
                     isValid = false;
                 } else if (!validateEmail(username.value) && !validateUsername(username.value)) {
-                    usernameError = 'Enter a valid email or username.';
+                    usernameError = 'Enter a valid email or name.';
                     isValid = false;
                 }
                 document.getElementById('usernameError').textContent = usernameError;
@@ -111,7 +111,7 @@
                 let password = document.getElementById('password').value;
     
                 if (field === 'password' && !username) {
-                    document.getElementById('usernameError').textContent = 'Please enter Username/Email before entering Password.';
+                    document.getElementById('usernameError').textContent = 'Please enter name/Email before entering Password.';
                     document.getElementById('password').value = '';  // Reset the password field
                 }
     

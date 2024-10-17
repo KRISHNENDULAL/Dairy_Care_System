@@ -15,34 +15,9 @@
             background-size: cover;
             font-family: 'Koh Santepheap', Arial, sans-serif;
         }
-        /* Add your other styles here */
-        .rating {
-    direction: rtl; /* Makes it easier to arrange stars from right to left */
-    display: flex;  /* Use flexbox for horizontal layout */
-}
-
-.rating input {
-    display: none;  /* Hide the radio buttons */
-}
-
-.rating label {
-    font-size: 30px; /* Size of the stars */
-    color: #ccc; /* Default color */
-    cursor: pointer; /* Change cursor to pointer on hover */
-}
-
-.rating input:checked ~ label {
-    color: gold; /* Color of stars when checked */
-}
-
-.rating label:hover,
-.rating label:hover ~ label {
-    color: gold; /* Color of stars on hover */
-}
-
-
-/* Add this CSS in your existing styles */
-.feedback-box {
+        
+    /* Add this CSS in your existing styles */
+    .feedback-box {
         border-radius: 20px;
         padding: 40px;
         text-align: center;
@@ -73,35 +48,37 @@
     }
 
     .rating {
-        margin: 20px 0; /* Add spacing around the rating stars */
-        display: flex; /* Use flexbox for layout */
-        justify-content: center; /* Center the stars */
-        align-items: center; /* Vertically align stars */
-    }
+    margin: 20px 0; /* Add spacing around the rating stars */
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center the stars */
+    align-items: center; /* Vertically align stars */
+}
 
-    .rating input {
-        display: none; /* Hide the radio buttons */
-    }
+.rating input {
+    display: none; /* Hide the radio buttons */
+}
 
-    .rating label {
-        font-size: 30px; /* Size of the stars */
-        color: #ccc; /* Default star color */
-        cursor: pointer; /* Pointer on hover */
-        margin: 0 5px; /* Spacing between stars */
-    }
+.rating label {
+    font-size: 30px; /* Size of the stars */
+    color: #ccc; /* Default star color */
+    cursor: pointer; /* Pointer on hover */
+    margin: 0 5px; /* Spacing between stars */
+}
 
-    .rating input:checked ~ label {
-        color: gold; /* Checked star color */
-    }
+.rating input:checked ~ label {
+    color: gold; /* Checked star color */
+}
 
-    .rating label:hover,
-    .rating label:hover ~ label {
-        color: gold; /* Color of stars on hover */
-    }
+.rating label:hover,
+.rating label:hover ~ label {
+    color: gold; /* Color of stars on hover */
+}
+
 
     .success {
-    color: green;
+    color: rgb(33, 17, 17);
     padding: 10px;
+    font-size: 20px;
     border-radius: 5px;
 }
 
@@ -165,16 +142,16 @@
 
                 <!-- <label for="rating">Rating:</label> -->
                 <div class="rating">
-                    <input type="radio" name="star" id="star1" value="5" required>
-                    <label for="star1" title="5 stars">★</label>
-                    <input type="radio" name="star" id="star2" value="4">
-                    <label for="star2" title="4 stars">★</label>
+                    <input type="radio" name="star" id="star5" value="5" required>
+                    <label for="star5" title="5 stars">★</label>
+                    <input type="radio" name="star" id="star4" value="4">
+                    <label for="star4" title="4 stars">★</label>
                     <input type="radio" name="star" id="star3" value="3">
                     <label for="star3" title="3 stars">★</label>
-                    <input type="radio" name="star" id="star4" value="2">
-                    <label for="star4" title="2 stars">★</label>
-                    <input type="radio" name="star" id="star5" value="1">
-                    <label for="star5" title="1 star">★</label>
+                    <input type="radio" name="star" id="star2" value="2">
+                    <label for="star2" title="2 stars">★</label>
+                    <input type="radio" name="star" id="star1" value="1">
+                    <label for="star1" title="1 star">★</label>
                 </div>
             
                 <textarea id="feedback" name="feedback" placeholder="Enter your feedback here..." required></textarea>
