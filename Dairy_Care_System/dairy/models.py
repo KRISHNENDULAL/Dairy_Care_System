@@ -147,3 +147,42 @@ class Feedback_table(models.Model):
 
     def __str__(self):
         return f"Feedback by {self.user.username} for {self.product.product_name}"
+    
+
+class Order_table(models.Model):
+    PAYMENT_CHOICES = (
+        ('cod', 'Cash on Delivery'),
+        ('online', 'Online Payment'),
+    )
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Shipped', 'Shipped'),
+        ('Delivered', 'Delivered'),
+        ('Cancelled', 'Cancelled'),
+    )
+
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)  # Reference to user
+    name = models.CharField(max_length=255, null=False, blank=False)  # Customer name
+    email = models.EmailField(null=False, blank=False)  # Email address
+    phone = models.CharField(max_length=20, null=False, blank=False)  # Contact number
+    place = models.CharField(max_length=255, null=False, blank=False)  # Place
+    pincode = models.CharField(max_length=6, null=False, blank=False)  # Pincode
+    delivery_address = models.TextField(null=False, blank=False)  # Delivery address
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)  # Total price of the order
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)  # Payment method
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')  # Order status
+    order_date = models.DateTimeField(auto_now_add=True)  # Automatically set order date
+    
+    def __str__(self):
+        return f"Order {self.id} - {self.user.username}"
+
+
+class OrderItem_table(models.Model):
+    order = models.ForeignKey(Order_table, on_delete=models.CASCADE, related_name='order_items')  # Reference to Order_table
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE)  # Reference to the Product
+    quantity = models.PositiveIntegerField()  # Quantity of the product
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Price at the time of purchase
+
+    def __str__(self):
+        return f"{self.product.name} (x{self.quantity}) in Order {self.order.id}"

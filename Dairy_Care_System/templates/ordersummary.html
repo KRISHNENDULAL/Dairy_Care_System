@@ -1,0 +1,239 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Receipt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: url('{% static "images/ordersummary.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-size: 14px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            font-size: 40px; /* Reduced size for header */
+            color: #1343c8;
+            font-family: Copperplate, Papyrus, fantasy;
+        }
+
+        h3 {
+            margin: 20px 0 10px 0;
+            font-style: italic;
+            color: #365061;
+        }
+
+        p {
+            line-height: 1.4;
+            margin: 5px 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border-bottom: 2px solid #3a3d43;
+        }
+
+        .details {
+            font-family: 'Lato', 'Georgia', serif;
+            margin-bottom: 20px;
+            font-size: 18px; /* Base font size */
+            line-height: 1.6; /* Improved line height for readability */
+            color: #333; /* Darker color for text */
+            background-color: #f9f9f9; /* Light gray background */
+            padding: 10px; /* Inner padding */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        .details strong {
+            font-weight: bold; /* Bold for field labels */
+            font-size: 15px; /* Slightly larger size for labels */
+        }
+
+        .details p {
+            margin: 5px 0; /* Adjust spacing between paragraphs */
+        }
+
+        ul {
+            list-style-type: none;
+            font-size: 18px;
+            padding: 0;
+            margin: 10px 0;
+            font-family: 'Playfair Display';
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0; /* Padding for item rows */
+        }
+
+        li img {
+    width: 50px; /* Set the width of the image */
+    height: 50px; /* Set the height of the image */
+    margin-right: 10px; /* Space between the image and text */
+    border-radius: 5px; /* Optional: rounded corners for images */
+}
+
+        li:last-child {
+            border-bottom: none; /* Remove border for last item */
+        }
+
+        .total-price {
+            color: #9b0404;
+            font-family: 'Baskerville';
+            font-size: 20px; /* Increased size for total price */
+            margin-top: 10px; /* Spacing above total */
+            border-top: 1px solid #ccc; /* Top border for total section */
+            padding-top: 10px; /* Padding above total */
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: green;
+            border-top: 1px solid #ccc; /* Top border for footer */
+            padding-top: 10px; /* Padding above footer */
+        }
+
+        /* Back to products */
+        .back-link {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            font-size: 25px;
+            color: white;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Download Button */
+        .download-btn {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            background-color: #0f2f52;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'customerpage' %}" class="back-link">&larr; BACK</a>
+    <button class="download-btn" onclick="downloadReceipt()">
+        <i class="fas fa-download"></i> Download Receipt
+    </button>
+    <br><br>
+    <div class="container" id="receipt">
+        <div class="header">
+            <h1>Receipt</h1><br>
+            <h3>Order Confirmation</h3>
+        </div>
+
+        <div class="details">
+            <p><strong>Name:</strong> {{ order.name }}</p>
+            <p><strong>Contact:</strong> {{ order.phone }}</p>
+            <p><strong>Email:</strong> {{ order.email }}</p>
+            <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
+            <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+        </div>
+
+        <h3>Items Ordered:</h3>
+        <ul>
+            {% for item in order_items %}
+                <li>
+                    <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    <span>{{ item.product.product_name }}</span>
+                    <span>{{ item.quantity }}</span>
+                    <span>Rs.{{ item.price }}</span>
+                </li>
+            {% empty %}
+                <li>No items found for this order.</li>
+            {% endfor %}
+        </ul>
+        
+        <div class="total-price">
+            <strong>Total Price:</strong> Rs.{{ total_price }}
+        </div>
+
+        <div class="footer"><br><strong>
+            Thank you for your order!<br></strong>
+            ..... &copy;Dairy Care System .....
+        </div>
+    </div>
+    
+    <script>
+        async function downloadReceipt() {
+            const { jsPDF } = window.jspdf; // Import jsPDF
+
+            const container = document.querySelector('#receipt'); // Select the receipt container
+
+            const canvas = await html2canvas(container, {
+                scale: 2, // Scale for better quality
+                useCORS: true // Enable Cross-Origin Resource Sharing
+            });
+
+            const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
+
+            const pdf = new jsPDF('p', 'mm', 'a4'); // Create a new jsPDF instance
+            const imgWidth = 210; // Width of A4 in mm
+            const pageHeight = 295; // Height of A4 in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width; // Calculate height to maintain aspect ratio
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            // Add image to PDF
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            // Save the PDF
+            pdf.save('receipt.pdf'); // Filename for the PDF
+        }
+    </script>
+</body>
+</html>

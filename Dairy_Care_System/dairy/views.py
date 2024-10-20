@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, Cart, Animals_table, AnimalImages
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, Cart, Order_table, OrderItem_table, Animals_table, AnimalImages
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -873,6 +873,39 @@ def addanimal(request):
     return render(request, 'addanimal.html')
 
 
+def animaldetails(request, animal_id):
+    # Fetch the specific animal with related images
+    animal = get_object_or_404(Animals_table.objects.prefetch_related('images'), animal_id=animal_id)
+
+    # Calculate the age of the animal
+    if animal.date_of_birth:
+        current_date = timezone.now().date()  # Get the current date
+        animal_age_years = (current_date - animal.date_of_birth).days // 365  # Calculate age in years
+        animal.age_in_years = animal_age_years  # Add a custom attribute to hold the age
+
+    context = {
+        'animal': animal,
+    }
+
+    return render(request, 'animaldetails.html', context)
+
+def delete_animal(request, animal_id):
+    animal = get_object_or_404(Animals_table, pk=animal_id)
+    animal.status = False  # Deactivate the animal
+    animal.save()
+    # messages.success(request, f"{animal.animal_name} has been deactivated.")
+    return redirect('animaldetails', animal_id=animal_id)
+
+def restore_animal(request, animal_id):
+    animal = get_object_or_404(Animals_table, pk=animal_id)
+    animal.status = True  # Reactivate the animal
+    animal.save()
+    # messages.success(request, f"{animal.animal_name} has been reactivated.")
+    return redirect('animaldetails', animal_id=animal_id)
+    
+
+
+
 # Add a product to the cart
 def add_to_cart(request, product_id):
     if request.method == 'POST':
@@ -941,6 +974,110 @@ def delete_from_cart(request, cart_id):
     cart_item = get_object_or_404(Cart, pk=cart_id)
     cart_item.delete()
     return redirect('viewcart')
+
+
+   
+# View to place an order
+def checkout(request):
+    user = Users_table.objects.get(user_id=request.session['user_id'])
+    user_cart = Cart.objects.filter(user=user)
+
+    # Calculate total price
+    total_price = sum([item.get_total_price() for item in user_cart])
+
+    # Fetch user details
+    user_name = user.username
+    user_phone = user.phone
+    user_email = user.email
+
+    if request.method == 'POST':
+        name = request.POST['username']
+        phone = request.POST['phone']
+        email = request.POST['email']
+        place = request.POST['place']
+        pincode = request.POST['pincode']
+        delivery_address = request.POST['delivery_address']
+        payment_method = request.POST['payment_method']
+
+        # Create the order
+        order = Order_table.objects.create(
+            user=user,
+            name=name,
+            phone=phone,
+            email=email,
+            place=place,
+            pincode=pincode,
+            delivery_address=delivery_address,
+            payment_method=payment_method,
+            total_price=total_price
+        )
+
+        # Create OrderItem instances for each item in the cart
+        for cart_item in user_cart:
+            OrderItem_table.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                price=cart_item.get_total_price()  # Store the price at the time of order
+            )
+
+        # Clear the user's cart after placing the order
+        user_cart.delete()
+
+        messages.success(request, 'Order placed successfully!')
+        return redirect('ordersummary', order_id=order.id)
+
+    # Pass the user details and cart items to the template
+    return render(request, 'checkout.html', {
+        'user_cart': user_cart,
+        'total_price': total_price,
+        'user_name': user_name,
+        'user_phone': user_phone,
+        'user_email': user_email
+    })
+
+
+
+# View to display the order summary after placing an order
+def ordersummary(request, order_id):
+    # Fetch the specific order
+    order = get_object_or_404(Order_table, id=order_id)
+
+    # Fetch the related items from OrderItem_table for this order
+    order_items = OrderItem_table.objects.filter(order=order)
+
+    context = {
+        'order': order,
+        'order_items': order_items,  # Passing the OrderItem instances to the template
+        'total_price': order.total_price,
+        'payment_method': order.get_payment_method_display(),
+    }
+
+    return render(request, 'ordersummary.html', context)
+
+
+# View to display the order history
+def orderhistory(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')  
+
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+
+        # Fetch all orders placed by the logged-in user, ordered by most recent
+        orders = Order_table.objects.filter(user=user).order_by('-order_date')
+
+        # Pass both orders and username to the template
+        context = {
+            'username': user.username,
+            'orders': orders,
+        }
+
+        return render(request, 'orderhistory.html', context)
+    else:
+        # Redirect to login if no user is logged in
+        return redirect('login')
 
 
 

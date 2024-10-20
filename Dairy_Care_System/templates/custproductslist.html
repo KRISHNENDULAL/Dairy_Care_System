@@ -11,7 +11,7 @@
             margin: 0;
         }
 
-        .hamburger {
+        /* .hamburger {
             font-size: 30px;
             cursor: pointer;
             padding: 2px;
@@ -25,8 +25,8 @@
             z-index: 1; 
             top: 0; 
             left: -250px; 
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-            backdrop-filter: blur(10px); /* Blur effect */
+            background-color: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(10px); 
             overflow-x: hidden; 
             transition: 0.5s; 
             padding-top: 10px; 
@@ -43,7 +43,7 @@
 
         .sidebar a:hover {
             color: #000000; 
-        }
+        } */
 
         /* .closebtn {
             font-size: 36px; 
@@ -52,16 +52,16 @@
         } */
 
         /* Header for navigation and search */
-        .header {
+        /* .header {
             margin-left: 0;
-            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
-        }
+            transition: margin-left 0.5s ease; 
+        } */
 
         /* Main content should also shift with sidebar */
-        .main-content {
+        /* .main-content {
             margin-left: 0;
-            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
-        }
+            transition: margin-left 0.5s ease; 
+        } */
     </style>
 
     <!-- Add Font Awesome and SweetAlert2 CSS -->
@@ -71,21 +71,21 @@
 <body>
 
     <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <a href="#">Dairy Care System</a><br><br><br><br>
+    <!-- <div id="sidebar" class="sidebar">
+        <a href="#">Dairy Care System</a><br><br><br><br> -->
         <!-- <a href="#" class="closebtn" onclick="toggleNav()">&times;</a><br><br> -->
-        <a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a><br>
+        <!-- <a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
         <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
         <a href="{% url 'feedbackpage' %}"><i class="fas fa-comment"></i> Your Feedback</a><br>
-    </div>
+    </div> -->
 
     <!-- Navigation Bar-->
     <ul>
         <div class="header">
             <!-- Hamburger Icon -->
-            <span class="hamburger" onclick="toggleNav()">&#9776;</span>
-            <!-- <div class="nav-item">
+            <!-- <span class="hamburger" onclick="toggleNav()">&#9776;</span> -->
+            <div class="nav-item">
                 <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
             </div>
             <div class="nav-item">
@@ -95,8 +95,11 @@
                 <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a></b></li>
             </div>
             <div class="nav-item">
+                <li><b><a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Your Orders</a></b></li>
+            </div>
+            <div class="nav-item">
                 <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Your Feedback</a></b></li>
-            </div> -->
+            </div>
             <div class="nav-item">
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
@@ -183,10 +186,10 @@
         }
 
         // Toggle the sidebar and shrink/expand the content and header when the hamburger icon is clicked
-        function toggleNav() {
+        /* function toggleNav() {
             var sidebar = document.getElementById("sidebar");
-            var header = document.getElementsByClassName("header")[0]; // Get the header
-            var mainContent = document.getElementsByClassName("main-content")[0]; // Get the main content
+            var header = document.getElementsByClassName("header")[0]; 
+            var mainContent = document.getElementsByClassName("main-content")[0]; 
 
             if (sidebar.style.left === "0px") {
                 // If the sidebar is open, close it
@@ -199,7 +202,7 @@
                 header.style.marginLeft = "250px"; // Shrink header when sidebar appears
                 mainContent.style.marginLeft = "250px"; // Shrink content when sidebar appears
             }
-        }
+        } */
     </script>
 
 </body>

@@ -216,15 +216,15 @@
                 <!-- Quantity and Unit Input (in the same line) -->
                 <div class="quantity-input">
                     <label for="quantity"><strong>Enter Quantity:</strong></label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" placeholder="Quantity">
+                    <input type="text" id="quantity" name="quantity" value="1" min="0.1" placeholder="Quantity">
 
-                    <select id="quantityUnit" name="quantity_unit" class="unit-select">
+                    <!-- <select id="quantityUnit" name="quantity_unit" class="unit-select">
                         <option value="" disabled selected>Select Unit</option>
                         <option value="litres">Litres (l)</option>
                         <option value="ml">Millilitres (ml)</option>
                         <option value="kg">Kilograms (kg)</option>
                         <option value="g">Grams (g)</option>
-                    </select>
+                    </select> -->
                 </div>
                 <br>
 
@@ -273,6 +273,24 @@
 
         document.getElementById('quantityUnit').addEventListener('change', function() {
             document.getElementById('cart-unit').value = this.value;
+        });
+
+        // Validate milk capacity (must be a number or float)
+        quantity.addEventListener("input", function() {
+            if (isNaN(quantity.value) || quantity.value < 0) {
+                showError(quantity, "Quantity must be a positive number or float");
+            } else {
+                clearError(quantity);
+            }
+        });
+
+        // Form submit validation
+        form.addEventListener("submit", function(e) {
+            // Prevent form submission if any field is invalid
+            if (isNaN(quantity.value) || quantity.value < 0) {
+                showError(quantity, "Quantity must be a positive number or float");
+                e.preventDefault();
+            }
         });
     </script>
 </body>

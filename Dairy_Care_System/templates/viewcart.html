@@ -264,58 +264,6 @@
                 text-align: center;
             }
         }
-
-        .hamburger {
-            font-size: 30px;
-            cursor: pointer;
-            padding: 2px;
-            color: white;
-        }
-
-        .sidebar {
-            height: 100%;
-            width: 250px; 
-            position: fixed; 
-            z-index: 1; 
-            top: 0; 
-            left: -250px; 
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-            backdrop-filter: blur(10px); /* Blur effect */
-            overflow-x: hidden; 
-            transition: 0.5s; 
-            padding-top: 10px; 
-        }
-
-        .sidebar a {
-            padding: 8px 8px 8px 32px; 
-            text-decoration: none; 
-            font-size: 25px; 
-            color: white; 
-            display: block; 
-            transition: 0.3s; 
-        }
-
-        .sidebar a:hover {
-            color: #000000; 
-        }
-
-        /* .closebtn {
-            font-size: 36px; 
-            margin-right: 10px; 
-            color: white; 
-        } */
-
-        /* Header for navigation and search */
-        .header {
-            margin-left: 0;
-            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
-        }
-
-        /* Main content should also shift with sidebar */
-        .main-content {
-            margin-left: 0;
-            transition: margin-left 0.5s ease; /* Smooth transition for shrinking effect */
-        }
     </style>
 </head>
 <body>
@@ -324,7 +272,7 @@
     <ul>
         <div class="header">
             <!-- Hamburger Icon -->
-            <span class="hamburger" onclick="toggleNav()">&#9776;</span>
+            <!-- <span class="hamburger" onclick="toggleNav()">&#9776;</span> -->
             <div class="nav-item">
                 <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
             </div>
@@ -333,6 +281,9 @@
             </div>  
             <div class="nav-item">
                 <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Your Orders</a></b></li>
             </div>
             <div class="nav-item">
                 <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Your Feedback</a></b></li>
@@ -390,13 +341,13 @@
                             <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input">
                             
                             <!-- Unit selection dropdown -->
-                            <select id="quantityUnit" name="quantity_unit" class="unit-select">
+                            <!-- <select id="quantityUnit" name="quantity_unit" class="unit-select">
                                 <option value="{{ item.quantityUnit }}">{{ item.quantityUnit }}</option>
                                 <option value="litres">Litres (l)</option>
                                 <option value="ml">Millilitres (ml)</option>
                                 <option value="kg">Kilograms (kg)</option>
                                 <option value="g">Grams (g)</option>
-                            </select>
+                            </select> -->
                             
                             <button class="btn btn-update" type="submit">Update</button>
                         </form>
@@ -421,7 +372,7 @@
         </div>
 
         <div class="checkout">
-            <a href="#" class="btn btn-checkout">Proceed to Checkout</a>
+            <a href="{% url 'checkout' %}" class="btn btn-checkout">Proceed to Checkout</a>
         </div>
 
         {% else %}
@@ -474,25 +425,6 @@
                     window.location.href = "{% url 'logout' %}";
                 }
             });
-        }
-
-        // Toggle the sidebar and shrink/expand the content and header when the hamburger icon is clicked
-        function toggleNav() {
-            var sidebar = document.getElementById("sidebar");
-            var header = document.getElementsByClassName("header")[0]; // Get the header
-            var mainContent = document.getElementsByClassName("main-content")[0]; // Get the main content
-
-            if (sidebar.style.left === "0px") {
-                // If the sidebar is open, close it
-                sidebar.style.left = "-250px"; 
-                header.style.marginLeft = "0"; // Reset header margin
-                mainContent.style.marginLeft = "0"; // Reset content margin
-            } else {
-                // If the sidebar is closed, open it
-                sidebar.style.left = "0";
-                header.style.marginLeft = "250px"; // Shrink header when sidebar appears
-                mainContent.style.marginLeft = "250px"; // Shrink content when sidebar appears
-            }
         }
     </script>
 

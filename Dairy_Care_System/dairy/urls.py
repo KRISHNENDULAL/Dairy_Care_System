@@ -40,6 +40,9 @@ urlpatterns = [
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/update/<int:cart_id>/', views.update_cart, name='update_cart'),
     path('cart/delete/<int:cart_id>/', views.delete_from_cart, name='delete_from_cart'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('ordersummary/<int:order_id>/', views.ordersummary, name='ordersummary'),
+    path('orderhistory/', views.orderhistory, name='orderhistory'),
 
     path('addproducts',views.addproducts,name='addproducts'),
     path('editproduct', views.editproduct, name='editproduct'),
@@ -48,6 +51,9 @@ urlpatterns = [
     path('restoreproduct/<int:product_id>/',views.restoreproduct, name='restoreproduct'),
     path('animalslist',views.animalslist,name='animalslist'),
     path('addanimal', views.addanimal, name='addanimal'),
+    path('animal/<int:animal_id>/', views.animaldetails, name='animaldetails'),
+    path('animal/delete/<int:animal_id>/', views.delete_animal, name='delete_animal'),
+    path('animal/restore/<int:animal_id>/', views.restore_animal, name='restore_animal'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
