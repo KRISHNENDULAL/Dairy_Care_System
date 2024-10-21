@@ -207,7 +207,7 @@
             <div class="product-details">
                 <h1 class="product-title">{{ product.product_name }}</h1><br>
 
-                <p class="product-price">Rs. {{ product.product_price }} (per 500g)</p><br>
+                <p class="product-price">Rs. {{ product.product_price }}</p><br>
 
                 <p class="product-description">{{ product.product_description }}</p>
 
@@ -216,7 +216,8 @@
                 <!-- Quantity and Unit Input (in the same line) -->
                 <div class="quantity-input">
                     <label for="quantity"><strong>Enter Quantity:</strong></label>
-                    <input type="text" id="quantity" name="quantity" value="1" min="0.1" placeholder="Quantity">
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.product_quantity }}" placeholder="Quantity" required>
+
 
                     <!-- <select id="quantityUnit" name="quantity_unit" class="unit-select">
                         <option value="" disabled selected>Select Unit</option>

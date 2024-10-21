@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Health Record</title>
+    <style>
+        /* Reset some default styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Center content and style headings */
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    color: #4A4A4A;
+}
+
+/* Form styling */
+form {
+    max-width: 600px;  /* Limit form width */
+    margin: 0 auto;    /* Center form */
+    background: white; /* White background for form */
+    padding: 20px;     /* Add padding */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Input and select styling */
+label {
+    display: block;
+    margin: 10px 0 5px; /* Spacing around labels */
+}
+
+input[type="date"],
+select {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for inputs */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 15px; /* Space below inputs */
+}
+
+input[type="date"]:focus,
+select:focus {
+    border-color: #007BFF; /* Border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Button styling */
+button {
+    background-color: #007BFF; /* Button color */
+    color: white; /* Text color */
+    padding: 10px 15px; /* Padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
+
+/* Back link styling */
+a {
+    display: block; /* Make it block-level for spacing */
+    text-align: center; /* Center align */
+    margin-top: 20px; /* Space above */
+    text-decoration: none; /* Remove underline */
+    color: #007BFF; /* Link color */
+}
+
+a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Additional responsive styling */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 24px; /* Adjust heading size on small screens */
+    }
+
+    button {
+        width: 100%; /* Full width button on mobile */
+    }
+}
+
+    </style>
+</head>
+<body>
+<center>
+    <h1>Add Health Record</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        <label for="checkup_date">Checkup Date:</label>
+        <input type="date" name="checkup_date" required>
+
+        <label for="health_status">Health Status:</label>
+        <select id="health_status" name="health_status" multiple required>
+            <option value="Healthy">Healthy</option>
+            <option value="Sick">Sick</option>
+            <option value="Recovering">Recovering</option>
+            <option value="Injured">Injured</option>
+            <option value="Under Observation">Under Observation</option>
+            <option value="Chronic Condition">Chronic Condition</option>
+            <option value="Euthanized">Euthanized</option>
+        </select>
+
+        <label for="vaccinations">Vaccinations:</label>
+        <select id="vaccinations" name="vaccinations" multiple required>
+            <option value="Rabies">Rabies</option>
+            <option value="Bovine Viral Diarrhea (BVD)">Bovine Viral Diarrhea (BVD)</option>
+            <option value="Clostridium Perfringens (Type C and D)">Clostridium Perfringens (Type C and D)</option>
+            <option value="Brucellosis">Brucellosis</option>
+            <option value="Leptospirosis">Leptospirosis</option>
+            <option value="Parainfluenza">Parainfluenza</option>
+            <option value="Infectious Bovine Rhinotracheitis (IBR)">Infectious Bovine Rhinotracheitis (IBR)</option>
+            <option value="Foot and Mouth Disease (FMD)">Foot and Mouth Disease (FMD)</option>
+        </select>
+
+        <label for="treatment_details">Treatment Details:</label>
+        <select id="treatment_details" name="treatment_details" multiple required>
+            <option value="Antibiotics">Antibiotics</option>
+            <option value="Anti-inflammatory Medications">Anti-inflammatory Medications</option>
+            <option value="Surgery">Surgery</option>
+            <option value="Fluid Therapy">Fluid Therapy</option>
+            <option value="Vaccination Administration">Vaccination Administration</option>
+            <option value="Wound Care">Wound Care</option>
+            <option value="Dietary Adjustments">Dietary Adjustments</option>
+            <option value="Topical Treatments">Topical Treatments</option>
+        </select>
+
+        <label for="veterinarian_name">Veterinarian Name:</label>
+        <select id="veterinarian_name" name="veterinarian_name" required>
+            <option value="">Select Veterinarian who examined</option>
+            <option value="Dr. Ravi Sankar S">Dr. Ravi Sankar S</option>
+            <option value="Dr. Krishna Lakshmi">Dr. Krishna Lakshmi</option>
+            <option value="Dr. Radhamadhav">Dr. Radhamadhav</option>
+        </select>
+
+        <label for="next_checkup_date">Next Checkup Date:</label>
+        <input type="date" name="next_checkup_date">
+
+        <input type="hidden" name="added_by_id" value="{{ request.user.id }}">
+        <input type="hidden" name="animal_id" value="{{ animal_id }}">
+
+        <button type="submit">Add Record</button>
+    </form>
+</center>
+    <a href="{% url 'animal_health_status' animal_id %}">Back to Health Records</a>
+</body>
+</html>

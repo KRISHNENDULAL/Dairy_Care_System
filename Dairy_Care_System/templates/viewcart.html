@@ -274,7 +274,7 @@
             <!-- Hamburger Icon -->
             <!-- <span class="hamburger" onclick="toggleNav()">&#9776;</span> -->
             <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
+                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
             </div>
             <div class="nav-item">
                 <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a></b></li>
@@ -310,6 +310,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Select</th> <!-- Add a new header for checkboxes -->
                     <th>Product</th>
                     <th>Quantity</th>
                     <th>Price</th>
@@ -320,6 +321,9 @@
             <tbody>
                 {% for item in cart_items %}
                 <tr>
+                    <td data-label="Select">
+                        <input type="checkbox" name="selected_products" value="{{ item.cart_id }}">
+                    </td>
                     <td data-label="Product"><strong>
                         <div class="product-name">
                             <!-- Display the product image if available -->
@@ -338,7 +342,7 @@
                     <td>
                         <form method="POST" action="{% url 'update_cart' item.cart_id %}">
                             {% csrf_token %}
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input">
+                            <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1" max="{{ product.product_quantity }}" placeholder="Quantity" required>
                             
                             <!-- Unit selection dropdown -->
                             <!-- <select id="quantityUnit" name="quantity_unit" class="unit-select">

@@ -43,6 +43,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('ordersummary/<int:order_id>/', views.ordersummary, name='ordersummary'),
     path('orderhistory/', views.orderhistory, name='orderhistory'),
+    path('stocknotification', views.stocknotification, name='stocknotification'),
+    path('cancelorder/<int:order_id>/', views.cancelorder, name='cancelorder'),
 
     path('addproducts',views.addproducts,name='addproducts'),
     path('editproduct', views.editproduct, name='editproduct'),
@@ -52,6 +54,9 @@ urlpatterns = [
     path('animalslist',views.animalslist,name='animalslist'),
     path('addanimal', views.addanimal, name='addanimal'),
     path('animal/<int:animal_id>/', views.animaldetails, name='animaldetails'),
+    path('animal/<int:animal_id>/animalhealthstatus/', views.animal_health_status, name='animal_health_status'),
+    path('animal/<int:animal_id>/health/add/', views.add_health_record, name='add_health_record'),
+    path('health/update/<int:health_id>/', views.update_health_record, name='update_health_record'),
     path('animal/delete/<int:animal_id>/', views.delete_animal, name='delete_animal'),
     path('animal/restore/<int:animal_id>/', views.restore_animal, name='restore_animal'),
 

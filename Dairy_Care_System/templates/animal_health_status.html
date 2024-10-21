@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ animal.animal_name }} Health Status</title>
+    <style>
+        /* Reset some default styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Main container */
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    color: #4A4A4A;
+}
+
+/* Link styling */
+a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Table styling */
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* No records message styling */
+td[colspan="7"] {
+    text-align: center;
+    font-style: italic;
+    color: #999;
+}
+
+/* Back to Animals List button */
+.back-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    text-align: center;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+/* Button styles */
+.button {
+    display: inline-block; /* Align buttons next to each other */
+    background-color: #007BFF; /* Button color */
+    color: white; /* Text color */
+    padding: 10px 15px; /* Padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 14px; /* Font size */
+    text-decoration: none; /* Remove underline */
+    margin-right: 10px; /* Space between buttons */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.button:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
+    </style>
+</head>
+<body>
+    <h1>{{ animal.animal_name }}'s Health Records</h1>
+    
+
+    <table>
+        <tr>
+            <th>Checkup Date</th>
+            <th>Health Status</th>
+            <th>Vaccinations</th>
+            <th>Treatment Details</th>
+            <th>Veterinarian Name</th>
+            <th>Next Checkup Date</th>
+            <th>Actions</th>
+        </tr>
+        {% for record in health_records %}
+        <tr>
+            <td>{{ record.checkup_date }}</td>
+            <td>{{ record.health_status }}</td>
+            <td>{{ record.vaccinations }}</td>
+            <td>{{ record.treatment_details }}</td>
+            <td>{{ record.veterinarian_name }}</td>
+            <td>{{ record.next_checkup_date }}</td>
+            <td>
+                <a href="{% url 'add_health_record' animal.animal_id %}" class="button">Add</a><br><br>
+                <a href="{% url 'update_health_record' record.health_id %}" class="button">Update</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No health records available.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a class="back-button" href="{% url 'animalslist' %}">Back to Animals List</a>
+</body>
+</html>

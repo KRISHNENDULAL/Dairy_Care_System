@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, Cart, Order_table, OrderItem_table, Animals_table, AnimalImages
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, Cart, Order_table, OrderItem_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -624,11 +624,15 @@ def productslist(request):
         else:
             # Fetch all available products and the related employee who added them
             products = Products_table.objects.filter(status=True).select_related('employee')
+
+        # Fetch distinct categories from Products_table
+        categories = Products_table.objects.values_list('product_category', flat=True).distinct()
         
         context = {
             'username': user.username,  # Pass the username to the template
             'products': products,       # Pass the filtered or all products to the template
             'search_query': search_query,  # Pass the search query to retain the input value in the search bar
+            'categories': categories,  # Pass the categories to the template
         }
         
         return render(request, 'productslist.html', context)
@@ -904,6 +908,67 @@ def restore_animal(request, animal_id):
     return redirect('animaldetails', animal_id=animal_id)
     
 
+# View for animal health status
+def animal_health_status(request, animal_id):
+    animal = get_object_or_404(Animals_table, animal_id=animal_id)
+    health_records = AnimalHealth_table.objects.filter(animal=animal)  # Use the foreign key 'animal'
+
+    context = {
+        'animal': animal,
+        'health_records': health_records,  # This will hold the records fetched from the database
+    }
+    
+    return render(request, 'animal_health_status.html', context)
+
+
+def add_health_record(request, animal_id):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if request.method == "POST":
+        # Retrieve data from the form
+        checkup_date = request.POST['checkup_date']
+        health_status = request.POST.getlist('health_status')  # Multiple selections
+        vaccinations = request.POST.getlist('vaccinations')
+        treatment_details = request.POST['treatment_details']
+        veterinarian_name = request.POST['veterinarian_name']
+        next_checkup_date = request.POST['next_checkup_date']
+
+        # Create a new health record instance
+        health_record = AnimalHealth_table(
+            animal_id=animal_id,
+            checkup_date=checkup_date,
+            health_status="; ".join(health_status),  # Joining multiple selections into a string
+            vaccinations ="; ".join(vaccinations),
+            treatment_details="; ".join(treatment_details),
+            veterinarian_name=veterinarian_name,
+            next_checkup_date=next_checkup_date,
+            added_by_id=user_id  # Set the current user
+        )
+        
+        health_record.save()  # Save the health record
+
+        messages.success(request, 'Health record added successfully!')
+        return redirect('animal_health_status', animal_id=animal_id)
+
+    return render(request, 'add_health_record.html', {'animal_id': animal_id})
+
+# View to update an existing health record
+def update_health_record(request, health_id):
+    health_record = get_object_or_404(AnimalHealth_table, health_id=health_id)
+
+    if request.method == "POST":
+        # Update the health record with new data
+        health_record.checkup_date = request.POST['checkup_date']
+        health_record.health_status = request.POST['health_status']
+        health_record.vaccinations = request.POST['vaccinations']
+        health_record.treatment_details = request.POST['treatment_details']
+        health_record.veterinarian_name = request.POST['veterinarian_name']
+        health_record.next_checkup_date = request.POST['next_checkup_date']
+        health_record.save()
+
+        messages.success(request, 'Health record updated successfully!')
+        return redirect('animal_health_status', animal_id=health_record.health_id)
+
+    return render(request, 'update_health_record.html', {'health_record': health_record})
 
 
 # Add a product to the cart
@@ -1021,6 +1086,16 @@ def checkout(request):
                 price=cart_item.get_total_price()  # Store the price at the time of order
             )
 
+            # Reduce product stock and save
+            cart_item.product.product_quantity -= cart_item.quantity
+            cart_item.product.save()
+
+            # Check if the product quantity is below 2 and create a notification
+            if cart_item.product.product_quantity < 2:
+                Notifications_table.objects.create(
+                    message=f"Stock for {cart_item.product.product_name} is low (below 2 units).",
+                )
+
         # Clear the user's cart after placing the order
         user_cart.delete()
 
@@ -1035,6 +1110,7 @@ def checkout(request):
         'user_phone': user_phone,
         'user_email': user_email
     })
+
 
 
 
@@ -1078,7 +1154,37 @@ def orderhistory(request):
     else:
         # Redirect to login if no user is logged in
         return redirect('login')
+    
 
+def cancelorder(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order_table, id=order_id)
+
+        # Restock the products
+        order_items = OrderItem_table.objects.filter(order=order)
+        for item in order_items:
+            product = item.product
+            product.product_quantity += item.quantity  # Restock the quantity
+            product.save()
+
+        # Update order status to canceled
+        order.status = 'Canceled'  # Assuming you have a status field in Order_table
+        order.save()
+
+        # Add a success message
+        messages.success(request, 'Order has been canceled and items have been restocked.')
+
+        # Redirect to the order history page
+        return redirect('orderhistory')
+
+    # If the request is not POST, redirect back to order history
+    return redirect('orderhistory')
+
+
+
+def stocknotification(request):
+    notifications = Notifications_table.objects.filter(is_read=False).order_by('-created_at')
+    return render(request, 'stocknotification.html', {'notifications': notifications})
 
 
 """def login(request):

@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Update Health Record</title>
+    <style>
+        /* Reset some default styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Center content and style headings */
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    color: #4A4A4A;
+}
+
+/* Form styling */
+form {
+    max-width: 600px;  /* Limit form width */
+    margin: 0 auto;    /* Center form */
+    background: white; /* White background for form */
+    padding: 20px;     /* Add padding */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Input and textarea styling */
+label {
+    display: block;
+    margin: 10px 0 5px; /* Spacing around labels */
+}
+
+input[type="date"],
+input[type="text"],
+textarea {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for inputs */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 15px; /* Space below inputs */
+    resize: vertical; /* Allow vertical resizing for textarea */
+}
+
+input[type="date"]:focus,
+input[type="text"]:focus,
+textarea:focus {
+    border-color: #007BFF; /* Border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Button styling */
+button {
+    background-color: #007BFF; /* Button color */
+    color: white; /* Text color */
+    padding: 10px 15px; /* Padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
+
+/* Back link styling */
+a {
+    display: block; /* Make it block-level for spacing */
+    text-align: center; /* Center align */
+    margin-top: 20px; /* Space above */
+    text-decoration: none; /* Remove underline */
+    color: #007BFF; /* Link color */
+}
+
+a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Additional responsive styling */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 24px; /* Adjust heading size on small screens */
+    }
+
+    button {
+        width: 100%; /* Full width button on mobile */
+    }
+}
+    </style>
+</head>
+<body>
+    <h1>Update Health Record</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="checkup_date">Checkup Date:</label>
+        <input type="date" name="checkup_date" value="{{ health_record.checkup_date }}" required>
+
+        <label for="health_status">Health Status:</label>
+        <input type="text" name="health_status" value="{{ health_record.health_status }}" required>
+
+        <label for="vaccinations">Vaccinations:</label>
+        <textarea name="vaccinations" required>{{ health_record.vaccinations }}</textarea>
+
+        <label for="treatment_details">Treatment Details:</label>
+        <textarea name="treatment_details">{{ health_record.treatment_details }}</textarea>
+
+        <label for="veterinarian_name">Veterinarian Name:</label>
+        <input type="text" name="veterinarian_name" value="{{ health_record.veterinarian_name }}" required>
+
+        <label for="next_checkup_date">Next Checkup Date:</label>
+        <input type="date" name="next_checkup_date" value="{{ health_record.next_checkup_date }}">
+
+        <button type="submit">Update Record</button>
+    </form>
+
+    <a href="{% url 'animal_health_status' health_record.animal_id %}">Back to Health Records</a>
+</body>
+</html>

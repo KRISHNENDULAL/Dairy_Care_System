@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 36px;
+            margin-bottom: 30px;
+            font-family: 'Verdana', sans-serif;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Unread notification styling */
+        .unread {
+            background-color: #f8d7da; /* Light red background for unread */
+        }
+
+        /* Read notification styling */
+        .read {
+            background-color: #f8f9fa; /* Neutral background for read */
+        }
+
+        ul li:hover {
+            background-color: #e2e6ea;
+        }
+
+        ul li span {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Notification message styling */
+        .notification-message {
+            font-size: 16px;
+            color: #34495e;
+        }
+
+        /* Notification date styling */
+        .notification-date {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            color: #95a5a6;
+            font-size: 18px;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        /* Unread indicator styling */
+        .unread-indicator {
+            font-size: 12px;
+            color: #ff0000;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Notifications</h2>
+        <ul>
+            {% for notification in notifications %}
+                <li class="{% if not notification.is_read %}unread{% else %}read{% endif %}">
+                    <span class="notification-message">
+                        {% if not notification.is_read %}
+                            <span class="unread-indicator">● Unread</span>
+                        {% endif %}
+                        {{ notification.message }}
+                    </span>
+                    <span class="notification-date">{{ notification.created_at }}</span>
+                </li>
+            {% empty %}
+                <li class="empty-state">No new notifications.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

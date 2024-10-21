@@ -11,57 +11,6 @@
             margin: 0;
         }
 
-        /* .hamburger {
-            font-size: 30px;
-            cursor: pointer;
-            padding: 2px;
-            color: white;
-        }
-
-        .sidebar {
-            height: 100%;
-            width: 250px; 
-            position: fixed; 
-            z-index: 1; 
-            top: 0; 
-            left: -250px; 
-            background-color: rgba(0, 0, 0, 0.5); 
-            backdrop-filter: blur(10px); 
-            overflow-x: hidden; 
-            transition: 0.5s; 
-            padding-top: 10px; 
-        }
-
-        .sidebar a {
-            padding: 8px 8px 8px 32px; 
-            text-decoration: none; 
-            font-size: 25px; 
-            color: white; 
-            display: block; 
-            transition: 0.3s; 
-        }
-
-        .sidebar a:hover {
-            color: #000000; 
-        } */
-
-        /* .closebtn {
-            font-size: 36px; 
-            margin-right: 10px; 
-            color: white; 
-        } */
-
-        /* Header for navigation and search */
-        /* .header {
-            margin-left: 0;
-            transition: margin-left 0.5s ease; 
-        } */
-
-        /* Main content should also shift with sidebar */
-        /* .main-content {
-            margin-left: 0;
-            transition: margin-left 0.5s ease; 
-        } */
     </style>
 
     <!-- Add Font Awesome and SweetAlert2 CSS -->
@@ -70,23 +19,11 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <!-- <div id="sidebar" class="sidebar">
-        <a href="#">Dairy Care System</a><br><br><br><br> -->
-        <!-- <a href="#" class="closebtn" onclick="toggleNav()">&times;</a><br><br> -->
-        <!-- <a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a><br>
-        <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
-        <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
-        <a href="{% url 'feedbackpage' %}"><i class="fas fa-comment"></i> Your Feedback</a><br>
-    </div> -->
-
     <!-- Navigation Bar-->
     <ul>
         <div class="header">
-            <!-- Hamburger Icon -->
-            <!-- <span class="hamburger" onclick="toggleNav()">&#9776;</span> -->
             <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
+                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
             </div>
             <div class="nav-item">
                 <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a></b></li>

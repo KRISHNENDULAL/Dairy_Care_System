@@ -156,7 +156,7 @@
     <ul>
         <div class="header">
             <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-tags"></i> Products List</a></b></li>
+                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
             </div>
             <div class="nav-item">
                 <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a></b></li>
@@ -193,6 +193,15 @@
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
+            <!-- Cancel Order Form -->
+            {% if order.get_status_display != "Canceled" %}
+            <form action="{% url 'cancelorder' order.id %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                    <button type="submit" class="cancel-order-btn"><strong>Cancel Order</strong></button>
+            </form>
+            {% else %}
+            <span><strong>Order Canceled</strong></span>
+        {% endif %}
         </div>
         {% empty %}
         <div class="order-card">

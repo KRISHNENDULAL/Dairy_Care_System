@@ -239,6 +239,48 @@
             background-color: #105314;
         }
 
+        /* Dropdown styles for categories */
+        /* .dropdown-categories {
+            position: relative;
+            display: inline-block;
+            width: 60%; 
+        }
+
+        .dropdown-content-categories {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            right: 0;
+            border-radius: 5px;
+        }
+
+        .dropdown-content-categories a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown-content-categories a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown-categories:hover .dropdown-content-categories {
+            display: block;
+        }
+
+        .category-search-bar {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%; 
+        } */
+
         /* Hamburger icon inside the navigation bar */
 /* .hamburger {
     font-size: 30px;
@@ -307,7 +349,7 @@
             <li><b><a href="{% url 'addproducts' %}"><i class="fa fa-cart-plus"></i> Add Products</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'editproduct' %}"><i class="fas fa-tags"></i> All Products List</a></b></li>
+            <li><b><a href="{% url 'editproduct' %}"><i class="fas fa-shopping-basket"></i> All Products List</a></b></li>
         </div>
         <div class="nav-item">
             <li>
@@ -333,6 +375,17 @@
             <button type="submit" class="search-button">Search</button>
         </form>
     </div>
+    <!-- Category Search Bar -->
+    <!-- <div class="dropdown-categories">
+        <input type="text" class="category-search-bar" placeholder="Search for categories..." onfocus="showCategoryDropdown()" onblur="hideCategoryDropdown()">
+        <div class="dropdown-content-categories" id="category-dropdown-content">
+            {% for category in categories %}
+                <a href="#" onclick="selectCategory('{{ category }}')">{{ category }}</a>
+            {% empty %}
+                <a href="#">No categories available</a>
+            {% endfor %}
+        </div>
+    </div> -->
 </center>
 
 <div class="products-container">
@@ -345,6 +398,7 @@
             <p>{{ product.product_description }}</p><br>
             <p><strong>Stock:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
             <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
+            <p><strong>Category:</strong> {{ product.product_category }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
             <p><strong>Added by:</strong> {{ product.employee.username }}</p>
             <p><strong>Added at:</strong> {{ product.added_at }}</p>
@@ -357,7 +411,30 @@
 
 <!-- Add SweetAlert2 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Show category dropdown on focus
+    function showCategoryDropdown() {
+        document.getElementById("category-dropdown-content").style.display = "block";
+    }
 
+    // Hide category dropdown on blur
+    function hideCategoryDropdown() {
+        setTimeout(function() {
+            document.getElementById("category-dropdown-content").style.display = "none";
+        }, 100); // Delay to allow click on dropdown
+    }
+
+    // Select a category from dropdown
+    function selectCategory(category) {
+        // Set category as search input value and submit the form
+        const categoryInput = document.querySelector('.category-search-bar');
+        categoryInput.value = category; // Set the selected category
+        // You can implement logic to search based on the selected category if desired
+        // For now, just alert the selected category
+        alert('Selected category: ' + category);
+        // Optionally submit the form or perform a search based on the selected category
+    }
+</script>
 <script>
     // Toggle dropdown on click
     function toggleDropdown() {

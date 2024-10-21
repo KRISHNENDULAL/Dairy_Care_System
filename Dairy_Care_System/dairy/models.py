@@ -44,6 +44,7 @@ class Products_table(models.Model):
     product_quantity = models.DecimalField(max_digits=10, decimal_places=2)  # Quantity
     quantity_unit = models.CharField(max_length=20)   # Unit of measurement
     product_price = models.DecimalField(max_digits=10, decimal_places=2)  # Price field
+    product_category = models.CharField(max_length=100, null=True, blank=True)  # Category field
     employee = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)         # 1 if available, else 0
     added_at = models.DateTimeField(auto_now_add=True) # Timestamp for when the product is added
@@ -70,6 +71,11 @@ class WishlistItem(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.product_name}"
+
+class Notifications_table(models.Model):
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 
