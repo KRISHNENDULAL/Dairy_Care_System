@@ -17,6 +17,7 @@ from django.core.files.storage import FileSystemStorage
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.db.models import Q  # Import Q for case-insensitive query
 
 
 
@@ -74,6 +75,7 @@ def regmailverify(request):
         return redirect('regotpverify')
 
     return render(request, 'regmailverify.html')
+
 
 def regotpverify(request):
     email = request.session.get('user_email') 
@@ -308,13 +310,14 @@ def login(request):
     if request.method == 'POST':
         username_or_email = request.POST.get('username')
         password = request.POST.get('password')
-        
+
         # Try to find the user by username or email
         user = Users_table.objects.filter(username=username_or_email).first() or Users_table.objects.filter(email=username_or_email).first()
 
         # Check if user exists and their account is active
         if user and user.status == 1:
-            if user.password == password:
+            # Use check_password to validate the hashed password
+            if check_password(password, user.password):
                 # Store user information in session
                 request.session['user_id'] = user.user_id
                 request.session['username'] = user.username
@@ -323,8 +326,7 @@ def login(request):
                 if user.role == 'customer':
                     return redirect('customerpage')
                 elif user.role == 'employee':
-                    if user.password == password:  # Assuming the random password is stored in plain text (ideally it should be hashed)
-                        return redirect('employeepage')
+                    return redirect('employeepage')
                 elif user.role == 'admin':
                     return redirect('adminpage')
             else:
@@ -559,12 +561,12 @@ def logout(request):
     return redirect('home')
 
 
-from django.db.models import Q  # Import Q for case-insensitive query
 
 def addproducts(request): 
     if request.method == 'POST':
         product_name = request.POST.get('product_name')
         product_description = request.POST.get('product_description')
+        product_category = request.POST.get('product_category')  # Get the product category
         product_quantity = request.POST.get('product_quantity')
         quantity_unit = request.POST.get('quantity_unit')
         product_price = request.POST.get('product_price')  # Get the price from the POST data
@@ -588,6 +590,7 @@ def addproducts(request):
         product = Products_table(
             product_name=product_name,
             product_description=product_description,
+            product_category=product_category,  # Add the category here
             product_quantity=product_quantity,
             quantity_unit=quantity_unit,
             product_price=product_price,

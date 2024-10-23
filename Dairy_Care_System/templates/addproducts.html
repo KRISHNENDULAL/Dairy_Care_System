@@ -36,6 +36,10 @@
     <textarea id="productDescription" name="product_description" rows="4"></textarea>
     <div id="descriptionError" class="error-message"></div>
 
+    <label for="productName">Category:</label>
+    <input type="text" id="productCategory" name="product_category">
+    <div id="categoryError" class="error-message"></div>
+
     <label for="productQuantity">Stock:</label>
     <div class="quantity-container">
         <input type="text" id="productQuantity" name="product_quantity" class="quantity-input">
@@ -77,6 +81,7 @@
         const form = document.getElementById('addProductForm');
         const productName = document.getElementById('productName');
         const productDescription = document.getElementById('productDescription');
+        const productCategory = document.getElementById('productCategory');
         const productQuantity = document.getElementById('productQuantity');
         const quantityUnit = document.getElementById('quantityUnit');
         const productPrice = document.getElementById('productPrice');
@@ -108,6 +113,11 @@
             return wordCount <= 100;
         }
 
+        // Function to validate product category (only alphabets)
+        function validateProductCategory(category) {
+            return /^[a-zA-Z\s]+$/.test(category); // Allow alphabets and spaces
+        }
+
         // Function to validate quantity (integer or decimal)
         function validateQuantity(quantity) {
             return /^\d+(\.\d+)?$/.test(quantity); // Allow integers and decimals
@@ -137,6 +147,17 @@
                 showError('Description must not exceed 100 words.', 'descriptionError');
             } else {
                 clearError('descriptionError');
+            }
+        });
+
+        // Live validation for product category
+        productCategory.addEventListener('input', function() {
+            if (productCategory.value.trim() === "") {
+                showError('Product category is required.', 'categoryError');
+            } else if (!validateProductCategory(productCategory.value.trim())) {
+                showError('Product category can only contain alphabets.', 'categoryError');
+            } else {
+                clearError('categoryError');
             }
         });
 
@@ -202,7 +223,8 @@
 
         // Apply validation for each field
         validateFieldsBefore(productDescription, productName, 'descriptionError');
-        validateFieldsBefore(productQuantity, productDescription, 'quantityError');
+        validateFieldsBefore(productCategory, productDescription, 'categoryError');
+        validateFieldsBefore(productQuantity, productCategory, 'quantityError');
         validateFieldsBefore(quantityUnit, productQuantity, 'unitError');
         validateFieldsBefore(productPrice, productQuantity, 'priceError');
 
@@ -218,6 +240,12 @@
 
             if (productDescription.value.trim() === "" || !validateDescription(productDescription.value.trim())) {
                 showError('Description is required and must not exceed 100 words.', 'descriptionError');
+                valid = false;
+            }
+
+            // Final validation checks before submission
+            if (productCategory.value.trim() === "" || !validateProductCategory(productCategory.value.trim())) {
+                showError('Product category is required and can only contain alphabets.', 'categoryError');
                 valid = false;
             }
 

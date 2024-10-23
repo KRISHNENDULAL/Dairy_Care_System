@@ -66,19 +66,38 @@ td[colspan="7"] {
     margin: 20px auto;
     padding: 10px 20px;
     text-align: center;
-    background-color: #007BFF;
-    color: white;
+    color: rgb(0, 0, 0);
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .back-button:hover {
-    background-color: #0056b3;
+    text-decoration: underline;
 }
 
 /* Button styles */
-.button {
+.add-button {
+    position: absolute; /* Use absolute positioning */
+    top: 20px; /* Adjust vertical position */
+    right: 20px; /* Aligns the button to the right corner */
+    background-color: #007BFF; /* Button color */
+    color: white; /* Text color */
+    padding: 10px 15px; /* Padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 14px; /* Font size */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.add-button:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
+
+/* Button styles */
+.update-button {
     display: inline-block; /* Align buttons next to each other */
     background-color: #007BFF; /* Button color */
     color: white; /* Text color */
@@ -92,13 +111,14 @@ td[colspan="7"] {
     transition: background-color 0.3s; /* Smooth transition for hover effect */
 }
 
-.button:hover {
+.update-button:hover {
     background-color: #0056b3; /* Darker on hover */
 }
     </style>
 </head>
 <body>
     <h1>{{ animal.animal_name }}'s Health Records</h1>
+    <a href="{% url 'add_health_record' animal.animal_id %}" class="add-button">Add another report</a><br><br>
     
 
     <table>
@@ -120,8 +140,7 @@ td[colspan="7"] {
             <td>{{ record.veterinarian_name }}</td>
             <td>{{ record.next_checkup_date }}</td>
             <td>
-                <a href="{% url 'add_health_record' animal.animal_id %}" class="button">Add</a><br><br>
-                <a href="{% url 'update_health_record' record.health_id %}" class="button">Update</a>
+                <a href="{% url 'update_health_record' record.health_id %}" class="update-button">Update</a>
             </td>
         </tr>
         {% empty %}
