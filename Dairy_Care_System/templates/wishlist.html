@@ -171,6 +171,7 @@
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!-- Navigation Bar-->
@@ -222,8 +223,13 @@
             <!-- Product details and remove button -->
             <div class="wishlist-item-content">
                 <div class="wishlist-item-details">
-                    <a href="{% url 'productdetails' item.product.product_id %}" style="text-decoration: underline; color: #000000;">
-                    <h2>{{ item.product.product_name }}</h2></a>
+                    {% if item.product.product_id %}
+                    <!-- <a href="{% url 'productdetails' %}?product_id={{ item.product.product_id }}" style="text-decoration: underline; color: #000000;"> -->
+                        <h2>{{ item.product.product_name }}</h2>
+                        </a>
+                    {% else %}
+                        <h2>{{ item.product.product_name }}</h2>
+                    {% endif %}
                     <p>{{ item.product.product_description }}</p><br>
                     <!-- <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br> -->
                     <p><strong>Price:</strong> Rs. {{ item.product.product_price }}</p><br><br>
@@ -231,7 +237,7 @@
                 <form method="POST" action="{% url 'wishlist' %}">
                     {% csrf_token %}
                     <input type="hidden" name="remove_product_id" value="{{ item.product.product_id }}">
-                    <button type="submit" class="remove-button">Remove</button>
+                    <button type="submit" class="remove-button"><i class="fas fa-trash"></i>Remove</button>
                 </form>
             </div>
         </div>
@@ -239,6 +245,18 @@
         <p>Your wishlist is empty.</p>
         {% endfor %}
     </center>
+
+
+    
+
+
+
+
+
+
+
+
+
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

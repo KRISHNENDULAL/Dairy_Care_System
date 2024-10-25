@@ -672,11 +672,13 @@ def custproductslist(request):
 
     
 
-def productdetails(request, product_id):
-    product = get_object_or_404(Products_table, product_id=product_id)
-    images = product.images.all()  # Get associated images
-
+def productdetails(request):
     if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Products_table, product_id=product_id)
+        images = product.images.all()  # Get associated images
+
+        # Wishlist addition logic remains the same
         if 'add_to_wishlist' in request.POST:
             user_id = request.session.get('user_id')
             if user_id:
@@ -690,11 +692,12 @@ def productdetails(request, product_id):
             else:
                 messages.error(request, 'You need to log in to add to your wishlist.')
 
-    context = {
-        'product': product,
-        'images': images,
-    }
-    return render(request, 'productdetails.html', context)
+        context = {
+            'product': product,
+            'images': images,
+        }
+        return render(request, 'productdetails.html', context)
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -724,8 +727,11 @@ def wishlist(request):
             return redirect('wishlist')
 
         wishlist_items = WishlistItem.objects.filter(user=user).select_related('product')
-        print("Wishlist items retrieved for the user:", wishlist_items)
-
+        
+        # Add print statements to debug the product details
+        for item in wishlist_items:
+            print(f"Wishlist Item: {item.product.product_name}, Product ID: {item.product.product_id}")
+        
         return render(request, 'wishlist.html', {'wishlist': wishlist_items, 'username': user.username})
     else:
         return redirect('login')
@@ -974,28 +980,104 @@ def update_health_record(request, health_id):
     return render(request, 'update_health_record.html', {'health_record': health_record})
 
 
-# Add a product to the cart
-def add_to_cart(request, product_id):
+""" # Add a product to the cart
+def add_to_cart(request):
     if request.method == 'POST':
+        # Get product_id from the POST data
+        product_id = request.POST.get('product_id')
         # Get the quantity from the form submission (input field)
         quantity = int(request.POST.get('quantity', 1))  # Default to 1 if not specified
 
-    product = get_object_or_404(Products_table, pk=product_id)
-    user_id = request.session['user_id']
-    user = get_object_or_404(Users_table, pk=user_id)
+        # Fetch product and user
+        product = get_object_or_404(Products_table, pk=product_id)
+        user_id = request.session['user_id']
+        user = get_object_or_404(Users_table, pk=user_id)
 
-    # Check if the product is already in the cart
-    cart_item, created = Cart.objects.get_or_create(
-        user=user,  # Assuming the user is logged in
-        product=product,
-        defaults={'quantity': quantity}  # Default quantity if the item is being added for the first time
-    )
+        # Check if the product is already in the cart
+        cart_item, created = Cart.objects.get_or_create(
+            user=user,  # Assuming the user is logged in
+            product=product,
+            defaults={'quantity': quantity}  # Default quantity if the item is being added for the first time
+        )
 
-    if not created:  # If the item already exists in the cart, just update the quantity
-        cart_item.quantity += quantity
-        cart_item.save()
+        if not created:  # If the item already exists in the cart, just update the quantity
+            cart_item.quantity += quantity
+            cart_item.save()
 
-    return redirect('viewcart')  # Redirect to the cart view after adding the item
+        return redirect('viewcart')  # Redirect to the cart view after adding the item
+
+# View the cart
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def viewcart(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch cart items for the logged-in user
+        cart_items = Cart.objects.filter(user=user)
+        
+        # Calculate the total price of the cart
+        total_price = sum([item.get_total_price() for item in cart_items])
+        
+        # Pass the username, cart items, and total price to the template
+        context = {
+            'username': user.username,  # User's username
+            'cart_items': cart_items,    # Cart items for the user
+            'total_price': total_price   # Total price of the items in the cart
+        }
+        return render(request, 'viewcart.html', context)
+    
+    else:
+        # Redirect to login if no user is logged in
+        return redirect('login')
+
+
+# Update the quantity of a product in the cart
+def update_cart(request, cart_id):
+    if request.method == 'POST':
+        cart_item = get_object_or_404(Cart, pk=cart_id)
+        quantity = int(request.POST.get('quantity', 1))
+
+        if quantity > 0:
+            cart_item.quantity = quantity
+            cart_item.save()
+
+        return redirect('viewcart')
+
+# Delete a product from the cart
+def delete_from_cart(request, cart_id):
+    cart_item = get_object_or_404(Cart, pk=cart_id)
+    cart_item.delete()
+    return redirect('viewcart') """
+
+
+# Add a product to the cart
+def add_to_cart(request):
+    if request.method == 'POST':
+        # Get product_id from the POST data
+        product_id = request.POST.get('product_id')
+        # Get the quantity from the form submission (input field)
+        quantity = int(request.POST.get('quantity', 1))  # Default to 1 if not specified
+
+        # Fetch product and user
+        product = get_object_or_404(Products_table, pk=product_id)
+        user_id = request.session['user_id']
+        user = get_object_or_404(Users_table, pk=user_id)
+
+        # Check if the product is already in the cart
+        cart_item, created = Cart.objects.get_or_create(
+            user=user,  # Assuming the user is logged in
+            product=product,
+            defaults={'quantity': quantity}  # Default quantity if the item is being added for the first time
+        )
+
+        if not created:  # If the item already exists in the cart, just update the quantity
+            cart_item.quantity += quantity
+            cart_item.save()
+
+        return redirect('viewcart')  # Redirect to the cart view after adding the item
 
 # View the cart
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -1102,7 +1184,7 @@ def checkout(request):
         # Clear the user's cart after placing the order
         user_cart.delete()
 
-        messages.success(request, 'Order placed successfully!')
+        # messages.success(request, 'Order placed successfully!')
         return redirect('ordersummary', order_id=order.id)
 
     # Pass the user details and cart items to the template
@@ -1119,7 +1201,11 @@ def checkout(request):
 
 # View to display the order summary after placing an order
 def ordersummary(request, order_id):
-    # Fetch the specific order
+    # order_id = request.GET.get('order_id')
+    # if not order_id:
+    #     return redirect('orderhistory')
+
+    # Fetch the specific order using the order_id
     order = get_object_or_404(Order_table, id=order_id)
 
     # Fetch the related items from OrderItem_table for this order

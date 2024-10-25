@@ -63,19 +63,25 @@
 
     <!-- Main content that shifts when the sidebar opens -->
     
-        <div class="products-container">
-            {% for product in products %}
-                <div class="product" onclick="window.location.href='{% url 'productdetails' product.product_id %}'" style="cursor: pointer;">
+    <div class="products-container">
+        {% for product in products %}
+        <div class="product">
+            <form action="{% url 'productdetails' %}" method="POST"  style="cursor: pointer;">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; width: 100%; text-align: center;">
                     {% for image in product.images.all %}
                         <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
                     {% endfor %}
                     <h3>{{ product.product_name }}</h3>
                     <p>{{ product.product_description }}</p>
-                </div>
-            {% empty %}
-                <p>No products available.</p>
-            {% endfor %}
+                </button>
+            </form>
         </div>
+        {% empty %}
+            <p>No products available.</p>
+        {% endfor %}
+    </div>
     </div>
 
     <!-- Add SweetAlert2 and Font Awesome JavaScript -->

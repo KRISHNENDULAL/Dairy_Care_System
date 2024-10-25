@@ -230,24 +230,22 @@
                 <br>
 
                 <div class="product-actions">
-                    <form method="POST" action="{% url 'productdetails' product.product_id %}">
+                    <form method="POST" action="{% url 'productdetails' %}">
                         {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
                         <button type="submit" name="add_to_wishlist" class="btn wish-button">
                             <i class="fas fa-heart"></i> Add to Wishlist
                         </button>
                     </form>
-
-                    <form method="POST" action="{% url 'add_to_cart' product.product_id %}">
-                        {% csrf_token %}
-                        <!-- Hidden field for quantity (updated via JavaScript) -->
-                        <input type="hidden" name="quantity" id="cart-quantity" value="1">
-                        <!-- Hidden field for unit (updated via JavaScript) -->
-                        <input type="hidden" name="unit" id="cart-unit" value="">
-                        
-                        <button type="submit" class="btn buy-button">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                    </form>
+                
+                    <div class="product-actions">
+                        <form method="POST" action="{% url 'add_to_cart' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                            <input type="hidden" name="quantity" id="cart-quantity" value="1">
+                            <button class="btn buy-button" type="submit">Add to Cart</button>
+                        </form>
+                </div>
                 </div><br><br>
 
                 <!-- Display success message if it exists -->

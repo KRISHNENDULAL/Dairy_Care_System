@@ -33,11 +33,11 @@ urlpatterns = [
     path('productstock',views.productstock,name='productstock'),
     path('custproductslist',views.custproductslist,name='custproductslist'),
 
-    path('productslist/<int:product_id>/', views.productdetails, name='productdetails'),
+    path('productdetails/', views.productdetails, name='productdetails'),
     path('wishlist', views.wishlist, name='wishlist'),
 
     path('viewcart', views.viewcart, name='viewcart'),
-    path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('add_to_cart/', views.add_to_cart, name='add_to_cart'),
     path('cart/update/<int:cart_id>/', views.update_cart, name='update_cart'),
     path('cart/delete/<int:cart_id>/', views.delete_from_cart, name='delete_from_cart'),
     path('checkout/', views.checkout, name='checkout'),

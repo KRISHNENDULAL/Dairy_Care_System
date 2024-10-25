@@ -196,18 +196,38 @@
         }
 
         .checkout {
-            text-align: right;
-        }
+    display: flex;
+    justify-content: space-between; /* This will place the two buttons at opposite ends */
+    align-items: center; /* This will vertically align them in the center */
+    margin: 20px 0; /* Add some spacing above and below the buttons */
+}
 
-        .btn-checkout {
-            background-color: #049918;
-            padding: 12px 20px;
-            font-size: 16px;
-        }
+.btn-checkout {
+    background-color: #049918;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: white; /* Ensure text is visible on the button */
+    text-decoration: none; /* Remove underline from the anchor */
+    border-radius: 5px; /* Optional: Add rounded corners */
+}
 
-        .btn-checkout:hover {
-            background-color: #08b210;
-        }
+.btn-checkout:hover {
+    background-color: #08b210;
+}
+
+.btn-shop {
+    background-color: #bb0606;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: white; /* Ensure text is visible on the button */
+    text-decoration: none; /* Remove underline from the anchor */
+    border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+.btn-shop:hover {
+    background-color: #e90505;
+}
+
 
         .empty-cart {
             text-align: center;
@@ -260,11 +280,12 @@
                 text-align: left;
             }
 
-            .total, .checkout {
+            .total, .checkout, .shop {
                 text-align: center;
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -326,45 +347,26 @@
                     </td>
                     <td data-label="Product"><strong>
                         <div class="product-name">
-                            <!-- Display the product image if available -->
-                            <img src="{{ item.product.images.first.image.url }}" >
-                            <a href="{% url 'productdetails' item.product.product_id %}" style="text-decoration: underline; color: #000000;">
-                            {{ item.product.product_name }}</a>
+                             <!-- Display the product image if available -->
+                            <img src="{{ item.product.images.first.image.url }}">
+                            <!-- <a href="{% url 'productdetails' %}?product_id={{ item.product.product_id }}" style="text-decoration: underline; color: #000000;"> -->
+                                {{ item.product.product_name }}</a>
                         </div>
                     </strong></td>
-                    <!-- <td>
+                    <td>    
                         <form method="POST" action="{% url 'update_cart' item.cart_id %}">
                             {% csrf_token %}
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                            <button class="btn btn-update" type="submit">Update</button>
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.product_quantity }}" required>
+                            <button class="btn btn-update" type="submit"><i class="fas fa-undo"></i> Update</button>
                         </form>
-                    </td> -->
+                    </td>
+                    <td>₹{{ item.product.product_price }}</td>
+                    <td>₹{{ item.get_total_price }}</td>
                     <td>
-                        <form method="POST" action="{% url 'update_cart' item.cart_id %}">
+                        <form method="POST" action="{% url 'delete_from_cart' item.cart_id %}">
                             {% csrf_token %}
-                            <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1" max="{{ product.product_quantity }}" placeholder="Quantity" required>
-                            
-                            <!-- Unit selection dropdown -->
-                            <!-- <select id="quantityUnit" name="quantity_unit" class="unit-select">
-                                <option value="{{ item.quantityUnit }}">{{ item.quantityUnit }}</option>
-                                <option value="litres">Litres (l)</option>
-                                <option value="ml">Millilitres (ml)</option>
-                                <option value="kg">Kilograms (kg)</option>
-                                <option value="g">Grams (g)</option>
-                            </select> -->
-                            
-                            <button class="btn btn-update" type="submit">Update</button>
+                            <button class="btn btn-remove" type="submit"><i class="fas fa-trash"></i> Remove</button>
                         </form>
-                    </td>                    
-                    <td data-label="Price">₹{{ item.product.product_price }}</td>
-                    <td data-label="Total">₹{{ item.get_total_price }}</td>
-                    <td data-label="Actions">
-                        <div class="actions">
-                            <form method="POST" action="{% url 'delete_from_cart' item.cart_id %}">
-                                {% csrf_token %}
-                                <button class="btn btn-remove" type="submit">Remove</button>
-                            </form>
-                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -376,8 +378,10 @@
         </div>
 
         <div class="checkout">
-            <a href="{% url 'checkout' %}" class="btn btn-checkout">Proceed to Checkout</a>
+            <a href="{% url 'custproductslist' %}" class="btn btn-shop"><i class="fas fa-shopping-basket"></i> Continue Shopping</a>
+            <a href="{% url 'checkout' %}" class="btn btn-checkout"><i class="fas fa-check-circle"></i> Proceed to Checkout</a>
         </div>
+
 
         {% else %}
         <div class="empty-cart">

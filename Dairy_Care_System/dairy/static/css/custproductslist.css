@@ -59,6 +59,19 @@ h2 {
     margin-left: 10px;
 }
 
+h3 {
+    font-size: 1.2em; /* Adjust font size */
+    margin: 10px 0; /* Margin for spacing */
+    text-align: center; /* Centering the product name */
+}
+
+p {
+    margin: 5px 0; /* Margin for spacing */
+    font-size: 1.2em;
+    color: #000000;
+    text-align: center; /* Centering the product name */
+}
+
 /* Dropdown styles */
 .dropdown-content {
     display: none;
@@ -122,14 +135,14 @@ h2 {
 }
 
 .product h3 {
-    font-size: 1.2em; /* Adjust font size */
+    font-size: 1.4em; /* Adjust font size */
     margin: 10px 0; /* Margin for spacing */
     text-align: center; /* Centering the product name */
 }
 
 .product p {
     margin: 5px 0; /* Margin for spacing */
-    font-size: 1.2em;
+    font-size: 1.3em;
     color: #000000;
     text-align: center; /* Centering the product name */
 }

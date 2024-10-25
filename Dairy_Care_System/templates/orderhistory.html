@@ -124,12 +124,6 @@
             color: #333;
         }
 
-        /* .order-card .order-total {
-            font-size: 18px;
-            font-weight: bold;
-            color: #007BFF;
-        } */
-
         .order-card .view-summary {
             text-decoration: none;
             color: #9a0606;
@@ -147,6 +141,75 @@
             font-size: 16px;
             color: green;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .confirm-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .success-message {
+            margin-top: 15px;
+            color: rgb(0, 0, 128);
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+        }
+
     </style>
 </head>
 
@@ -189,19 +252,15 @@
         {% for order in orders %}
         <div class="order-card">
             <span>{{ forloop.counter }}</span>
-            <!-- <span><strong>Order:</strong> {{ order.id }}</span> -->
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
-            <!-- Cancel Order Form -->
+            <!-- Cancel Order Button -->
             {% if order.get_status_display != "Canceled" %}
-            <form action="{% url 'cancelorder' order.id %}" method="POST" style="display:inline;">
-                {% csrf_token %}
-                    <button type="submit" class="cancel-order-btn"><strong>Cancel Order</strong></button>
-            </form>
+            <button class="cancel-order-btn" data-order-id="{{ order.id }}">Cancel Order</button>
             {% else %}
             <span><strong>Order Canceled</strong></span>
-        {% endif %}
+            {% endif %}
         </div>
         {% empty %}
         <div class="order-card">
@@ -212,7 +271,33 @@
         <br><br>
         <div class="footer"><strong>
             Thank you for shopping with us!
-        </strong></div>
+        </strong></div><br><br>
+        <!-- Display success message if it exists -->
+        {% if messages %}
+        <div class="success-message">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal for Order Cancellation -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dairy Care System</h2>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this order?
+            </div>
+            <form id="cancelOrderForm" action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="order-id-input" name="order_id" value="">
+                <button type="button" class="confirm-btn" id="confirmCancelBtn">Yes, Cancel</button>
+                <button type="button" class="cancel-btn">No, Go Back</button>
+            </form>
+        </div>
     </div>
 
     <!-- Add SweetAlert2 and Font Awesome JavaScript -->
@@ -223,11 +308,7 @@
         // Toggle dropdown on click
         function toggleDropdown() {
             var dropdown = document.getElementById("dropdown-content");
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
-            }
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
         }
 
         // Close the dropdown if clicked outside of it
@@ -239,6 +320,45 @@
                 }
             }
         }
+
+        // Modal functionality
+        const modal = document.getElementById("cancelModal");
+        const closeModal = document.getElementsByClassName("close");
+        const cancelButtons = document.querySelectorAll(".cancel-order-btn");
+        const confirmCancelBtn = document.getElementById("confirmCancelBtn");
+        const orderIdInput = document.getElementById("order-id-input");
+
+        cancelButtons.forEach(button => {
+            button.onclick = function() {
+                const orderId = this.getAttribute('data-order-id');
+                orderIdInput.value = orderId;
+                modal.style.display = "block";
+            };
+        });
+
+        Array.from(closeModal).forEach(element => {
+            element.onclick = function() {
+                modal.style.display = "none";
+            };
+        });
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        confirmCancelBtn.onclick = function() {
+    const form = document.getElementById("cancelOrderForm");
+    const orderId = orderIdInput.value;
+
+    if (orderId) { // Check if the orderId is not empty
+        form.action = "{% url 'cancelorder' '0' %}".replace("0", orderId); // Default value to avoid errors
+        form.submit();
+    } else {
+        alert('Order ID is missing!'); // Alert if the ID is not found
+    }
+};
 
         // Custom SweetAlert2 logout confirmation
         function confirmLogout() {
@@ -253,7 +373,6 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redirect to logout URL
                     window.location.href = "{% url 'logout' %}";
                 }
             });
