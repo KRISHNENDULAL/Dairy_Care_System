@@ -163,6 +163,16 @@
             transform: scale(1.02);
         }
 
+        .order-button {
+            background-color: rgb(4, 16, 92);
+            color: white;
+        }
+
+        .order-button:hover {
+            background-color: #061f9e;
+            transform: scale(1.02);
+        }
+
         .btn i {
             font-size: 20px;
         }
@@ -245,7 +255,15 @@
                             <input type="hidden" name="quantity" id="cart-quantity" value="1">
                             <button class="btn buy-button" type="submit">Add to Cart</button>
                         </form>
-                </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <form method="GET" action="{% url 'preorder' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                            <button class="btn order-button" type="submit">Pre-Order {{ product.product_name }}</button>
+                        </form>
+                    </div>
                 </div><br><br>
 
                 <!-- Display success message if it exists -->

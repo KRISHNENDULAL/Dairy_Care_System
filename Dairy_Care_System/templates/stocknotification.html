@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Global styles */
         body {
@@ -17,6 +18,21 @@
             height: 100vh;
         }
 
+        /* Styling for the back link in the upper left corner */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 25px;
+    color: black;
+    text-decoration: none;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
         .container {
             max-width: 600px;
             width: 100%;
@@ -28,8 +44,8 @@
 
         h2 {
             text-align: center;
-            color: #2c3e50;
-            font-size: 36px;
+            color: #000000;
+            font-size: 30px;
             margin-bottom: 30px;
             font-family: 'Verdana', sans-serif;
         }
@@ -51,6 +67,12 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
+        /* Hover effect */
+        ul li:hover {
+            background-color: #e6f7ff;
+            transform: translateY(-2px);
+        }
+
         /* Unread notification styling */
         .unread {
             background-color: #f8d7da; /* Light red background for unread */
@@ -58,7 +80,7 @@
 
         /* Read notification styling */
         .read {
-            background-color: #f8f9fa; /* Neutral background for read */
+            background-color: #e1edee; /* Neutral background for read */
         }
 
         ul li:hover {
@@ -72,14 +94,14 @@
 
         /* Notification message styling */
         .notification-message {
-            font-size: 16px;
-            color: #34495e;
+            font-size: 18px;
+            color: #0955a1;
         }
 
         /* Notification date styling */
         .notification-date {
             font-size: 14px;
-            color: #7f8c8d;
+            color: #07396b;
         }
 
         /* Empty state styling */
@@ -102,8 +124,9 @@
     </style>
 </head>
 <body>
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
     <div class="container">
-        <h2>Notifications</h2>
+        <h2>Notifications on Stock Variations</h2><br>
         <ul>
             {% for notification in notifications %}
                 <li class="{% if not notification.is_read %}unread{% else %}read{% endif %}">

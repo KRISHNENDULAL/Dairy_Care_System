@@ -35,12 +35,15 @@ urlpatterns = [
 
     path('productdetails/', views.productdetails, name='productdetails'),
     path('wishlist', views.wishlist, name='wishlist'),
+    path('preorder/', views.preorder, name='preorder'),
+    path('preorderlisting', views.preorderlisting, name='preorderlisting'),  # URL for pre-order list
 
     path('viewcart', views.viewcart, name='viewcart'),
     path('add_to_cart/', views.add_to_cart, name='add_to_cart'),
     path('cart/update/<int:cart_id>/', views.update_cart, name='update_cart'),
     path('cart/delete/<int:cart_id>/', views.delete_from_cart, name='delete_from_cart'),
-    path('checkout/', views.checkout, name='checkout'),
+    path('checkoutbilling/', views.checkoutbilling, name='checkoutbilling'),
+    path('checkoutorder/', views.checkoutorder, name='checkoutorder'),
     path('ordersummary/<int:order_id>/', views.ordersummary, name='ordersummary'),
     path('orderhistory/', views.orderhistory, name='orderhistory'),
     path('stocknotification', views.stocknotification, name='stocknotification'),
@@ -59,6 +62,7 @@ urlpatterns = [
     path('health/update/<int:health_id>/', views.update_health_record, name='update_health_record'),
     path('animal/delete/<int:animal_id>/', views.delete_animal, name='delete_animal'),
     path('animal/restore/<int:animal_id>/', views.restore_animal, name='restore_animal'),
+    path('milkdetails/', views.milkdetails, name='milkdetails'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

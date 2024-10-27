@@ -89,7 +89,7 @@
 </div>
 
 <!-- Modal Container -->
-<div id="confirmationModal" class="modal">
+<!-- <div id="confirmationModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">Dairy Care System</div>
         <div class="modal-body" id="modal-message"></div>
@@ -98,9 +98,78 @@
             <button class="btn-cancel" onclick="closeModal();">Cancel</button>
         </div>
     </div>
+</div> -->
+
+<!-- Modal Container -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Dairy Care System</div>
+        <div class="modal-body" id="modal-message"></div>
+        
+        <!-- Add reason input field (visible only for deactivation) -->
+        <div class="modal-body" id="reason-container" style="display: none;">
+            <label for="deactivationReason">Reason for Deactivation:</label>
+            <input type="text" id="deactivationReason" placeholder="Enter reason here..." style="width: 100%;">
+            <p id="reasonError" style="color: red; display: none;">Reason is required.</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-confirm" id="confirm-btn">Confirm</button>
+            <button class="btn-cancel" onclick="closeModal();">Cancel</button>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
+    // Function to open the modal with the corresponding message
+    function openModal(actionType, username, url) {
+        var modal = document.getElementById("confirmationModal");
+        var message = document.getElementById("modal-message");
+        var confirmBtn = document.getElementById("confirm-btn");
+        var reasonContainer = document.getElementById("reason-container");
+        var reasonError = document.getElementById("reasonError");
+
+        // Reset reason input and error display
+        document.getElementById("deactivationReason").value = "";
+        reasonError.style.display = "none";
+
+        // Show reason input only for delete action
+        if (actionType === 'delete') {
+            message.innerHTML = "Are you sure you want to delete the user <strong>" + username + "</strong> and <strong>deactivate</strong> their account?";
+            reasonContainer.style.display = "block";
+        } else if (actionType === 'restore') {
+            message.innerHTML = "Are you sure you want to restore the user <strong>" + username + "</strong> and <strong>reactivate</strong> their account?";
+            reasonContainer.style.display = "none";
+        }
+
+        confirmBtn.onclick = function() {
+            var reason = document.getElementById("deactivationReason").value.trim();
+            if (actionType === 'delete' && reason === "") {
+                reasonError.style.display = "block";
+                return; // Prevent confirmation if reason is empty
+            }
+            // Append the reason to the URL as a query parameter
+            window.location.href = url + "?reason=" + encodeURIComponent(reason);
+        };
+
+        modal.style.display = "block";
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        document.getElementById("confirmationModal").style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        var modal = document.getElementById("confirmationModal");
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+<!-- <script type="text/javascript">
     // Function to open the modal with the corresponding message
     function openModal(actionType, username, url) {
         var modal = document.getElementById("confirmationModal");
@@ -133,7 +202,7 @@
             closeModal();
         }
     }
-</script>
+</script> -->
 
 <!-- Add SweetAlert2 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

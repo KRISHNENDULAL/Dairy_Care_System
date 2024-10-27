@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Milk Details</title>
+    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: url('{% static "images/rrr.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 5px;
+            overflow: hidden;
+            background-color: black;
+            display: flex;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .nav-item.left {
+            color: white;
+            padding: 5px 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        li {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        li a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 50px 0;
+            font-size: 2.5em;
+            color: #000000;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        .animal-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px; /* Spacing between animals */
+        }
+
+        img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 2px solid #ddd; /* Border around image */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+
+        .animal-name {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #fff;
+        }
+
+        /* Styling for the back link in the upper left corner */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 25px;
+    color: black;
+    text-decoration: none;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
+    
+    <!-- Navigation Bar -->
+    <!-- <ul>
+        <div class="header">
+            <div class="nav-item">
+                <li><b><a href="{% url 'addanimal' %}"><i class="fa fa-paw"></i> Add Animals</a></b></li>
+            </div>
+
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul> -->
+
+    <center>
+        <h1>Milk Production Details</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Animal Picture</th>
+                    <th>Breed & Category</th>
+                    <th>Milk Capacity (Liters)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for animal in animals %}
+                <tr>
+                    <td>
+                        <div class="animal-info">
+                            {% if animal.images.all %}
+                                <img src="{{ animal.images.all.0.animal_image.url }}" alt="Animal Image">
+                            {% else %}
+                                <img src="{% static 'images/default-animal.jpg' %}" alt="Default Animal Image"> <!-- Default image -->
+                            {% endif %}
+                            <span class="animal-name">{{ animal.animal_name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ animal.breed }} - {{ animal.animal_category }}</td>
+                    <td>{{ animal.milk_capacity }} L</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table><br><br><br>
+    </center>
+
+    <!-- <footer>
+        <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+    </footer> -->
+
+    <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+        // Custom SweetAlert2 logout confirmation
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

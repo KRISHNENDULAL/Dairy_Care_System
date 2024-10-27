@@ -20,8 +20,8 @@
             min-height: 100vh;
         }
         .container {
-            width: 90%;
-            max-width: 900px;
+            width: 70%;
+            max-width: 700px;
             background: #e7e4e4;
             border-radius: 15px;
             backdrop-filter: blur(30px); /* Blur effect */
@@ -37,7 +37,7 @@
             margin-top: 10px;
             text-decoration: underline;
             margin-bottom: 40px;
-            font-size: 60px;
+            font-size: 50px;
             text-align: center;
         }
 
@@ -58,7 +58,7 @@
             border-radius: 10px;
             background: #ecf0f1;
         }
-        table {
+        /* table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
@@ -80,7 +80,7 @@
             color: green;
             font-size: 1.3em;
             text-align: center;
-        }
+        } */
         form {
             display: flex;
             flex-direction: column;
@@ -125,6 +125,22 @@
         button:active {
             transform: translateY(0);
         }
+
+        /* Back to products */
+        .back-link {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            font-size: 28px;
+            color: white;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -132,46 +148,16 @@
             h1, h2, h3 {
                 font-size: 1.5em;
             }
-            table {
+            /* table {
                 font-size: 14px;
-            }
+            } */
         }
     </style>
 </head>
 <body>
+    <a href="{% url 'viewcart' %}" class="back-link">&larr; BACK</a>
     <div class="container">
-        <h1>Checkout</h1>
-        
-        <h2>Your Cart Items</h2>
-        <div class="cart-items">
-            {% if user_cart %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in user_cart %}
-                            <tr>
-                                <td><!-- <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}" style="width: 50px; height: 50px; margin-right: 10px;"> -->{{ item.product.product_name }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>{{ item.product.product_price }}</td>
-                                <td>{{ item.get_total_price }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <h3 class="total-price">Total Price: Rs. {{ total_price }}</h3>
-            {% else %}
-                <p>No items in cart.</p>
-            {% endif %}
-        </div><br>
-
-        <h2>Billing Details</h2>
+        <h1>Billing Details</h1>
         <form method="POST">
             {% csrf_token %}
             <label for="username">Name:</label>
@@ -190,20 +176,9 @@
             <input type="text" name="place" id="place" required>
 
             <label for="pincode">Pincode:</label>
-            <input type="text" name="pincode" id="pincode" required>
+            <input type="text" name="pincode" id="pincode" required><br>
 
-            <label>Payment Method:</label><br>
-
-    <div style="display: inline-block;">
-        <input type="radio" id="cod" name="payment_method" value="cod">
-        <label for="cod">Cash on Delivery</label>
-          
-        <input type="radio" id="online" name="payment_method" value="online">
-        <label for="online">Online Payment</label>
-    </div><br>
-
-
-            <button type="submit">Place Order</button>
+            <button type="submit">Continue to Order</button>
         </form>
     </div>
 </body>

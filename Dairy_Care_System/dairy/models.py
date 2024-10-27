@@ -77,7 +77,17 @@ class Notifications_table(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+class PreOrder(models.Model):
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    date_of_delivery = models.DateField(blank=True, null=True)
+    additional_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Pre-Order: {self.product.product_name} by {self.user.username}"
+    
 
 class Animals_table(models.Model):
     animal_id = models.AutoField(primary_key=True)
@@ -192,3 +202,21 @@ class OrderItem_table(models.Model):
 
     def __str__(self):
         return f"{self.product.name} (x{self.quantity}) in Order {self.order.id}"
+    
+
+class Address_table(models.Model):
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+    district = models.CharField(max_length=50)  # Removed choices
+    street_address = models.CharField(max_length=255)
+    town_city = models.CharField(max_length=50)
+    postcode_zip = models.CharField(max_length=10)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"{self.name}, {self.district} - {self.street_address}, {self.town_city}, {self.postcode_zip}"
+
+    
+    def full_address(self):
+        return f"{self.street_address}, {self.town_city}, {self.district}, {self.postcode_zip}"

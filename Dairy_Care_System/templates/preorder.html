@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Order {{ product.product_name }}</title>
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            background: url('{% static "images/preorder-background.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+    
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    
+        h1 {
+            font-size: 35px;
+            margin-bottom: 20px;
+            color: #07509f;
+            font-family: Copperplate, Papyrus, fantasy;
+        }
+    
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+    
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #000000;
+        }
+    
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    
+        /* Specific styling for the date input field */
+        input[type="date"] {
+            color: #333;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+    
+        input[type="date"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+    
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+    
+        .btn-submit {
+            padding: 12px 20px;
+            background-color: #005903;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        .btn-submit:hover {
+            background-color: #189e1e;
+        }
+    
+        /* Back to products */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+    
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    
+        .success-message {
+            margin-top: 15px;
+            color: rgb(0, 0, 128);
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+        }
+    </style>
+    
+</head>
+<body>
+    <a href="{% url 'custproductslist' %}" class="back-link">&larr; BACK</a>
+
+    <div class="container">
+        <h1>Pre-Order {{ product.product_name }}</h1><br>
+        <form method="POST" action="{% url 'preorder' %}">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" id="quantity" required min="1" max="{{ product.product_quantity }}" placeholder="Enter quantity">
+            </div>
+
+            <div class="form-group">
+                <label for="date_of_delivery">Date to deliver:</label>
+                <input type="date" id="date_of_delivery" name="date_of_delivery" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="additional_notes">Additional Notes:</label>
+                <textarea name="additional_notes" id="additional_notes" placeholder="Any special instructions..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Submit Pre-Order</button>
+        </form><br><br>
+
+        <!-- Display success message if it exists -->
+        {% if messages %}
+        <div class="success-message">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

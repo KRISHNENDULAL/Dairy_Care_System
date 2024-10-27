@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: url('{% static "images/checkout.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #000000;
+            display: flex;            
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background: #e7e4e4;
+            border-radius: 15px;
+            backdrop-filter: blur(30px); /* Blur effect */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 60px;
+            margin-bottom: 60px;
+            padding: 30px;
+            overflow: hidden;
+        }
+        h1 {
+            font-family: Copperplate, Papyrus, fantasy;
+            color: #124578;
+            margin-top: 10px;
+            text-decoration: underline;
+            margin-bottom: 40px;
+            font-size: 50px;
+            text-align: center;
+        }
+
+        h2 {
+            color: rgb(152, 48, 48);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h3 {
+            color: #0da84d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .cart-items {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background: #ecf0f1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #57778d;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .total-price {
+            font-weight: bold;
+            color: green;
+            font-size: 1.3em;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        } 
+        img {
+            width: 50px; /* Set the width of the image */
+            height: 50px; /* Set the height of the image */
+            margin-right: 10px; /* Space between the image and text */
+            border-radius: 5px; /* Optional: rounded corners for images */
+        }
+        button {
+            background-color: #0a3b5c;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+
+        .payment-options {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.payment-card {
+    position: relative;
+    padding: 20px;
+    width: 150px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.payment-card:hover {
+    background-color: #aecce6;
+}
+
+.payment-card input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.card-title {
+    color: #333;
+}
+
+.payment-card input:checked + .card-content {
+    color: #00796b;
+    border-color: #00796b;
+    background-color: #9cbcc2;
+    border-radius: 20%;
+}
+
+/* Back to products */
+.back-link {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            font-size: 28px;
+            color: white;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1, h2, h3 {
+                font-size: 1.5em;
+            }
+            table {
+                font-size: 14px;
+            }
+        }
+
+        .razorpay-details {
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'checkoutbilling' %}" class="back-link">&larr; BACK</a>
+    <div class="container">
+        <h1>Order Details</h1>
+        
+        <h2>Your Cart Items</h2>
+        <div class="cart-items">
+            {% if user_cart %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in user_cart %}
+                            <tr>
+                                <td>{{ item.product.product_name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.product.product_price }}</td>
+                                <td>{{ item.get_total_price }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <h3 class="total-price">Total Price: Rs. {{ total_price }}</h3>
+            {% else %}
+                <p>No items in cart.</p>
+            {% endif %}
+        </div><br>
+
+        <h2>Payment Methods</h2>
+<form method="POST">
+    {% csrf_token %}
+    <div class="payment-options">
+        <label class="payment-card">
+            <input type="radio" id="cod" name="payment_method" value="cod">
+            <div class="card-content">
+                <span class="card-title">Cash on Delivery</span>
+            </div>
+        </label>
+
+        <label class="payment-card">
+            <input type="radio" id="online" name="payment_method" value="online">
+            <div class="card-content">
+                <span class="card-title">Online Payment</span>
+            </div>
+        </label>
+    </div>
+
+    <button type="submit">Place Order</button>
+</form>
+    </div>
+</body>
+</html>
+
+
+<!-- Razorpay payment details section -->
+<!-- <div id="razorpay-details" class="razorpay-details">
+    <h3>Enter Razorpay Details</h3>
+    <label for="card-number">Card Number</label>
+    <input type="text" id="card-number" name="card_number" placeholder="Enter card number" required>
+
+    <label for="expiry-date">Expiry Date</label>
+    <input type="text" id="expiry-date" name="expiry_date" placeholder="MM/YY" required>
+
+    <label for="cvv">CVV</label>
+    <input type="text" id="cvv" name="cvv" placeholder="Enter CVV" required>
+</div> -->

@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, Cart, Order_table, OrderItem_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table
+from django.http import HttpResponseBadRequest
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -339,6 +342,48 @@ def login(request):
     return render(request, 'login.html')
 
 
+# def login(request):
+#     if request.method == 'POST':
+#         username_or_email = request.POST.get('username')
+#         password = request.POST.get('password')
+
+#         # First, check in the custom Users_table
+#         user = Users_table.objects.filter(username=username_or_email).first() or Users_table.objects.filter(email=username_or_email).first()
+
+#         if user and user.status == 1:
+#             # Validate password for Users_table entries
+#             if check_password(password, user.password):
+#                 request.session['user_id'] = user.user_id
+#                 request.session['username'] = user.username
+
+#                 # Redirect based on user role in Users_table
+#                 if user.role == 'customer':
+#                     return redirect('customerpage')
+#                 elif user.role == 'employee':
+#                     return redirect('employeepage')
+#                 elif user.role == 'admin':
+#                     return redirect('adminpage')
+#             else:
+#                 messages.error(request, 'Invalid credentials')
+        
+#         else:
+#             # Check in Django's auth_user table if not found in Users_table
+#             auth_user = authenticate(request, username=username_or_email, password=password)
+#             if auth_user:
+#                 # Set session data for auth_user table users
+#                 request.session['user_id'] = auth_user.id  # Use id as primary key
+#                 request.session['username'] = auth_user.username
+
+#                 # Assuming users from auth_user should go to 'customerpage' by default
+#                 return redirect('customerpage')
+#             else:
+#                 messages.error(request, 'Invalid credentials or deactivated account')
+
+#         return render(request, 'login.html')
+
+#     return render(request, 'login.html')
+
+
 
 def changepassword(request):
     if request.method == 'POST':
@@ -385,7 +430,7 @@ def reguserlist(request, role=None):
         return redirect('login')  # Redirect to login if no user is logged in
 
 
-def regdeleteuser(request, user_id):
+""" def regdeleteuser(request, user_id):
     user = get_object_or_404(Users_table, user_id=user_id)
     user.status = False  # Set status to inactive
     user.save()  # Save changes to the database
@@ -404,6 +449,36 @@ def regdeleteuser(request, user_id):
 
     from_email = settings.EMAIL_HOST_USER
     recipient_list = [user.email]         
+
+    send_mail(subject, message, from_email, recipient_list)
+    return redirect('reguserlist', 'all')  # Redirect to the user list page """
+
+
+def regdeleteuser(request, user_id):
+    reason = request.GET.get('reason')
+    if not reason:
+        return HttpResponseBadRequest("Reason for deactivation is required.")
+    
+    user = get_object_or_404(Users_table, user_id=user_id)
+    user.status = False  # Set status to inactive
+    user.save()  # Save changes to the database
+    
+    # Send email notification
+    subject = 'Account Deactivation Notification - Dairy Care System ⚠️'
+    message = (
+        f"Hello {user.username},\n\n"
+        "We want to inform you that your account has been deactivated.\n\n"
+        f"Reason for deactivation: {reason}\n\n"
+        "If you believe this action was taken in error, please reach out to our support team at "
+        "dairycaresystem25@gmail.com for assistance.\n\n"
+        "Thank you for being a part of our community. We hope to resolve this matter quickly.\n\n"
+        "Best regards,\n"
+        "The Dairy Care System Team\n\n\n\n\n"
+        "Disclaimer: This is an automated message. If you did not request this change, please contact our support team immediately."
+    )
+
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [user.email]
 
     send_mail(subject, message, from_email, recipient_list)
     return redirect('reguserlist', 'all')  # Redirect to the user list page
@@ -527,6 +602,7 @@ def userprofile(request):
         return render(request, 'userprofile.html', context)
     else: 
         return render(request, 'login.html')
+
 
 
 def updateuserprofile(request):
@@ -809,12 +885,87 @@ def restoreproduct(request, product_id):
 
 
 def productstock(request):
-    # Fetch all products from the Products_table
-    products = Products_table.objects.all()
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch all products from the Products_table
+        products = Products_table.objects.all()
+        
+        # Pass both the username and products to the template
+        context = {
+            'username': user.username,
+            'products': products
+        }
+        return render(request, 'productstock.html', context)
+    else:
+        # Redirect to login if user is not authenticated
+        return redirect('login')
 
-    # Pass the products to the template
-    return render(request, 'productstock.html', {'products': products})
 
+def preorder(request):
+    if request.method == "POST":
+        # Handle form submission
+        user_id = request.session.get('user_id')
+        if not user_id:
+            messages.error(request, "Please log in to place a pre-order.")
+            return redirect("login")
+
+        user = Users_table.objects.get(user_id=user_id)
+        product_id = request.POST.get("product_id")
+        product = get_object_or_404(Products_table, product_id=product_id)
+
+        # Get form data and validate
+        quantity = int(request.POST.get("quantity"))
+        date_of_delivery = request.POST.get("date_of_delivery")
+        additional_notes = request.POST.get("additional_notes", "")
+
+        if quantity > product.product_quantity:
+            messages.error(request, "Quantity exceeds available stock.")
+            return redirect("preorder")  # Or reload with context for errors
+
+        # Create new pre-order
+        PreOrder.objects.create(
+            product=product,
+            quantity=quantity,
+            date_of_delivery=date_of_delivery,
+            additional_notes=additional_notes,
+            user=user
+        )
+
+        messages.success(request, f"Your pre-order for {product.product_name} was successfully placed!")
+        # Redirect to the same page to display success message
+        return redirect(request.path + '?product_id=' + str(product_id))
+
+    # GET request to display the form
+    product_id = request.GET.get("product_id")
+    if not product_id:
+        messages.error(request, "Product not found.")
+        return redirect("custproductslist")
+
+    product = get_object_or_404(Products_table, product_id=product_id)
+    return render(request, "preorder.html", {"product": product})
+
+
+def preorderlisting(request):
+    # Get user_id from the session
+    user_id = request.session.get('user_id')
+
+    if user_id:  # Check if user_id exists in the session
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        preorders = PreOrder.objects.filter(user_id=user_id)  # Fetch pre-orders for the user
+        
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'preorders': preorders,  # Pass pre-orders to the template
+        }
+        return render(request, 'preorderlisting.html', context)
+    else:
+        return redirect('login')  # Redirect to login if user_id is not in the session
+    
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def animalslist(request):
@@ -980,6 +1131,31 @@ def update_health_record(request, health_id):
     return render(request, 'update_health_record.html', {'health_record': health_record})
 
 
+def milkdetails(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch animals and related images
+        animals = Animals_table.objects.prefetch_related('images').all()
+        
+        # Prepare context with username and animals
+        context = {
+            'username': user.username,  # Pass the username
+            'animals': animals,         # Pass the animals
+        }
+        
+        # Render the milkdetails.html page with context
+        return render(request, 'milkdetails.html', context)
+    
+    else:
+        # If user is not authenticated, redirect to the login page
+        return redirect('login')
+
+
 """ # Add a product to the cart
 def add_to_cart(request):
     if request.method == 'POST':
@@ -1126,14 +1302,9 @@ def delete_from_cart(request, cart_id):
     return redirect('viewcart')
 
 
-   
-# View to place an order
-def checkout(request):
-    user = Users_table.objects.get(user_id=request.session['user_id'])
-    user_cart = Cart.objects.filter(user=user)
 
-    # Calculate total price
-    total_price = sum([item.get_total_price() for item in user_cart])
+def checkoutbilling(request):
+    user = Users_table.objects.get(user_id=request.session['user_id'])
 
     # Fetch user details
     user_name = user.username
@@ -1141,23 +1312,94 @@ def checkout(request):
     user_email = user.email
 
     if request.method == 'POST':
-        name = request.POST['username']
-        phone = request.POST['phone']
-        email = request.POST['email']
-        place = request.POST['place']
-        pincode = request.POST['pincode']
-        delivery_address = request.POST['delivery_address']
+        # Save billing details to session and proceed to order page
+        request.session['billing_details'] = {
+            'name': request.POST['username'],
+            'phone': request.POST['phone'],
+            'email': request.POST['email'],
+            'place': request.POST['place'],
+            'pincode': request.POST['pincode'],
+            'delivery_address': request.POST['delivery_address']
+        }
+        return redirect('checkoutorder')  # Redirect to the second page
+
+    return render(request, 'checkoutbilling.html', {
+        'user_name': user_name,
+        'user_phone': user_phone,
+        'user_email': user_email
+    })
+
+
+# def checkoutbilling(request):
+#     user_id = request.session.get('user_id')
+#     if not user_id:
+#         return redirect('login')  # Redirect to login if user is not authenticated
+
+#     user = Users_table.objects.get(user_id=user_id)
+
+#     # Fetch user details
+#     user_name = user.username
+#     user_phone = user.phone
+#     user_email = user.email
+
+#     # Get existing addresses for the user
+#     addresses = Address_table.objects.filter(user=user)
+
+#     if request.method == 'POST':
+#         # Validate and save new address
+#         new_address = Address_table(
+#             user=user,
+#             name=request.POST['name'],
+#             district=request.POST['district'],
+#             street_address=request.POST['street_address'],
+#             town_city=request.POST['town_city'],
+#             postcode_zip=request.POST['postcode_zip'],
+#             phone=request.POST['phone'],
+#             email=request.POST['email']
+#         )
+#         new_address.save()
+
+#         # Optionally store the latest address in the session
+#         request.session['billing_details'] = {
+#             'name': new_address.name,
+#             'phone': new_address.phone,
+#             'email': new_address.email,
+#             'address_id': new_address.id
+#         }
+#         return redirect('checkoutorder')
+
+#     return render(request, 'checkoutbilling.html', {
+#         'user_name': user_name,
+#         'user_phone': user_phone,
+#         'user_email': user_email,
+#         'addresses': addresses
+#     })
+
+
+
+def checkoutorder(request):
+    user = Users_table.objects.get(user_id=request.session['user_id'])
+    user_cart = Cart.objects.filter(user=user)
+
+    # Calculate total price
+    total_price = sum([item.get_total_price() for item in user_cart])
+
+    # Retrieve billing details from session
+    billing_details = request.session.get('billing_details')
+
+    if request.method == 'POST':
+        # Complete order details
         payment_method = request.POST['payment_method']
 
         # Create the order
         order = Order_table.objects.create(
             user=user,
-            name=name,
-            phone=phone,
-            email=email,
-            place=place,
-            pincode=pincode,
-            delivery_address=delivery_address,
+            name=billing_details['name'],
+            phone=billing_details['phone'],
+            email=billing_details['email'],
+            place=billing_details['place'],
+            pincode=billing_details['pincode'],
+            delivery_address=billing_details['delivery_address'],
             payment_method=payment_method,
             total_price=total_price
         )
@@ -1168,34 +1410,52 @@ def checkout(request):
                 order=order,
                 product=cart_item.product,
                 quantity=cart_item.quantity,
-                price=cart_item.get_total_price()  # Store the price at the time of order
+                price=cart_item.get_total_price()
             )
+
+            # Remove from wishlist if the item is present
+            # WishlistItem.objects.filter(user=user, product=cart_item.product).delete()
 
             # Reduce product stock and save
             cart_item.product.product_quantity -= cart_item.quantity
             cart_item.product.save()
 
-            # Check if the product quantity is below 2 and create a notification
+            # Check if product quantity is below 2 and create a notification
             if cart_item.product.product_quantity < 2:
                 Notifications_table.objects.create(
-                    message=f"Stock for {cart_item.product.product_name} is low (below 2 units).",
+                    message=f"Alert: Stock for '{cart_item.product.product_name}' is critically low (below 2 units). Immediate restocking is required.",
                 )
 
         # Clear the user's cart after placing the order
         user_cart.delete()
 
-        # messages.success(request, 'Order placed successfully!')
         return redirect('ordersummary', order_id=order.id)
 
-    # Pass the user details and cart items to the template
-    return render(request, 'checkout.html', {
+    return render(request, 'checkoutorder.html', {
         'user_cart': user_cart,
         'total_price': total_price,
-        'user_name': user_name,
-        'user_phone': user_phone,
-        'user_email': user_email
+        'billing_details': billing_details
     })
 
+
+
+def stocknotification(request):
+    # Fetch unread notifications
+    notifications = Notifications_table.objects.filter(is_read=False).order_by('-created_at')
+    
+    # Get the count of unread notifications
+    unread_count = notifications.count()
+
+    # Mark all fetched notifications as read
+    notifications.update(is_read=True)
+    
+    # Fetch all notifications (to display both read and unread)
+    all_notifications = Notifications_table.objects.all().order_by('-created_at')
+    
+    return render(request, 'stocknotification.html', {
+        'notifications': all_notifications,
+        'unread_count': unread_count  # Pass the unread count to the template
+    })
 
 
 
@@ -1269,11 +1529,6 @@ def cancelorder(request, order_id):
     # If the request is not POST, redirect back to order history
     return redirect('orderhistory')
 
-
-
-def stocknotification(request):
-    notifications = Notifications_table.objects.filter(is_read=False).order_by('-created_at')
-    return render(request, 'stocknotification.html', {'notifications': notifications})
 
 
 """def login(request):
