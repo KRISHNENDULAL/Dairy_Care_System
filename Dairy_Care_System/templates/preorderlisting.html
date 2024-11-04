@@ -94,16 +94,40 @@ li a:hover {
 }
 
         /* Header and Container Styles */
-        h1 {
+        /* h1 {
             text-align: center;
             margin-top: 20px;
             color: #07509f;
             font-size: 50px;
             font-family: Copperplate, Papyrus, fantasy;
+        } */
+
+        h1 {
+            text-align: center;
+            color: #07509f;
+            margin-top: 20px;
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 45px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(14, 4, 153, 0.5);
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1:after {
+            content: '';
+            display: block;
+            width: 90%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #000000, transparent);
+            position: absolute;
+            bottom: -2px;
+            left: 10%;
         }
 
         .container {
-            max-width: 65%;
+            max-width: 75%;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
@@ -120,13 +144,12 @@ li a:hover {
         }
 
         th, td {
-            border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
         }
 
         th {
-            background-color: #000000;
+            background-color: #343a40;
             color: #ffffff;
         }
 
@@ -183,13 +206,13 @@ li a:hover {
         </div>
     </ul><br><br>
 
-    <h1>Your Pre-Orders</h1>
+    <center><h1>Your Pre-Orders</h1></center>
     <div class="container">
         {% if preorders %}
             <table>
                 <thead>
                     <tr>
-                        <th>No.</th>
+                        <!-- <th>No.</th> -->
                         <th>Product</th>
                         <th>Quantity</th>
                         <th>Date of Delivery</th>
@@ -200,10 +223,11 @@ li a:hover {
                 <tbody>
                     {% for preorder in preorders %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <!-- <td>{{ forloop.counter }}</td> -->
                         <td>
                             <img src="{{ preorder.product.images.first.image.url }}" alt="{{ preorder.product.product_name }}" style="max-width: 100px; max-height: 100px; display: block; margin: 0 auto;"><br>
-                            {{ preorder.product.product_name }}
+                            <a href="{% url 'custproductslist' %}" style="text-decoration: underline; color: #000000;">
+                                <b>{{ preorder.product.product_name }}</b></a>          
                         </td>
                         <td>{{ preorder.quantity }}</td>
                         <td>{{ preorder.date_of_delivery }}</td>
@@ -220,7 +244,7 @@ li a:hover {
 
     <div class="footer"><strong>
         Thank you for your continued support!
-    </strong></div>
+    </strong></div><br><br><br>
 
     <!-- Add SweetAlert2 and Font Awesome JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

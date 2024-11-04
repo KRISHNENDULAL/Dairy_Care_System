@@ -176,7 +176,9 @@
                             {% else %}
                                 <img src="{% static 'images/default-animal.jpg' %}" alt="Default Animal Image"> <!-- Default image -->
                             {% endif %}
-                            <span class="animal-name">{{ animal.animal_name }}</span>
+                            <span class="animal-name">
+                                <a href="{% url 'animaldetails' animal.animal_id %}">{{ animal.animal_name }}</a>
+                            </span>
                         </div>
                     </td>
                     <td>{{ animal.breed }} - {{ animal.animal_category }}</td>

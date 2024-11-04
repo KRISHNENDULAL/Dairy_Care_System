@@ -207,10 +207,9 @@ class OrderItem_table(models.Model):
 class Address_table(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
-    district = models.CharField(max_length=50)  # Removed choices
-    street_address = models.CharField(max_length=255)
-    town_city = models.CharField(max_length=50)
-    postcode_zip = models.CharField(max_length=10)
+    place = models.CharField(max_length=50)  # Removed choices
+    delivery_address = models.CharField(max_length=255)
+    pincode = models.CharField(max_length=10)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
 

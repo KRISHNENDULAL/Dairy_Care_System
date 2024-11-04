@@ -114,11 +114,103 @@ td[colspan="7"] {
 .update-button:hover {
     background-color: #0056b3; /* Darker on hover */
 }
+
+/* Main modal background styling */
+.modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Modal content styling */
+        .modal-content {
+    position: relative; /* Or 'absolute' if it's contained within a parent */
+    top: -20px; /* Adjust this value as needed */
+    margin: 0 auto;
+    max-width: 500px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+        /* Close button styling */
+        .close-button {
+            position: absolute;
+            top: 25px;
+            right: 18px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .close-button:hover {
+            color: #ff4d4d;
+        }
+
+        /* Form heading */
+        .modal-content h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        /* Label styling */
+        label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        /* Input and select styling */
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: #fff;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Multi-select styling */
+        select[multiple] {
+            height: 80px;
+        }
+
+        /* Submit button styling */
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
     <h1>{{ animal.animal_name }}'s Health Records</h1>
-    <a href="{% url 'add_health_record' animal.animal_id %}" class="add-button">Add another report</a><br><br>
+    <a href="#" class="add-button" onclick="openModal()">Add another report</a><br><br>
     
 
     <table>
@@ -151,5 +243,87 @@ td[colspan="7"] {
     </table>
 
     <a class="back-button" href="{% url 'animalslist' %}">Back to Animals List</a>
+
+    <!-- Modal for adding health record -->
+    <div id="addHealthRecordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h1>Add Health Record</h1>
+            <form method="post" action="{% url 'add_health_record' animal.animal_id %}">
+                {% csrf_token %}
+                
+                <label for="checkup_date">Checkup Date:</label>
+                <input type="date" name="checkup_date" required>
+
+                <label for="health_status">Health Status:</label>
+                <select id="health_status" name="health_status" multiple required>
+                    <option value="Healthy">Healthy</option>
+                    <option value="Sick">Sick</option>
+                    <option value="Recovering">Recovering</option>
+                    <option value="Injured">Injured</option>
+                    <option value="Under Observation">Under Observation</option>
+                    <option value="Chronic Condition">Chronic Condition</option>
+                    <option value="Euthanized">Euthanized</option>
+                </select>
+
+                <label for="vaccinations">Vaccinations:</label>
+                <select id="vaccinations" name="vaccinations" multiple required>
+                    <option value="Rabies">Rabies</option>
+                    <option value="BVD">Bovine Viral Diarrhea (BVD)</option>
+                    <option value="Clostridium Perfringens">Clostridium Perfringens</option>
+                    <option value="Brucellosis">Brucellosis</option>
+                    <option value="Leptospirosis">Leptospirosis</option>
+                    <option value="Parainfluenza">Parainfluenza</option>
+                    <option value="IBR">Infectious Bovine Rhinotracheitis (IBR)</option>
+                    <option value="FMD">Foot and Mouth Disease (FMD)</option>
+                </select>
+
+                <label for="treatment_details">Treatment Details:</label>
+                <select id="treatment_details" name="treatment_details" multiple required>
+                    <option value="Antibiotics">Antibiotics</option>
+                    <option value="Anti-inflammatory">Anti-inflammatory Medications</option>
+                    <option value="Surgery">Surgery</option>
+                    <option value="Fluid Therapy">Fluid Therapy</option>
+                    <option value="Vaccination">Vaccination Administration</option>
+                    <option value="Wound Care">Wound Care</option>
+                    <option value="Dietary Adjustments">Dietary Adjustments</option>
+                    <option value="Topical Treatments">Topical Treatments</option>
+                </select>
+
+                <label for="veterinarian_name">Veterinarian Name:</label>
+                <select id="veterinarian_name" name="veterinarian_name" required>
+                    <option value="">Select Veterinarian</option>
+                    <option value="Dr. Ravi Sankar S">Dr. Ravi Sankar S</option>
+                    <option value="Dr. Krishna Lakshmi">Dr. Krishna Lakshmi</option>
+                    <option value="Dr. Radhamadhav">Dr. Radhamadhav</option>
+                </select>
+
+                <label for="next_checkup_date">Next Checkup Date:</label>
+                <input type="date" name="next_checkup_date">
+
+                <input type="hidden" name="added_by_id" value="{{ request.user.id }}">
+                <input type="hidden" name="animal_id" value="{{ animal_id }}">
+                
+                <button type="submit">Add Record</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById("addHealthRecordModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("addHealthRecordModal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("addHealthRecordModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
 </body>
 </html>

@@ -248,23 +248,23 @@
         </div><br>
 
         <h2>Payment Methods</h2>
-<form method="POST">
-    {% csrf_token %}
-    <div class="payment-options">
-        <label class="payment-card">
-            <input type="radio" id="cod" name="payment_method" value="cod">
-            <div class="card-content">
-                <span class="card-title">Cash on Delivery</span>
-            </div>
-        </label>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="payment-options">
+                <label class="payment-card">
+                    <input type="radio" id="cod" name="payment_method" value="cod">
+                    <div class="card-content">
+                        <span class="card-title">Cash on Delivery</span>
+                    </div>
+                </label>
 
-        <label class="payment-card">
-            <input type="radio" id="online" name="payment_method" value="online">
-            <div class="card-content">
-                <span class="card-title">Online Payment</span>
+                <label class="payment-card">
+                    <input type="radio" id="online" name="payment_method" value="online">
+                    <div class="card-content">
+                        <span class="card-title">Online Payment</span>
+                    </div>
+                </label>
             </div>
-        </label>
-    </div>
 
     <button type="submit">Place Order</button>
 </form>

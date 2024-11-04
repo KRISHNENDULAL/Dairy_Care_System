@@ -1302,6 +1302,39 @@ def delete_from_cart(request, cart_id):
     return redirect('viewcart')
 
 
+# def checkoutbilling(request):
+#     user = Users_table.objects.get(user_id=request.session['user_id'])
+    
+#     if request.method == 'POST':
+#         # Handle the form submission to add a new address
+#         name = request.POST.get('name')
+#         place = request.POST.get('place')
+#         delivery_address = request.POST.get('delivery_address')
+#         pincode = request.POST.get('pincode')
+#         phone = request.POST.get('phone')
+#         email = request.POST.get('email')
+
+#         # Create and save the new address
+#         new_address = Address_table.objects.create(
+#             user=user,  # Assuming you have a relationship to Users_table
+#             name=name,
+#             place=place,
+#             delivery_address=delivery_address,
+#             pincode=pincode,
+#             phone=phone,
+#             email=email
+#         )
+#         messages.success(request, 'Address added successfully!')
+#         return redirect('checkoutbilling')  # Redirect to the same page to show the updated list
+
+#     addresses = Address_table.objects.filter(user=user)  # Fetch the addresses for the user
+
+#     return render(request, 'checkoutbilling.html', {
+#         'addresses': addresses,
+#         'user_name': user.username,
+#         'user_phone': user.phone,
+#         'user_email': user.email
+#     })
 
 def checkoutbilling(request):
     user = Users_table.objects.get(user_id=request.session['user_id'])
@@ -1328,53 +1361,6 @@ def checkoutbilling(request):
         'user_phone': user_phone,
         'user_email': user_email
     })
-
-
-# def checkoutbilling(request):
-#     user_id = request.session.get('user_id')
-#     if not user_id:
-#         return redirect('login')  # Redirect to login if user is not authenticated
-
-#     user = Users_table.objects.get(user_id=user_id)
-
-#     # Fetch user details
-#     user_name = user.username
-#     user_phone = user.phone
-#     user_email = user.email
-
-#     # Get existing addresses for the user
-#     addresses = Address_table.objects.filter(user=user)
-
-#     if request.method == 'POST':
-#         # Validate and save new address
-#         new_address = Address_table(
-#             user=user,
-#             name=request.POST['name'],
-#             district=request.POST['district'],
-#             street_address=request.POST['street_address'],
-#             town_city=request.POST['town_city'],
-#             postcode_zip=request.POST['postcode_zip'],
-#             phone=request.POST['phone'],
-#             email=request.POST['email']
-#         )
-#         new_address.save()
-
-#         # Optionally store the latest address in the session
-#         request.session['billing_details'] = {
-#             'name': new_address.name,
-#             'phone': new_address.phone,
-#             'email': new_address.email,
-#             'address_id': new_address.id
-#         }
-#         return redirect('checkoutorder')
-
-#     return render(request, 'checkoutbilling.html', {
-#         'user_name': user_name,
-#         'user_phone': user_phone,
-#         'user_email': user_email,
-#         'addresses': addresses
-#     })
-
 
 
 def checkoutorder(request):
