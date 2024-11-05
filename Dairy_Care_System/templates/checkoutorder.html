@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Place Order</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -248,7 +249,7 @@
         </div><br>
 
         <h2>Payment Methods</h2>
-        <form method="POST">
+        <form method="POST" action="{% url 'checkoutorder' %}" id="payment-form">
             {% csrf_token %}
             <div class="payment-options">
                 <label class="payment-card">
@@ -257,7 +258,7 @@
                         <span class="card-title">Cash on Delivery</span>
                     </div>
                 </label>
-
+        
                 <label class="payment-card">
                     <input type="radio" id="online" name="payment_method" value="online">
                     <div class="card-content">
@@ -265,23 +266,49 @@
                     </div>
                 </label>
             </div>
-
-    <button type="submit">Place Order</button>
-</form>
+        
+            <input type="hidden" name="payment_id" id="payment_id">
+            <button type="button" id="place-order-btn" onclick="handlePlaceOrder()">Place Order</button>
+        </form>
     </div>
+
+    <script>
+        function handlePlaceOrder() {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+            if (paymentMethod === 'cod') {
+                // If Cash on Delivery, submit the form directly
+                document.getElementById('payment-form').submit();
+            } else if (paymentMethod === 'online') {
+                // If Online Payment, initiate Razorpay
+                initiateRazorpayPayment();
+            }
+        }
+
+        function initiateRazorpayPayment() {
+            var options = {
+                "key": "{{ RAZORPAY_KEY_ID }}",
+                "amount": "{{ total_price|floatformat:2 }}".replace(".", ""),
+                "currency": "INR",
+                "name": "Dairy Care System",
+                "description": "Order Payment",
+                "handler": function(response) {
+                    document.getElementById('payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('payment-form').submit();
+                },
+                "prefill": {
+                    "name": "{{ billing_details.name }}",
+                    "email": "{{ billing_details.email }}",
+                    "contact": "{{ billing_details.phone }}"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp = new Razorpay(options);
+            rzp.open();
+        }
+    </script>    
+
 </body>
 </html>
-
-
-<!-- Razorpay payment details section -->
-<!-- <div id="razorpay-details" class="razorpay-details">
-    <h3>Enter Razorpay Details</h3>
-    <label for="card-number">Card Number</label>
-    <input type="text" id="card-number" name="card_number" placeholder="Enter card number" required>
-
-    <label for="expiry-date">Expiry Date</label>
-    <input type="text" id="expiry-date" name="expiry_date" placeholder="MM/YY" required>
-
-    <label for="cvv">CVV</label>
-    <input type="text" id="cvv" name="cvv" placeholder="Enter CVV" required>
-</div> -->

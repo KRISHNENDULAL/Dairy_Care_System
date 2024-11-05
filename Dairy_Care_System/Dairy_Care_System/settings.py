@@ -197,3 +197,7 @@ LOGIN_URL = '/login/'  # Ensure this points to your custom login URL
 LOGIN_REDIRECT_URL = '/customerpage/'  # Adjust this to where users should land after login
 LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
 
+
+RAZORPAY_KEY_ID = 'rzp_test_K3m91dIeZXVDcE'
+RAZORPAY_SECRET_KEY = '5Pc3YEyRGnv8eASHMCzbs1tp'
+

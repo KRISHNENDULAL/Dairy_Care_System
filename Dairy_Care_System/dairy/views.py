@@ -21,6 +21,8 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Q  # Import Q for case-insensitive query
+import razorpay
+from django.http import JsonResponse
 
 
 
@@ -1363,34 +1365,115 @@ def checkoutbilling(request):
     })
 
 
+# def checkoutorder(request):
+#     user = Users_table.objects.get(user_id=request.session['user_id'])
+#     user_cart = Cart.objects.filter(user=user)
+
+#     # Calculate total price
+#     total_price = sum([item.get_total_price() for item in user_cart])
+
+#     # Retrieve billing details from session
+#     billing_details = request.session.get('billing_details')
+
+#     if request.method == 'POST':
+#         # Complete order details
+#         payment_method = request.POST['payment_method']
+
+#         # Create the order
+#         order = Order_table.objects.create(
+#             user=user,
+#             name=billing_details['name'],
+#             phone=billing_details['phone'],
+#             email=billing_details['email'],
+#             place=billing_details['place'],
+#             pincode=billing_details['pincode'],
+#             delivery_address=billing_details['delivery_address'],
+#             payment_method=payment_method,
+#             total_price=total_price
+#         )
+
+#         # Create OrderItem instances for each item in the cart
+#         for cart_item in user_cart:
+#             OrderItem_table.objects.create(
+#                 order=order,
+#                 product=cart_item.product,
+#                 quantity=cart_item.quantity,
+#                 price=cart_item.get_total_price()
+#             )
+
+#             # Remove from wishlist if the item is present
+#             # WishlistItem.objects.filter(user=user, product=cart_item.product).delete()
+
+#             # Reduce product stock and save
+#             cart_item.product.product_quantity -= cart_item.quantity
+#             cart_item.product.save()
+
+#             # Check if product quantity is below 2 and create a notification
+#             if cart_item.product.product_quantity < 2:
+#                 Notifications_table.objects.create(
+#                     message=f"Alert: Stock for '{cart_item.product.product_name}' is critically low (below 2 units). Immediate restocking is required.",
+#                 )
+
+#         # Clear the user's cart after placing the order
+#         user_cart.delete()
+
+#         return redirect('ordersummary', order_id=order.id)
+
+#     return render(request, 'checkoutorder.html', {
+#         'user_cart': user_cart,
+#         'total_price': total_price,
+#         'billing_details': billing_details
+#     })
+
+
+# Initialize Razorpay client
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
+
 def checkoutorder(request):
     user = Users_table.objects.get(user_id=request.session['user_id'])
     user_cart = Cart.objects.filter(user=user)
-
-    # Calculate total price
     total_price = sum([item.get_total_price() for item in user_cart])
-
-    # Retrieve billing details from session
     billing_details = request.session.get('billing_details')
 
     if request.method == 'POST':
-        # Complete order details
-        payment_method = request.POST['payment_method']
+        payment_method = request.POST.get('payment_method')
 
-        # Create the order
-        order = Order_table.objects.create(
-            user=user,
-            name=billing_details['name'],
-            phone=billing_details['phone'],
-            email=billing_details['email'],
-            place=billing_details['place'],
-            pincode=billing_details['pincode'],
-            delivery_address=billing_details['delivery_address'],
-            payment_method=payment_method,
-            total_price=total_price
-        )
+        # Check if it's a Razorpay payment
+        if payment_method == "online":
+            # Process Razorpay payment
+            payment_id = request.POST.get('payment_id')
+            try:
+                # Verify the payment
+                razorpay_client.payment.fetch(payment_id)
+            except razorpay.errors.RazorpayError:  # Catch all Razorpay errors
+                return JsonResponse({"error": "Payment verification failed"})
 
-        # Create OrderItem instances for each item in the cart
+            # If payment is successful, create the order
+            order = Order_table.objects.create(
+                user=user,
+                name=billing_details['name'],
+                phone=billing_details['phone'],
+                email=billing_details['email'],
+                place=billing_details['place'],
+                pincode=billing_details['pincode'],
+                delivery_address=billing_details['delivery_address'],
+                payment_method="online",
+                total_price=total_price
+            )
+
+        else:  # For Cash on Delivery
+            order = Order_table.objects.create(
+                user=user,
+                name=billing_details['name'],
+                phone=billing_details['phone'],
+                email=billing_details['email'],
+                place=billing_details['place'],
+                pincode=billing_details['pincode'],
+                delivery_address=billing_details['delivery_address'],
+                payment_method="cod",
+                total_price=total_price
+            )
+
         for cart_item in user_cart:
             OrderItem_table.objects.create(
                 order=order,
@@ -1398,30 +1481,29 @@ def checkoutorder(request):
                 quantity=cart_item.quantity,
                 price=cart_item.get_total_price()
             )
-
-            # Remove from wishlist if the item is present
-            # WishlistItem.objects.filter(user=user, product=cart_item.product).delete()
-
-            # Reduce product stock and save
             cart_item.product.product_quantity -= cart_item.quantity
             cart_item.product.save()
 
-            # Check if product quantity is below 2 and create a notification
             if cart_item.product.product_quantity < 2:
                 Notifications_table.objects.create(
                     message=f"Alert: Stock for '{cart_item.product.product_name}' is critically low (below 2 units). Immediate restocking is required.",
                 )
 
-        # Clear the user's cart after placing the order
         user_cart.delete()
+
+        # Redirect for Razorpay
+        if payment_method == "online":
+            return redirect('ordersummary', order_id=order.id)
 
         return redirect('ordersummary', order_id=order.id)
 
     return render(request, 'checkoutorder.html', {
         'user_cart': user_cart,
         'total_price': total_price,
-        'billing_details': billing_details
+        'billing_details': billing_details,
+        'RAZORPAY_KEY_ID': settings.RAZORPAY_KEY_ID
     })
+
 
 
 
