@@ -14,7 +14,7 @@
         }
     
         body {
-            background: url('{% static "images/preorder-background.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/preorder.jpeg" %}') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
             color: #333;
@@ -139,6 +139,7 @@
             <div class="form-group">
                 <label for="additional_notes">Additional Notes:</label>
                 <textarea name="additional_notes" id="additional_notes" placeholder="Any special instructions..."></textarea>
+                <center><div id="error-messages" style="color: red; font-size: 14px; margin-top: 10px;"></div></center>
             </div>
 
             <button type="submit" class="btn-submit">Submit Pre-Order</button>
@@ -153,5 +154,48 @@
         </div>
         {% endif %}
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const quantityInput = document.getElementById("quantity");
+            const dateInput = document.getElementById("date_of_delivery");
+            const notesInput = document.getElementById("additional_notes");
+            const form = document.querySelector("form");
+            const errorContainer = document.getElementById("error-messages");
+
+            // Set minimum date to today for the date field
+            const today = new Date().toISOString().split("T")[0];
+            dateInput.setAttribute("min", today);
+
+            // Event listener for form submission
+            form.addEventListener("submit", function (e) {
+                let valid = true;
+                errorContainer.innerHTML = ""; // Clear previous error messages
+
+                // Quantity validation
+                if (!quantityInput.value || isNaN(quantityInput.value) || quantityInput.value <= 0) {
+                    errorContainer.innerHTML += "<p>Please enter a valid quantity.</p>";
+                    valid = false;
+                }
+
+                // Date validation
+                if (!dateInput.value || dateInput.value < today) {
+                    errorContainer.innerHTML += "<p>Please select a date that is today or later.</p>";
+                    valid = false;
+                }
+
+                // Additional notes validation
+                if (notesInput.value.length < 1 || notesInput.value.length > 100) {
+                    errorContainer.innerHTML += "<p>Additional notes must be between 1 and 100 characters.</p>";
+                    valid = false;
+                }
+
+                // Prevent form submission if validation fails
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
