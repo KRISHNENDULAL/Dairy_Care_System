@@ -124,6 +124,8 @@ WSGI_APPLICATION = 'Dairy_Care_System.wsgi.application'
 #     }
 # }
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -134,6 +136,8 @@ DATABASES = {
         'PORT': '3307',
     }
 }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
