@@ -152,13 +152,20 @@
                 font-size: 14px;
             } */
         }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <a href="{% url 'viewcart' %}" class="back-link">&larr; BACK</a>
     <div class="container">
         <h1>Billing Details</h1>
-        <form method="POST">
+        <form method="POST" id="billingForm">
             {% csrf_token %}
             <label for="username">Name:</label>
             <input type="text" name="username" id="username" value="{{ user_name }}" required>
@@ -171,16 +178,72 @@
 
             <label for="delivery_address">Delivery Address:</label>
             <textarea name="delivery_address" id="delivery_address" required></textarea>
+            <div class="error-message" id="addressError"></div>
 
             <label for="place">Place:</label>
-            <input type="text" name="place" id="place" required>
+            <input type="text" name="place" id="place" required disabled>
+            <div class="error-message" id="placeError"></div>
 
             <label for="pincode">Pincode:</label>
-            <input type="text" name="pincode" id="pincode" required><br>
+            <input type="text" name="pincode" id="pincode" required disabled>
+            <div class="error-message" id="pincodeError"></div><br>
 
             <button type="submit">Continue to Order</button>
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const address = document.getElementById("delivery_address");
+            const place = document.getElementById("place");
+            const pincode = document.getElementById("pincode");
+
+            const addressError = document.getElementById("addressError");
+            const placeError = document.getElementById("placeError");
+            const pincodeError = document.getElementById("pincodeError");
+
+            // Delivery address validation
+            address.addEventListener("input", function () {
+                if (address.value.length < 1 || address.value.length > 50) {
+                    addressError.textContent = "Delivery address must be between 1 and 50 characters.";
+                    place.disabled = true;
+                } else {
+                    addressError.textContent = "";
+                    place.disabled = false;
+                }
+            });
+
+            // Place validation
+            place.addEventListener("input", function () {
+                if (place.value.trim() === "") {
+                    placeError.textContent = "Please fill out the above field before filling this one.";
+                    pincode.disabled = true;
+                } else {
+                    placeError.textContent = "";
+                    pincode.disabled = false;
+                }
+            });
+
+            // Pincode validation
+            pincode.addEventListener("input", function () {
+                const pincodeRegex = /^[0-9]{6}$/;
+                if (!pincodeRegex.test(pincode.value)) {
+                    pincodeError.textContent = "Pincode must contain only 6 numbers.";
+                } else {
+                    pincodeError.textContent = "";
+                }
+            });
+
+            // Prevent form submission if validation fails
+            document.getElementById("billingForm").addEventListener("submit", function (event) {
+                if (address.value.length < 1 || address.value.length > 50 ||
+                    place.value.trim() === "" || !pincodeRegex.test(pincode.value)) {
+                    event.preventDefault();
+                    alert("Please fill out the form correctly.");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 
