@@ -13,41 +13,6 @@
             background-size: cover;
             font-family: Arial, sans-serif;
         }
-
-        .form-group input {
-            width: 100%; /* Full width */
-            padding: 10px; /* Same padding for both fields */
-            box-sizing: border-box; /* Makes sure padding doesn't affect overall width */
-        }
-
-        .password-input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .password-input-wrapper input {
-            width: 100%; /* Ensure password input takes full width */
-            padding: 10px; /* Same padding as username */
-            box-sizing: border-box; /* Ensure padding and icon don't affect the width */
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-        }
-        .toggle-password:hover {
-            color: #333;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 10px;
-            color: #000000;
-        }
     </style>
 </head>
 <body>
@@ -55,9 +20,30 @@
         <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
     </a> -->
 
+    <!-- <a href="{% url 'home' %}">
+        <i class="fas fa-home home-icon"></i>
+    </a> -->
+
+    <ul>
     <a href="{% url 'home' %}">
         <i class="fas fa-home home-icon"></i>
     </a>
+
+    <div class="header">
+        <div class="nav-item">
+            <li><b><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'regmailverify' %}"><i class="fas fa-user-plus"></i> Register</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'contactus' %}"><i class="fas fa-envelope"></i> Contact Us</a></b></li>
+        </div>
+    </div>
+</ul>
 
     <div class="container">
         <div class="login-box">

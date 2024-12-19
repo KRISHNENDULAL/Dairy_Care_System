@@ -11,10 +11,12 @@
             margin: 0;
         }
     </style>
+    <!-- Add Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <!-- Add Font Awesome CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -27,16 +29,20 @@
             <li><b><a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i> Users List</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'reguserlist' 'employee' %}"><i class="fas fa-user-tie"></i> Employee List</a></b></li>
+            <li><b><a href="{% url 'reguserlist' 'owner' %}"><i class="fas fa-house-user"></i> Farm Owners List</a></b></li>
         </div>
         <div class="nav-item">
-            <li><b><a href="{% url 'reguserlist' 'customer' %}"><i class="fas fa-user-friends"></i> Customer List</a></b></li>
+            <li><b><a href="{% url 'reguserlist' 'customer' %}"><i class="fas fa-user-friends"></i> Customers List</a></b></li>
+        </div>
+        <div class="nav-item">
+            <li><b><a href="{% url 'reguserlist' 'employee' %}"><i class="fas fa-user-tie"></i> Employees List</a></b></li>
         </div>
         <div class="nav-item">
             <li>
                 <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                 <div class="dropdown-content" id="dropdown-content">
                     <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#" onclick="goBack()"><i class="fas fa-home"></i> Dashboard</a>
                     <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </li>
@@ -87,18 +93,6 @@
         </tbody>
     </table>
 </div>
-
-<!-- Modal Container -->
-<!-- <div id="confirmationModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">Dairy Care System</div>
-        <div class="modal-body" id="modal-message"></div>
-        <div class="modal-footer">
-            <button class="btn-confirm" id="confirm-btn">Confirm</button>
-            <button class="btn-cancel" onclick="closeModal();">Cancel</button>
-        </div>
-    </div>
-</div> -->
 
 <!-- Modal Container -->
 <div id="confirmationModal" class="modal">
@@ -169,41 +163,6 @@
     }
 </script>
 
-<!-- <script type="text/javascript">
-    // Function to open the modal with the corresponding message
-    function openModal(actionType, username, url) {
-        var modal = document.getElementById("confirmationModal");
-        var message = document.getElementById("modal-message");
-        var confirmBtn = document.getElementById("confirm-btn");
-
-        if (actionType === 'delete') {
-            message.innerHTML = "Are you sure you want to delete the user <strong>" + username + "</strong> and <strong>deactivate</strong> their account?";
-        } else if (actionType === 'restore') {
-            message.innerHTML = "Are you sure you want to restore the user <strong>" + username + "</strong> and <strong>reactivate</strong> their account?";
-        }
-
-        // Set the confirm button to redirect to the action's URL
-        confirmBtn.onclick = function() {
-            window.location.href = url;
-        };
-
-        modal.style.display = "block";
-    }
-
-    // Function to close the modal
-    function closeModal() {
-        document.getElementById("confirmationModal").style.display = "none";
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        var modal = document.getElementById("confirmationModal");
-        if (event.target == modal) {
-            closeModal();
-        }
-    }
-</script> -->
-
 <!-- Add SweetAlert2 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -226,6 +185,24 @@
                 dropdown.style.display = "none";
             }
         }
+    }
+
+    // Redirect based on user role
+    function goBack() {
+        var userRole = "{{ users.get_role_display }}";  // Get user role from context
+        var redirectUrl = "";
+
+        if (userRole === "Customer") {
+            redirectUrl = "{% url 'customerpage' %}";
+        } else if (userRole === "Employee") {
+            redirectUrl = "{% url 'employeepage' %}";
+        } else if (userRole === "Admin") {
+            redirectUrl = "{% url 'adminpage' %}";
+        } else if (userRole === "Farm Owner") {
+            redirectUrl = "{% url 'farmownerpage' %}";
+        }
+
+        window.location.href = redirectUrl;  // Redirect to the appropriate page
     }
 
     // Custom SweetAlert2 logout confirmation

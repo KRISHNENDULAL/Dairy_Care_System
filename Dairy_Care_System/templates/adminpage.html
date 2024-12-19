@@ -41,14 +41,16 @@
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
         <a href="#">Dairy Care System</a><br><br>
-        <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Users List</a><br>
-        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a><br>
-        <a href="{% url 'animalslist' %}"><i class="fas fa-paw"></i>  Animals List</a><br>
-        <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
-        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications
+        <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
+        <a href="{% url 'addemployee' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
+        <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
+        <a href="{% url 'adminanimalslist' %}"><i class="fas fa-paw"></i>  Manage Animals</a><br>
+        <a href="{% url 'adminproductstock' %}"><i class="fas fa-boxes"></i>  Manage Stock</a><br>
+        <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
+        <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications
             <!--  class="notification-badge" <span class="badge" id="notification-count">{{ unread_count }}</span>  -->
         </a><br>
-        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+        <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
     </div>
 
     <!-- Navigation Bar -->

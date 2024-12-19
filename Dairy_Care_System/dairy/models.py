@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 
+
+
 class Users_table(models.Model):
     user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True)
@@ -13,8 +15,9 @@ class Users_table(models.Model):
         ('admin', 'Admin'),
         ('customer', 'Customer'),
         ('employee', 'Employee'),
+        ('owner', 'Farm Owner'),
     )
-    role = models.CharField(max_length=10, choices=ROLES, default='customer')
+    role = models.CharField(max_length=10, choices=ROLES)
     
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -36,6 +39,7 @@ class Users_table(models.Model):
     def __str__(self):
         return self.username  
     
+
 
 class Products_table(models.Model):
     product_id = models.AutoField(primary_key=True)  # Auto-incrementing primary key
@@ -64,6 +68,7 @@ class ProductImage(models.Model):
         return f"Image {self.image_id} for {self.product.product_name}"
     
 
+
 class WishlistItem(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     product = models.ForeignKey(Products_table, on_delete=models.CASCADE)
@@ -72,10 +77,15 @@ class WishlistItem(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.product.product_name}"
 
+
+
 class Notifications_table(models.Model):
     message = models.CharField(max_length=255)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE, null=True, blank=True)
+
+
 
 class PreOrder(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
@@ -89,10 +99,10 @@ class PreOrder(models.Model):
         return f"Pre-Order: {self.product.product_name} by {self.user.username}"
     
 
+
 class Animals_table(models.Model):
     animal_id = models.AutoField(primary_key=True)
     animal_name = models.CharField(max_length=100)
-    animal_category = models.CharField(max_length=50)  # E.g., Cow, Buffalo, etc.
     breed = models.CharField(max_length=100, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=10, blank=True, null=True)  # Gender of the animal
@@ -153,6 +163,7 @@ class Cart(models.Model):
         return self.quantity * self.product.product_price  # Calculate the total price
     
 
+
 class Feedback_table(models.Model):
     feedback_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)  # Customer providing the feedback
@@ -164,6 +175,7 @@ class Feedback_table(models.Model):
     def __str__(self):
         return f"Feedback by {self.user.username} for {self.product.product_name}"
     
+
 
 class Order_table(models.Model):
     PAYMENT_CHOICES = (
@@ -204,6 +216,7 @@ class OrderItem_table(models.Model):
         return f"{self.product.name} (x{self.quantity}) in Order {self.order.id}"
     
 
+
 class Address_table(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
@@ -219,3 +232,5 @@ class Address_table(models.Model):
     
     def full_address(self):
         return f"{self.street_address}, {self.town_city}, {self.district}, {self.postcode_zip}"
+    
+

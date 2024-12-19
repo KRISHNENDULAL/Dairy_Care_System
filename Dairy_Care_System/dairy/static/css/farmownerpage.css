@@ -44,6 +44,19 @@ li a:hover {
     border-radius: 5px;
 }
 
+h1 {
+    color: black;
+    font-size: 60px;
+    margin-top: 100px;
+}
+/* 
+h3 {
+    color: black;
+    font-size: 30px;
+    margin-left: 10px;
+} */
+
+
 /* Dropdown styles */
 .dropdown-content {
     display: none;
@@ -71,6 +84,35 @@ li a:hover {
 
 .nav-item:hover .dropdown-content {
     display: block;
+}
+
+.message {
+    font-size: 30px;
+    color: #000;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.quote {
+    font-style: italic;
+    font-size: 20px;
+    color: black;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.quote::before {
+    content: "“";
+}
+
+.quote::after {
+    content: "”";
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: black;
 }
 
 /* Side navigation (Always Visible) */
@@ -105,48 +147,7 @@ li a:hover {
     width: 250px; /* Sidebar always visible */
 }
 
-/* Animal container styles */
-.animal-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
-    gap: 60px; /* Space between items */
-    padding: 60px; /* Padding around the container */
+/* Adjust the body margin to make space for the sidebar */
+body {
+    margin-left: 250px;
 }
-
-.animal {
-    border: 1px solid #ccc;
-    border-radius: 8px; /* Rounded corners */
-    overflow: hidden; /* Prevents overflow of content */
-    display: flex; /* Align children vertically */
-    flex-direction: column; /* Stack children vertically */
-    padding: 15px;
-    background-color: #fff; /* White background for products */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-    transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
-}
-
-.animal img {
-    width: 100%; /* Full width of the product container */
-    height: 250px; /* Fixed height for uniformity */
-    object-fit: cover; /* Maintain aspect ratio and cover the area */
-    border-radius: 4px; /* Rounded corners for the image */
-}
-
-.animal:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
-}
-
-.animal h3 {
-    font-size: 1.2em; /* Adjust font size */
-    margin: 10px 0; /* Margin for spacing */
-    text-align: center; /* Centering the animal name */
-}
-
-.animal p {
-    margin: 5px 0; /* Margin for spacing */
-    font-size: 1em;
-    color: #000000;
-    text-align: center; /* Centering the details */
-}
-

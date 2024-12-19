@@ -160,6 +160,20 @@
             background-color: #eaeaea;
         }
 
+        .back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 25px;
+    color: black;
+    text-decoration: none;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
         @media (max-width: 768px) {
             table, th, td {
                 font-size: 14px;
@@ -169,45 +183,29 @@
             h1 {
                 font-size: 24px;
             }
-
-            .back-link {
-                font-size: 16px;
-            }
+            
         }
     </style>
     
 </head>
 <body>
     <!-- Navigation Bar-->
-<ul>
+<!-- <ul>
     <div class="header">
-        <!-- Hamburger Icon -->
-        <!-- <span class="hamburger" onclick="openNav()">&#9776;</span> -->
-         
-        <div class="nav-item">
-            <li><b><a href="{% url 'addproducts' %}"><i class="fa fa-cart-plus"></i> Add Products</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'editproduct' %}"><i class="fas fa-shopping-basket"></i> All Products List</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'productstock' %}"><i class="fas fa-boxes"></i> Stock Details</a></b></li>
-        </div>
         <div class="nav-item">
             <li>
                 <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                 <div class="dropdown-content" id="dropdown-content">
                     <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                    <!-- <a href="{% if request.session.user_role == 'admin' %}{% url 'adminpage' %}{% elif request.session.user_role == 'employee' %}{% url 'employeepage' %}{% else %}{% url 'customerpage' %}{% endif %}">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>                                       -->
-                    <!-- Change Logout link to trigger a custom SweetAlert -->
                     <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </li>
         </div>
     </div>
-</ul><br>
+</ul> -->
+
+<a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
+<br>
 
 
     <h1><u><strong>Stock Details</strong></u></h1><br>
@@ -220,6 +218,7 @@
                 <th>Description</th>
                 <th>Quantity</th>
                 <th>Status</th>
+                <th>Added By</th>
                 <th>Added At</th>
                 <th>Updated At</th>
             </tr>
@@ -232,6 +231,7 @@
                 <td>{{ product.product_description }}</td>
                 <td>{{ product.product_quantity }} {{ product.quantity_unit }}</td>
                 <td>{{ product.status|yesno:"Available,Not Available" }}</td>
+                <td>{{ product.employee.username }}</td>
                 <td>{{ product.added_at|date:"Y-m-d H:i" }}</td>
                 <td>{{ product.updated_at|date:"Y-m-d H:i" }}</td>
             </tr>

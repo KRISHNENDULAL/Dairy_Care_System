@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Animals List</title>
+    <link rel="stylesheet" href="{% static 'css/animalslist.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/animalslist.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+        }
+
+        /* Navigation Bar styles */
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 5px;
+            overflow: hidden;
+            background-color: black;
+            display: flex;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 5px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        li {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        li a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+
+        /* Animal container styles */
+        .animal-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
+            gap: 60px; /* Space between items */
+            padding: 60px; /* Padding around the container */
+        }
+
+        .animal {
+            border: 1px solid #ccc;
+            border-radius: 8px; /* Rounded corners */
+            overflow: hidden; /* Prevents overflow of content */
+            display: flex; /* Align children vertically */
+            flex-direction: column; /* Stack children vertically */
+            padding: 15px;
+            background-color: #fff; /* White background for products */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+            transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+        }
+
+        .animal img {
+            width: 100%; /* Full width of the product container */
+            height: 250px; /* Fixed height for uniformity */
+            object-fit: cover; /* Maintain aspect ratio and cover the area */
+            border-radius: 4px; /* Rounded corners for the image */
+        }
+
+        .animal:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+        }
+
+        .animal h3 {
+            font-size: 1.2em; /* Adjust font size */
+            margin: 10px 0; /* Margin for spacing */
+            text-align: center; /* Centering the animal name */
+        }
+
+        .animal p {
+            margin: 5px 0; /* Margin for spacing */
+            font-size: 1em;
+            color: #000000;
+            text-align: center; /* Centering the details */
+        }
+
+        /* Dropdown styles */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            right: 0;
+            top: 70px;
+            border-radius: 5px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .nav-item:hover .dropdown-content {
+            display: block;
+        }
+
+        .back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 25px;
+    color: black;
+    text-decoration: none;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+    </style>
+
+    <!-- Add SweetAlert2 and Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation Bar-->
+    <ul>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul>
+
+    <!-- <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br> -->
+
+    <!-- Animal Details Section -->
+    <div class="animal-container">
+        {% for animal in animals %}
+        <div class="animal" onclick="window.location.href='{% url 'animaldetails' animal.animal_id %}'" style="cursor: pointer;">
+            {% if animal.images.exists %}  <!-- Check if there are images -->
+                <img src="{{ animal.images.first.animal_image.url }}" alt="{{ animal.animal_name }}"> <!-- Display the first image -->
+            {% else %}
+                <img src="{% static 'images/default_animal_image.png' %}" alt="Default Image"> <!-- Placeholder if no image -->
+            {% endif %}
+            <h3><strong>{{ animal.animal_name }}</strong></h3>
+            <p>{{ animal.animal_category }}, {{ animal.breed }}</p>
+            <p><strong>Status:</strong> {% if not animal.status %}Inactive{% else %}Active{% endif %}<p>
+        </div>
+        {% empty %}
+            <p>No animals available.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Add SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+        // Custom SweetAlert2 logout confirmation
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to logout URL
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

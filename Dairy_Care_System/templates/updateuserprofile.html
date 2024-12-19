@@ -15,10 +15,31 @@
             padding: 20px;
         }
     </style>
+    <!-- Add Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <body>
-    <a href="{% url 'userprofile' %}" class="back-link">&larr; BACK</a>
+    <!-- <a href="{% url 'userprofile' %}" class="back-link">&larr; BACK</a> -->
+
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ user.username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="#" onclick="goBack()">&larr; Back</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul><br>
 
     <div class="container">
         <h1>Update Profile</h1><br>
@@ -138,6 +159,68 @@
                 }
             });
         });
+    </script>
+
+    <!-- Add SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+        // Redirect based on user role
+        function goBack() {
+            var userRole = "{{ user.get_role_display }}";  // Get user role from context
+            var redirectUrl = "";
+
+            if (userRole === "Customer") {
+                redirectUrl = "{% url 'customerpage' %}";
+            } else if (userRole === "Employee") {
+                redirectUrl = "{% url 'employeepage' %}";
+            } else if (userRole === "Admin") {
+                redirectUrl = "{% url 'adminpage' %}";
+            } else if (userRole === "Farm Owner") {
+                redirectUrl = "{% url 'farmownerpage' %}";
+            }
+
+            window.location.href = redirectUrl;  // Redirect to the appropriate page
+        }
+
+        // Custom SweetAlert2 logout confirmation
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to logout URL
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
     </script>
     
 </body>

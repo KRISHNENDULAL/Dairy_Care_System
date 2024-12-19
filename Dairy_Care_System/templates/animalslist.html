@@ -8,146 +8,160 @@
         body {
             background: url('{% static "images/animalslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin: 0;
+            margin-left: 250px;
         }
 
-        /* Navigation Bar styles */
         ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 5px;
-            overflow: hidden;
-            background-color: black;
-            display: flex;
-            align-items: center;
-        }
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+    overflow: hidden;
+    background-color: black;
+    display: flex;
+    align-items: center;
+}
 
-        .header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px;
-            font-family: 'Arial', sans-serif;
-        }
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-family: 'Arial', sans-serif;
+}
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            padding: 5px 8px;
-        }
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
 
-        li {
-            margin-right: 10px;
-            font-size: 20px;
-        }
+li {
+    margin-right: 10px;
+    font-size: 20px;
+}
 
-        li a {
-            display: block;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            padding: 10px 12px;
-            transition: background-color 0.3s ease;
-        }
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    padding: 4px 5px;
+    transition: background-color 0.3s ease;
+}
 
-        li a:hover {
-            background-color: #ddd;
-            border-radius: 5px;
-        }
+li a:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+}
 
-        /* Animal container styles */
-        .animal-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
-            gap: 60px; /* Space between items */
-            padding: 60px; /* Padding around the container */
-        }
+/* Dropdown styles */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 0;
+    top: 70px;
+    border-radius: 5px;
+}
 
-        .animal {
-            border: 1px solid #ccc;
-            border-radius: 8px; /* Rounded corners */
-            overflow: hidden; /* Prevents overflow of content */
-            display: flex; /* Align children vertically */
-            flex-direction: column; /* Stack children vertically */
-            padding: 15px;
-            background-color: #fff; /* White background for products */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-            transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
-        }
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
 
-        .animal img {
-            width: 100%; /* Full width of the product container */
-            height: 250px; /* Fixed height for uniformity */
-            object-fit: cover; /* Maintain aspect ratio and cover the area */
-            border-radius: 4px; /* Rounded corners for the image */
-        }
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
 
-        .animal:hover {
-            transform: translateY(-5px); /* Lift effect on hover */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
-        }
+.nav-item:hover .dropdown-content {
+    display: block;
+}
 
-        .animal h3 {
-            font-size: 1.2em; /* Adjust font size */
-            margin: 10px 0; /* Margin for spacing */
-            text-align: center; /* Centering the animal name */
-        }
+/* Side navigation (Always Visible) */
+.sidenav {
+    height: 100%; /* Full-height */
+    width: 100px; /* Fixed width to keep the sidebar always visible */
+    position: fixed; /* Fixed position */
+    z-index: 1; /* Sit on top */
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    backdrop-filter: blur(10px); /* Blur effect */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px; /* Padding on top */
+}
 
-        .animal p {
-            margin: 5px 0; /* Margin for spacing */
-            font-size: 1em;
-            color: #000000;
-            text-align: center; /* Centering the details */
-        }
+.sidenav a {
+    padding: 8px 8px 15px 20px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #ffffff;
+    display: block;
+    transition: 0.3s;
+}
 
-        /* Dropdown styles */
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            right: 0;
-            top: 70px;
-            border-radius: 5px;
-        }
+.sidenav a:hover {
+    color: #000000;
+}
 
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #ddd;
-        }
-
-        .nav-item:hover .dropdown-content {
-            display: block;
-        }
+/* Remove the open/close functionality */
+#mySidenav {
+    width: 250px; /* Sidebar always visible */
+}
     </style>
 
-    <!-- Add SweetAlert2 and Font Awesome CSS -->
+    <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
     <!-- Navigation Bar-->
-    <ul>
+    <!-- <ul>
         <div class="header">
             <div class="nav-item">
                 <li><b><a href="{% url 'addanimal' %}"><i class="fa fa-paw"></i> Add Animals</a></b></li>
-            </div>
+            </div> -->
             <!-- <div class="nav-item">
                 <li><b><a href="#"><i class="fas fa-paw"></i> All Animals List</a></b></li>
             </div> -->
+            <!-- <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul> -->
+
+    <!-- Side Navigation (Always Visible) -->
+    <div id="mySidenav" class="sidenav">
+        <a href="#">Dairy Care System</a><br><br>
+        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a><br>
+        <a href="{% url 'animalslist' %}"><i class="fas fa-paw"></i>  Animals List</a><br>
+        <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
+        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications
+            <!--  class="notification-badge" <span class="badge" id="notification-count">{{ unread_count }}</span>  -->
+        </a><br>
+        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+    </div>
+
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="header">
             <div class="nav-item">
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
@@ -170,7 +184,7 @@
                 <img src="{% static 'images/default_animal_image.png' %}" alt="Default Image"> <!-- Placeholder if no image -->
             {% endif %}
             <h3><strong>{{ animal.animal_name }}</strong></h3>
-            <p>{{ animal.animal_category }}, {{ animal.breed }}</p>
+            <p>{{ animal.breed }}</p>
             <p><strong>Status:</strong> {% if not animal.status %}Inactive{% else %}Active{% endif %}<p>
         </div>
         {% empty %}

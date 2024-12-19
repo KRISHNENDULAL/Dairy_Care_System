@@ -32,7 +32,7 @@
     justify-content: flex-end;
     align-items: center;
     margin: 0 5px;
-    padding: 8px 10px;
+    padding: 5px 10px;
     font-family: 'Arial', sans-serif;
 }
 
@@ -91,87 +91,157 @@ li a:hover {
     display: block;
 }
 
-        /* Profile Container */
+        /* Profile Container Styling */
         .profile-container {
             max-width: 800px;
             margin: 50px auto;
-            padding: 20px;
-            background-color: rgba(218, 217, 200, 0.9);
-            border-radius: 15px;
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #2980b9);
         }
 
         h1 {
-            font-family: Copperplate, Papyrus, fantasy;
-            color: #260a8b;
-            font-size: 36px;
-            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 30px;
+            font-weight: 600;
             text-align: center;
-            letter-spacing: 2px;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        h1:after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 3px;
+            background: #3498db;
+            margin: 15px auto 0;
+            border-radius: 2px;
         }
 
         /* User Details Section */
         .user-details {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #eceae8;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
         }
 
         .user-details p {
-            font-size: 18px;
             display: flex;
             align-items: center;
-            color: #1c1c6f;
+            margin: 15px 0;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
-        .user-details p strong {
-            margin-left: 10px;
-            font-weight: bold;
+        .user-details p:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
         .icon {
+            background: #e3f2fd;
+            color: #3498db;
+            padding: 12px;
+            border-radius: 10px;
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .user-details strong {
+            color: #2c3e50;
             margin-right: 10px;
-            color: #000000;
-            font-size: 24px;
+            font-weight: 600;
+            min-width: 100px;
         }
 
         /* Action Buttons */
         .action-buttons {
             display: flex;
             justify-content: center;
-            gap: 50px;
+            gap: 20px;
+            margin-top: 35px;
         }
 
         .button {
-            background-color: #101c29;
+            background: #3498db;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
             text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .button:hover {
-            background-color: #04468d;
-            transform: scale(1.05);
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .button:nth-child(2) {
+            background: #2c3e50;
+        }
+
+        .button:nth-child(2):hover {
+            background: #34495e;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .profile-container {
-                width: 90%;
-                padding: 15px;
+                margin: 20px;
+                padding: 25px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+                justify-content: center;
             }
         }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-container {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
     </style>
+
+    <!-- Add Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Add SweetAlert2 CSS -->
@@ -186,6 +256,7 @@ li a:hover {
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ user.username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
+                        <a href="#" onclick="goBack()">&larr; Back</a>
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </li>
@@ -202,7 +273,7 @@ li a:hover {
             <p><i class="icon fas fa-user"></i><strong>Username:</strong> {{ user.username }}</p>
             <p><i class="icon fas fa-envelope"></i><strong>Email:</strong> {{ user.email }}</p>
             <p><i class="icon fas fa-phone"></i><strong>Phone:</strong> {{ user.phone }}</p>
-            <p><i class="icon fas fa-user-tag"></i><strong>Role:</strong> {{ user.role }}</p>
+            <p><i class="icon fas fa-user-tag"></i><strong>Role:</strong> {{ user.get_role_display }}</p>
         </div>
 
         <!-- Action Buttons -->
@@ -234,6 +305,24 @@ li a:hover {
                     dropdown.style.display = "none";
                 }
             }
+        }
+
+        // Redirect based on user role
+        function goBack() {
+            var userRole = "{{ user.get_role_display }}";  // Get user role from context
+            var redirectUrl = "";
+
+            if (userRole === "Customer") {
+                redirectUrl = "{% url 'customerpage' %}";
+            } else if (userRole === "Employee") {
+                redirectUrl = "{% url 'employeepage' %}";
+            } else if (userRole === "Admin") {
+                redirectUrl = "{% url 'adminpage' %}";
+            } else if (userRole === "Farm Owner") {
+                redirectUrl = "{% url 'farmownerpage' %}";
+            }
+
+            window.location.href = redirectUrl;  // Redirect to the appropriate page
         }
 
         // Custom SweetAlert2 logout confirmation

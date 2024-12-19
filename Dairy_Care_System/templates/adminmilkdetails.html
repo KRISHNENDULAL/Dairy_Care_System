@@ -10,118 +10,11 @@
         body {
             background: url('{% static "images/milkdetails.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin-left: 250px;
+            margin: 0;
             font-family: 'Arial', sans-serif;
         }
 
         ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 5px;
-    overflow: hidden;
-    background-color: black;
-    display: flex;
-    align-items: center;
-}
-
-.header {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin: 0 5px;
-    padding: 5px 10px;
-    font-family: 'Arial', sans-serif;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-}
-
-li {
-    margin-right: 10px;
-    font-size: 20px;
-}
-
-li a {
-    display: block;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    padding: 4px 5px;
-    transition: background-color 0.3s ease;
-}
-
-li a:hover {
-    background-color: #ddd;
-    border-radius: 5px;
-}
-
-/* Dropdown styles */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    right: 0;
-    top: 70px;
-    border-radius: 5px;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-}
-
-.dropdown-content a:hover {
-    background-color: #ddd;
-}
-
-.nav-item:hover .dropdown-content {
-    display: block;
-}
-
-/* Side navigation (Always Visible) */
-.sidenav {
-    height: 100%; /* Full-height */
-    width: 100px; /* Fixed width to keep the sidebar always visible */
-    position: fixed; /* Fixed position */
-    z-index: 1; /* Sit on top */
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-    backdrop-filter: blur(10px); /* Blur effect */
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px; /* Padding on top */
-}
-
-.sidenav a {
-    padding: 8px 8px 15px 20px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #ffffff;
-    display: block;
-    transition: 0.3s;
-}
-
-.sidenav a:hover {
-    color: #000000;
-}
-
-/* Remove the open/close functionality */
-#mySidenav {
-    width: 250px; /* Sidebar always visible */
-}
-
-        /* ul {
             list-style-type: none;
             margin: 0;
             padding: 5px;
@@ -167,7 +60,7 @@ li a:hover {
         li a:hover {
             background-color: #ddd;
             border-radius: 5px;
-        } */
+        }
 
         h1 {
             text-align: center;
@@ -225,7 +118,7 @@ li a:hover {
         }
 
         /* Styling for the back link in the upper left corner */
-/* .back-link {
+.back-link {
     position: absolute;
     top: 20px;
     left: 20px;
@@ -237,44 +130,12 @@ li a:hover {
 
 .back-link:hover {
     text-decoration: underline;
-} */
+}
     </style>
-    <!-- Add SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <!-- Add Font Awesome CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-    <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#">Dairy Care System</a><br><br>
-        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a><br>
-        <a href="{% url 'animalslist' %}"><i class="fas fa-paw"></i>  Animals List</a><br>
-        <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
-        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications
-            <!--  class="notification-badge" <span class="badge" id="notification-count">{{ unread_count }}</span>  -->
-        </a><br>
-        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
-    </div>
-
-    <!-- Navigation Bar -->
-    <ul>
-        <div class="header">
-            <div class="nav-item">
-                <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                    <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </li>
-            </div>
-        </div>
-    </ul>
-
-    
-    <!-- <a href="{% url 'farmownerpage' %}" class="back-link"><b>&larr; BACK</b></a> -->
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
     
     <!-- Navigation Bar -->
     <!-- <ul>
@@ -303,6 +164,7 @@ li a:hover {
                     <th>Animal Picture</th>
                     <th>Breed</th>
                     <th>Milk Capacity (Liters)</th>
+                    <th>Added by</th>
                 </tr>
             </thead>
             <tbody>
@@ -322,6 +184,7 @@ li a:hover {
                     </td>
                     <td>{{ animal.breed }}</td>
                     <td>{{ animal.milk_capacity }} L</td>
+                    <td>{{ animal.added_by.username }} </td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -13,35 +13,6 @@
             background-size: cover;
             font-family: Arial, sans-serif;
         }
-
-        .form-group input {
-            width: 100%; /* Full width */
-            padding: 10px; /* Same padding for both fields */
-            box-sizing: border-box; /* Makes sure padding doesn't affect overall width */
-        }
-
-        .password-input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .password-input-wrapper input {
-            width: 100%; /* Ensure password input takes full width */
-            padding: 10px; /* Same padding as username */
-            box-sizing: border-box; /* Ensure padding and icon don't affect the width */
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 35%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-        }
-        .toggle-password:hover {
-            color: #333;
-        }
     </style>
 </head>
 <body>
@@ -51,8 +22,8 @@
     
     <a href="{% url 'home' %}">
         <i class="fas fa-home home-icon"></i>
-    </a>
-    
+    </a><br>
+
     <div class="container">
         <div class="login-box">
             <h2><b>Register</b></h2>
@@ -82,6 +53,15 @@
                     <div class="error-message" id="phoneError"></div>
                 </div>
                 <div class="form-group">
+                    <label for="role">Role</label>
+                    <select name="role" id="role" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="customer">Customer</option>
+                        <option value="owner">Farm Owner</option>
+                    </select>
+                    <div class="error-message" id="roleError"></div>
+                </div>
+                <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-input-wrapper">
                         <input type="password" id="password" name="password" placeholder="Enter your password">
@@ -108,6 +88,7 @@
             const email = document.getElementById('email');
             const phone = document.getElementById('phone');
             const password = document.getElementById('password');
+            const role = document.getElementById('role');
     
             // Function to show error
             function showError(message, elementId) {
@@ -127,6 +108,11 @@
             // Function to validate username (only alphabets)
             function validateUsername(username) {
                 return /^[a-zA-Z]+$/.test(username);
+            }
+
+            // Function to validate role selection
+            function validateRole(roleValue) {
+                return roleValue !== ""; // Ensure a role is selected
             }
     
             // Function to validate password
@@ -163,6 +149,14 @@
                 }
             });
 
+            role.addEventListener('change', function() {
+                if (validateRole(role.value)) {
+                    clearError('roleError');
+                } else {
+                    showError('Please select a role.', 'roleError');
+                }
+            });
+
             password.addEventListener('input', function() {
                 if (validatePassword(password.value.trim())) {
                     clearError('passwordError');
@@ -186,7 +180,8 @@
             // Apply validation for each field
             validateFieldsBefore(username, email, 'emailError');
             validateFieldsBefore(phone, username, 'phoneError');
-            validateFieldsBefore(password, phone, 'passwordError');
+            validateFieldsBefore(role, phone, 'roleError');
+            validateFieldsBefore(password, role, 'passwordError');
 
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
@@ -212,6 +207,13 @@
                     valid = false;
                 } else {
                     clearError('phoneError');
+                }
+
+                if (!validateRole(role.value)) {
+                    showError('Please select a role.', 'roleError');
+                    valid = false;
+                } else {
+                    clearError('roleError');
                 }
     
                 if (!validatePassword(password.value.trim())) {

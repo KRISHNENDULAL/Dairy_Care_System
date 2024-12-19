@@ -4,12 +4,20 @@
 <head>
     <title>Products Page</title>
     <link rel="stylesheet" href="{% static 'css/custproductslist.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
     <style>
         body {
             background: url('{% static "images/productslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
+            margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
         }
+
+        /* Add margin between icons and text */
+        .sidenav a i, .dropdown-content a i {
+            margin-right: 10px; /* Space between icon and text */
+        }
+
 
     </style>
 
@@ -20,7 +28,7 @@
 <body>
 
     <!-- Navigation Bar-->
-    <ul>
+    <!-- <ul>
         <div class="header">
             <div class="nav-item">
                 <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
@@ -51,7 +59,39 @@
                 </li>
             </div>
         </div>
-    </ul>
+    </ul> -->
+
+    <!-- Side Navigation (Always Visible) -->
+    <div id="mySidenav" class="sidenav">
+        <a href="#"></i> Dairy Care System</a><br><br><br>
+        <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
+        <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
+        <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
+        <a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Your Orders</a><br>
+        <a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Your Pre-Orders</a><br>
+        <a href="{% url 'feedbackpage' %}" id="feed"><i class="fas fa-comment"></i> Give Feedback</a><br>
+        <a href="{% url 'custfeedback' %}" id="feed"><i class="fas fa-comments"></i> Your Feedbacks</a><br>
+    </div>
+
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b>
+                        <a href="#" class="username" onclick="toggleDropdown()">
+                            <i class="fas fa-user-circle"></i> {{ username }}
+                        </a>
+                    </b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <!-- Change Logout link to trigger a custom SweetAlert -->
+                        <a href="#" onclick="confirmLogout()" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul><br><br><br><br>
 
     <div class="main-content">
     <!-- Search Bar -->

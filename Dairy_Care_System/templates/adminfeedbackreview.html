@@ -74,7 +74,7 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'farmownerpage' %}" class="back-link"><b>&larr; BACK</b></a>
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
     <h1>Feedback Review</h1>
 
     <div class="feedback-list">
@@ -84,6 +84,7 @@
                     <tr>
                         <th>Customer</th>
                         <th>Product</th>
+                        <th>Owner</th>
                         <th>Rating (/5)</th>
                         <th>Feedback</th>
                         <th>Submitted At</th>
@@ -94,6 +95,7 @@
                     <tr>
                         <td>{{ feedback.user.username }}</td>
                         <td>{{ feedback.product.product_name }}</td>
+                        <td>{{ feedback.product.employee.username }}</td>
                         <td>
                             {{ feedback.rating }} <span class="rating"><i class="fas fa-star"></i></span>
                         </td>
@@ -104,7 +106,7 @@
                 </tbody>
             </table>
         {% else %}
-            <center><p class="no-feedback">No feedback available.</p></center>
+            <p class="no-feedback">No feedback available.</p>
         {% endif %}
     </div>
 

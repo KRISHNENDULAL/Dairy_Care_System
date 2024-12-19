@@ -1,94 +1,86 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Pre-Orders</title>
+    <title>Feedback Review</title>
+    <link rel="stylesheet" href="{% static 'css/feedbackreview.css' %}">
     <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('{% static "images/feedbackreview.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
             margin-left: 250px;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #000000;
+            padding: 20px;
         }
 
         h1 {
             text-align: center;
-            color: #07509f;
-            margin-top: 20px;
+            color: #000000;
+            margin-bottom: 30px;
             font-family: Copperplate, Papyrus, fantasy;
-            font-size: 45px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(14, 4, 153, 0.5);
-            letter-spacing: 2px;
-            position: relative;
-            display: inline-block;
+            font-size: 3.0em;
         }
-
-        h1:after {
-            content: '';
-            display: block;
-            width: 90%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #000000, transparent);
-            position: absolute;
-            bottom: -2px;
-            left: 10%;
-        }
-
-        .container {
-            max-width: 75%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
+        .feedback-list {
+            max-width: 1200px; /* Increased width */
+            margin: auto;
+            background: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin-top: 20px; /* Add space between the navbar and the container */
+            padding: 20px;
+            overflow: hidden;
         }
-
-        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
-
         th, td {
-            padding: 12px;
-            text-align: center;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.3s;
         }
-
         th {
-            background-color: #343a40;
-            color: #ffffff;
+            text-align: center;
+            background-color: #0b4078;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
         tr:hover {
             background-color: #f1f1f1;
         }
-
-        /* Footer Styles */
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 16px;
-            color: green;
+        .rating {
+            color: #ffcc00; /* Gold color for rating stars */
         }
+        
+        /* Styling for the back link in the upper left corner */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 25px;
+    color: black;
+    text-decoration: none;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
     </style>
     <!-- Add Font Awesome and SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
-
 <body>
+
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
         <a href="#"></i> Dairy Care System</a><br><br><br>
@@ -121,83 +113,38 @@
         </div>
     </ul>
 
-    <!-- Navigation Bar-->
-    <!-- <ul>
-        <div class="header">
-            <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Pre-Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Feedback</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                    <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="{% url 'customerpage' %}"><i class="fas fa-home"></i> Dashboard</a>
-                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </li>
-            </div>
-        </div>
-    </ul> -->
-    <br><br>
+    <!-- <a href="{% url 'customerpage' %}" class="back-link"><b>&larr; BACK</b></a> -->
+    <h1>Feedbacks</h1>
 
-    <center><h1>Your Pre-Orders</h1></center>
-    <div class="container">
-        {% if preorders %}
+    <div class="feedback-list">
+        {% if feedback_list %}
             <table>
                 <thead>
-                    <tr>
-                        <!-- <th>No.</th> -->
+                    <tr>    
                         <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Date of Delivery</th>
-                        <th>Additional Notes</th>
-                        <th>Ordered At</th>
+                        <th>Rating (/5)</th>
+                        <th>Feedback</th>
+                        <th>Submitted At</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for preorder in preorders %}
+                    {% for feedback in feedback_list %}
                     <tr>
-                        <!-- <td>{{ forloop.counter }}</td> -->
+                        <td>{{ feedback.product.product_name }}</td>
                         <td>
-                            <img src="{{ preorder.product.images.first.image.url }}" alt="{{ preorder.product.product_name }}" style="max-width: 100px; max-height: 100px; display: block; margin: 0 auto;"><br>
-                            <a href="{% url 'custproductslist' %}" style="text-decoration: underline; color: #000000;">
-                                <b>{{ preorder.product.product_name }}</b></a>          
+                            {{ feedback.rating }} <span class="rating"><i class="fas fa-star"></i></span>
                         </td>
-                        <td>{{ preorder.quantity }}</td>
-                        <td>{{ preorder.date_of_delivery }}</td>
-                        <td>{{ preorder.additional_notes }}</td>
-                        <td>{{ preorder.created_at }}</td>
+                        <td>{{ feedback.feedback_text }}</td>
+                        <td>{{ feedback.created_at|date:"Y-m-d H:i" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p>You have no pre-orders yet.</p>
+            <center><p class="no-feedback">No feedback available.</p></center>
         {% endif %}
-        <br><br></div>
+    </div>
 
-    <div class="footer"><strong>
-        Thank you for your continued support!
-    </strong></div><br><br><br>
-
-    <!-- Font Awesome for icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <!-- Add SweetAlert2 and Font Awesome JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
@@ -241,6 +188,7 @@
                 }
             });
         }
-        </script>
+    </script>
+
 </body>
 </html>

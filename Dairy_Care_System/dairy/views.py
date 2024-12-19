@@ -109,6 +109,7 @@ def registration(request):
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
+        role = request.POST['role']  
         password = request.POST['password']
 
         # Check if the username or email already exists
@@ -119,9 +120,13 @@ def registration(request):
         if Users_table.objects.filter(email=email).exists():
             messages.error(request, 'Email already exists.')
             return redirect('registration')
+        
+        if not role:
+            messages.error(request, 'Please select a role.')
+            return redirect('registration')
 
         # Create the new user with hashed password
-        user = Users_table(username=username, email=email, phone=phone, password=password)
+        user = Users_table(username=username, email=email, phone=phone, password=password, role=role)
         user.save()
 
         # Send email notification
@@ -130,7 +135,7 @@ def registration(request):
         Hello {username},
 
         Thank you for registering with us! We are excited to have you on board.
-        Your account has been successfully created, and you can now log in.
+        Your account has been successfully created as a {role}, and you can now log in.
         
         Important Warning: If you did not register for an account with this email address, please report it to us immediately at dairycaresystem25@gmail.com.
         If you have any questions or need assistance, feel free to reach out to us.
@@ -330,6 +335,8 @@ def login(request):
                 # Redirect based on user role
                 if user.role == 'customer':
                     return redirect('customerpage')
+                elif user.role == 'owner':
+                    return redirect('farmownerpage')
                 elif user.role == 'employee':
                     return redirect('employeepage')
                 elif user.role == 'admin':
@@ -388,25 +395,30 @@ def login(request):
 
 
 def changepassword(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+
     if request.method == 'POST':
-        user_id = request.session.get('user_id')
-        if user_id:
-            new_password = request.POST['new_password']
-            confirm_password = request.POST['confirm_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
 
-            if new_password == confirm_password:
-                user = Users_table.objects.get(user_id=user_id)
-                user.password = new_password  # Update with the new password
-                user.save()
-
-                messages.success(request, 'Password reset successful. Please log in with your new password.')
-                return redirect('login')
-            else:
-                messages.error(request, 'Passwords do not match.')
-        else:
+        if new_password == confirm_password:
+            user.password = new_password  # Update with the new password
+            user.save()
+            messages.success(request, 'Password reset successful. Please log in with your new password.')
             return redirect('login')
+        else:
+            messages.error(request, 'Passwords do not match.')
 
-    return render(request, 'changepassword.html')
+    # Render the change password page with the username
+    context = {
+        'username': user.username,  # Pass the username to the template
+        'user': user  # Pass the entire user object to the template
+    }
+    return render(request, 'changepassword.html', context)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -415,10 +427,10 @@ def reguserlist(request, role=None):
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
-        if role == 'customer' or role == 'employee':
+        if role == 'customer' or role == 'owner' or role == 'employee':
             users = Users_table.objects.filter(role=role)
         elif role == 'all':
-            users = Users_table.objects.filter(role__in=['customer', 'employee'])
+            users = Users_table.objects.filter(role__in=['customer', 'owner', 'employee'])
         else:
             users = []
         
@@ -536,6 +548,18 @@ def employeepage(request):
         return render(request, 'employeepage.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in 
+    
+
+def farmownerpage(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context = {
+            'username': user.username,  # Pass the username to the template
+        }
+        return render(request, 'farmownerpage.html', context)
+    else:
+        return redirect('login')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -588,9 +612,47 @@ def feedbackpage(request):
         return redirect('login')
 
 
-def feedbackreview(request):
+def adminfeedbackreview(request):
     feedback_list = Feedback_table.objects.all().order_by('-created_at')
-    return render(request, 'feedbackreview.html', {'feedback_list': feedback_list})
+    return render(request, 'adminfeedbackreview.html', {'feedback_list': feedback_list})
+
+
+def feedbackreview(request):
+    user_id = request.session.get('user_id')  # Retrieve the logged-in user's ID from the session
+    
+    if user_id:
+        # Filter feedback for products added by the logged-in user
+        feedback_list = Feedback_table.objects.filter(
+            product__employee_id=user_id
+        ).select_related('user', 'product__employee').order_by('-created_at')
+        
+        return render(request, 'feedbackreview.html', {'feedback_list': feedback_list})
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+    
+
+def custfeedback(request):
+    user_id = request.session.get('user_id')  # Retrieve the logged-in user's ID from the session
+
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+
+        # Filter feedback submitted by the logged-in user
+        feedback_list = Feedback_table.objects.filter(
+            user_id=user_id
+        ).select_related('product', 'product__employee').order_by('-created_at')
+
+        # Prepare the context for the template
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'feedback_list': feedback_list  # Pass the feedback list to the template
+        }
+
+        return render(request, 'custfeedback.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -687,6 +749,34 @@ def addproducts(request):
     return render(request, 'addproducts.html')
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def adminproductslist(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+
+        # Get the search query from the GET request (if any)
+        search_query = request.GET.get('search', '')
+
+        # If a search query exists, filter products based on the search term
+        if search_query:
+            products = Products_table.objects.filter(product_name__icontains=search_query)
+        else:
+            # Fetch all products if no search query is provided
+            products = Products_table.objects.all()
+
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'products': products,       # Pass the filtered or all products to the template
+            'search_query': search_query,  # Pass the search query to retain the input value in the search bar
+        }
+
+        return render(request, 'adminproductslist.html', context)
+
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+    
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -699,15 +789,21 @@ def productslist(request):
         # Get the search query from the GET request (if any)
         search_query = request.GET.get('search', '')
         
-        # If a search query exists, filter products based on the search term and their status
+        # Filter products added by the logged-in user (matching employee_id with user_id)
         if search_query:
-            products = Products_table.objects.filter(product_name__icontains=search_query, status=True).select_related('employee')
+            products = Products_table.objects.filter(
+                product_name__icontains=search_query,
+                employee_id=user_id  # Use employee_id instead of added_by
+            ).select_related('employee')
         else:
-            # Fetch all available products and the related employee who added them
-            products = Products_table.objects.filter(status=True).select_related('employee')
+            products = Products_table.objects.filter(
+                employee_id=user_id  # Use employee_id instead of added_by
+            ).select_related('employee')
 
-        # Fetch distinct categories from Products_table
-        categories = Products_table.objects.values_list('product_category', flat=True).distinct()
+        # Fetch distinct categories for products added by the logged-in user
+        categories = Products_table.objects.filter(
+            employee_id=user_id
+        ).values_list('product_category', flat=True).distinct()
         
         context = {
             'username': user.username,  # Pass the username to the template
@@ -720,6 +816,7 @@ def productslist(request):
     
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
 
     
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -750,32 +847,108 @@ def custproductslist(request):
 
     
 
+# def productdetails(request):
+#     if request.method == 'POST':
+#         product_id = request.POST.get('product_id')
+#         product = get_object_or_404(Products_table, product_id=product_id)
+#         images = product.images.all()  # Get associated images
+
+#         # Wishlist addition logic remains the same
+#         if 'add_to_wishlist' in request.POST:
+#             user_id = request.session.get('user_id')
+#             if user_id:
+#                 user = Users_table.objects.get(user_id=user_id)
+#                 wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
+
+#                 if created:
+#                     messages.success(request, f'{product.product_name} added to wishlist successfully!')
+#                 else:
+#                     messages.info(request, f'{product.product_name} is already in your wishlist.')
+#             else:
+#                 messages.error(request, 'You need to log in to add to your wishlist.')
+
+#         context = {
+#             'product': product,
+#             'images': images,
+#         }
+#         return render(request, 'productdetails.html', context)
+
+
 def productdetails(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
         product = get_object_or_404(Products_table, product_id=product_id)
         images = product.images.all()  # Get associated images
 
-        # Wishlist addition logic remains the same
+        # Wishlist addition logic
         if 'add_to_wishlist' in request.POST:
-            user_id = request.session.get('user_id')
-            if user_id:
-                user = Users_table.objects.get(user_id=user_id)
-                wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
+            wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
 
-                if created:
-                    messages.success(request, f'{product.product_name} added to wishlist successfully!')
-                else:
-                    messages.info(request, f'{product.product_name} is already in your wishlist.')
+            if created:
+                messages.success(request, f'{product.product_name} added to wishlist successfully!')
             else:
-                messages.error(request, 'You need to log in to add to your wishlist.')
+                messages.info(request, f'{product.product_name} is already in your wishlist.')
+
+        # Fetch feedbacks for the current product
+        feedbacks = Feedback_table.objects.filter(product=product).order_by('-created_at')
 
         context = {
             'product': product,
             'images': images,
+            'username': user.username,  # Pass the username to the template
+            'feedbacks': feedbacks,  # Pass feedbacks to the template
         }
         return render(request, 'productdetails.html', context)
 
+    # If not a POST request, simply pass the user's username
+    context = {
+        'username': user.username,
+    }
+    return render(request, 'productdetails.html', context)
+
+
+
+# def productdetails(request):
+#     user_id = request.session.get('user_id')  # Retrieve user_id from the session
+
+#     if not user_id:
+#         return redirect('login')  # Redirect to login if no user is logged in
+
+#     user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+
+#     if request.method == 'POST':
+#         product_id = request.POST.get('product_id')
+#         product = get_object_or_404(Products_table, product_id=product_id)
+#         images = product.images.all()  # Get associated images
+
+#         # Wishlist addition logic
+#         if 'add_to_wishlist' in request.POST:
+#             wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
+
+#             if created:
+#                 messages.success(request, f'{product.product_name} added to wishlist successfully!')
+#             else:
+#                 messages.info(request, f'{product.product_name} is already in your wishlist.')
+
+#         context = {
+#             'product': product,
+#             'images': images,
+#             'username': user.username,  # Pass the username to the template
+#         }
+#         return render(request, 'productdetails.html', context)
+
+#     # If not a POST request, simply pass the user's username
+#     context = {
+#         'username': user.username,
+#     }
+#     return render(request, 'productdetails.html', context)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -830,7 +1003,7 @@ def editproduct(request):
             products = Products_table.objects.filter(product_name__icontains=search_query)
         else:
             # Fetch all products if no search query is provided
-            products = Products_table.objects.all()
+            products = Products_table.objects.filter(employee_id=user_id)
 
         context = {
             'username': user.username,  # Pass the username to the template
@@ -886,7 +1059,7 @@ def restoreproduct(request, product_id):
     return redirect('editproduct')  # Redirect to the product listing page
 
 
-def productstock(request):
+def adminproductstock(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
     
@@ -902,32 +1075,105 @@ def productstock(request):
             'username': user.username,
             'products': products
         }
+        return render(request, 'adminproductstock.html', context)
+    else:
+        # Redirect to login if user is not authenticated
+        return redirect('login')
+    
+
+
+def productstock(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch all products from the Products_table
+        products = Products_table.objects.filter(employee_id=user_id)
+        
+        # Pass both the username and products to the template
+        context = {
+            'username': user.username,
+            'products': products
+        }
         return render(request, 'productstock.html', context)
     else:
         # Redirect to login if user is not authenticated
         return redirect('login')
 
 
+# def preorder(request):
+#     if request.method == "POST":
+#         # Handle form submission
+#         user_id = request.session.get('user_id')
+#         if not user_id:
+#             messages.error(request, "Please log in to place a pre-order.")
+#             return redirect("login")
+
+#         user = Users_table.objects.get(user_id=user_id)
+#         product_id = request.POST.get("product_id")
+#         product = get_object_or_404(Products_table, product_id=product_id)
+
+#         # Get form data and validate
+#         quantity = int(request.POST.get("quantity"))
+#         date_of_delivery = request.POST.get("date_of_delivery")
+#         additional_notes = request.POST.get("additional_notes", "")
+
+#         if quantity > product.product_quantity:
+#             messages.error(request, "Quantity exceeds available stock.")
+#             return redirect("preorder")  # Or reload with context for errors
+
+#         # Create new pre-order
+#         PreOrder.objects.create(
+#             product=product,
+#             quantity=quantity,
+#             date_of_delivery=date_of_delivery,
+#             additional_notes=additional_notes,
+#             user=user
+#         )
+
+#         messages.success(request, f"Your pre-order for {product.product_name} was successfully placed!")
+#         # Redirect to the same page to display success message
+#         return redirect(request.path + '?product_id=' + str(product_id))
+
+#     # GET request to display the form
+#     product_id = request.GET.get("product_id")
+#     if not product_id:
+#         messages.error(request, "Product not found.")
+#         return redirect("custproductslist")
+
+#     product = get_object_or_404(Products_table, product_id=product_id)
+#     return render(request, "preorder.html", {"product": product})
+
 def preorder(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+
+    if not user_id:
+        messages.error(request, "Please log in to place a pre-order.")
+        return redirect("login")  # Redirect to login if no user is logged in
+
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+
     if request.method == "POST":
         # Handle form submission
-        user_id = request.session.get('user_id')
-        if not user_id:
-            messages.error(request, "Please log in to place a pre-order.")
-            return redirect("login")
-
-        user = Users_table.objects.get(user_id=user_id)
         product_id = request.POST.get("product_id")
         product = get_object_or_404(Products_table, product_id=product_id)
 
         # Get form data and validate
-        quantity = int(request.POST.get("quantity"))
+        try:
+            quantity = int(request.POST.get("quantity"))
+        except (TypeError, ValueError):
+            messages.error(request, "Please enter a valid quantity.")
+            return redirect(request.path + f'?product_id={product_id}')
+
         date_of_delivery = request.POST.get("date_of_delivery")
         additional_notes = request.POST.get("additional_notes", "")
 
         if quantity > product.product_quantity:
             messages.error(request, "Quantity exceeds available stock.")
-            return redirect("preorder")  # Or reload with context for errors
+            return redirect(request.path + f'?product_id={product_id}')  # Reload page with error message
 
         # Create new pre-order
         PreOrder.objects.create(
@@ -940,7 +1186,7 @@ def preorder(request):
 
         messages.success(request, f"Your pre-order for {product.product_name} was successfully placed!")
         # Redirect to the same page to display success message
-        return redirect(request.path + '?product_id=' + str(product_id))
+        return redirect(request.path + f'?product_id={product_id}')
 
     # GET request to display the form
     product_id = request.GET.get("product_id")
@@ -949,7 +1195,13 @@ def preorder(request):
         return redirect("custproductslist")
 
     product = get_object_or_404(Products_table, product_id=product_id)
-    return render(request, "preorder.html", {"product": product})
+
+    # Pass the product details and username to the template
+    context = {
+        "product": product,
+        "username": user.username,  # Pass the username to the template
+    }
+    return render(request, "preorder.html", context)
 
 
 def preorderlisting(request):
@@ -970,13 +1222,40 @@ def preorderlisting(request):
     
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def animalslist(request):
+def adminanimalslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
         
         # Fetch all animals with their related images
         animals = Animals_table.objects.prefetch_related('images').all()  # Use the correct related name
+        
+        # Calculate the age of each animal in years based on date_of_birth
+        for animal in animals:
+            # Assuming 'date_of_birth' is the field that indicates the animal's birthdate
+            if animal.date_of_birth:
+                current_date = timezone.now().date()  # Get the current date
+                animal_age_years = (current_date - animal.date_of_birth).days // 365  # Calculate age in years
+                animal.age_in_years = animal_age_years  # Add a custom attribute to hold the age
+
+        context = {
+            'username': user.username,  # Pass the username to the template
+            'animals': animals,         # Pass the list of animals to the template
+        }
+        return render(request, 'adminanimalslist.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+    
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def animalslist(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        
+        # Fetch all animals with their related images
+        animals = Animals_table.objects.filter(added_by=user_id).prefetch_related('images').all()  # Use the correct related name
         
         # Calculate the age of each animal in years based on date_of_birth
         for animal in animals:
@@ -1000,7 +1279,6 @@ def addanimal(request):
     if request.method == 'POST':
         # Fetch form data
         animal_name = request.POST.get('animal_name')
-        animal_category = request.POST.get('animal_type')
         breed = request.POST.get('breed')
         date_of_birth = request.POST.get('date_of_birth') if request.POST.get('date_of_birth') else None
         gender = request.POST.get('gender')
@@ -1015,7 +1293,6 @@ def addanimal(request):
         # Create a new animal record with the user instance in the added_by field
         animal = Animals_table.objects.create(
             animal_name=animal_name,
-            animal_category=animal_category,
             breed=breed,
             date_of_birth=date_of_birth,
             gender=gender,
@@ -1133,7 +1410,7 @@ def update_health_record(request, health_id):
     return render(request, 'update_health_record.html', {'health_record': health_record})
 
 
-def milkdetails(request):
+def adminmilkdetails(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
     
@@ -1143,6 +1420,32 @@ def milkdetails(request):
         
         # Fetch animals and related images
         animals = Animals_table.objects.prefetch_related('images').all()
+        
+        # Prepare context with username and animals
+        context = {
+            'username': user.username,  # Pass the username
+            'animals': animals,         # Pass the animals
+        }
+        
+        # Render the milkdetails.html page with context
+        return render(request, 'adminmilkdetails.html', context)
+    
+    else:
+        # If user is not authenticated, redirect to the login page
+        return redirect('login')
+    
+
+
+def milkdetails(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch animals and related images
+        animals = Animals_table.objects.prefetch_related('images').filter(added_by=user_id)
         
         # Prepare context with username and animals
         context = {
@@ -1505,9 +1808,7 @@ def checkoutorder(request):
     })
 
 
-
-
-def stocknotification(request):
+def adminstocknotification(request):
     # Fetch unread notifications
     notifications = Notifications_table.objects.filter(is_read=False).order_by('-created_at')
     
@@ -1520,10 +1821,40 @@ def stocknotification(request):
     # Fetch all notifications (to display both read and unread)
     all_notifications = Notifications_table.objects.all().order_by('-created_at')
     
-    return render(request, 'stocknotification.html', {
+    return render(request, 'adminstocknotification.html', {
         'notifications': all_notifications,
         'unread_count': unread_count  # Pass the unread count to the template
     })
+
+
+def stocknotification(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+
+        # Fetch products added by the logged-in user (assuming Products_table has a reference to the user)
+        user_products = Products_table.objects.filter(employee=user)
+
+        # Fetch all notifications related to the logged-in user's products
+        notifications = Notifications_table.objects.filter(
+            product__in=user_products  # Only get notifications related to the products of this user
+        ).order_by('-created_at')
+
+        # Get the count of unread notifications
+        unread_count = notifications.filter(is_read=False).count()
+
+        # Mark all fetched notifications as read
+        notifications.filter(is_read=False).update(is_read=True)
+
+        return render(request, 'stocknotification.html', {
+            'notifications': notifications,
+            'unread_count': unread_count  # Pass the unread count to the template
+        })
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
 
 
 
