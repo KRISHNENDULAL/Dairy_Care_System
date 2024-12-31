@@ -4,6 +4,7 @@
 <head>
     <title>Farm Owner Page</title>
     <link rel="stylesheet" href="{% static 'css/farmownerpage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
         body {
             background: url('{% static "images/farmownerpg.jpg" %}') no-repeat center center fixed;
@@ -29,44 +30,12 @@
             padding: 2px 5px;
             font-size: 15px;
         }
-
-        /* Dropdown Menu Styles */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #ddd;
-        }
-
-        /* Style for the down and up arrows */
-        .arrow {
-            margin-left: 10px;
-            font-size: 14px;
-        }
-
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 
@@ -74,25 +43,11 @@
     <div id="mySidenav" class="sidenav">
         <a href="#">Dairy Care System</a><br><br>
         <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a><br>
-        <!-- Animals List Dropdown -->
-        <!-- <div class="dropdown">
-            <a href="javascript:void(0)" onclick="toggleDropdown()"><i class="fas fa-shopping-basket"></i>  Products List <span id="arrow" class="arrow">&#9660;</span></a><br>
-            <div class="dropdown-content" id="productDropdown">
-                <a href="{% url 'productslist' %}">View Products</a>
-                <a href="{% url 'addproducts' %}">Add Products</a>
-            </div>
-        </div><br> -->
-        
-        <!-- Animals List Dropdown -->
-        <div class="dropdown">
-            <a href="javascript:void(0)" onclick="toggleDropdown()"><i class="fas fa-paw"></i> Animals List <span id="arrow" class="arrow">&#9660;</span></a><br>
-            <div class="dropdown-content" id="animalDropdown">
-                <a href="{% url 'animalslist' %}">View Animals</a>
-                <a href="{% url 'addanimal' %}">Add Animal</a>
-            </div>
-        </div><br>
-        
+        <a href="{% url 'addproducts' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
+        <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>  Animals List</a><br>
+        <a href="{% url 'addanimal' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
         <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
+        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
         <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
     </div>
@@ -110,7 +65,7 @@
                 </li>
             </div>
         </div>
-    </ul>
+    </ul><br><br><br><br><br><br><br>
 
     <center>
         <div class="message">
@@ -119,10 +74,10 @@
         </div><br><br>
         <div class="quote">
             A true dairy farm owner nurtures the herd, the land, and the community that benefits from it.
-        </div><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div><br><br><br><br><br><br><br><br><br><br><br>
 
         <footer>
-            <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+            <b><p>&copy; 2024 Dairy Care System. All rights reserved.</p></b>
         </footer>
     </center>
 
@@ -131,54 +86,24 @@
 
     <script>
         // Toggle dropdown on click
-        function toggleDropdown() {
-            var dropdown = document.getElementById("productDropdown");
-            var arrow = document.getElementById("arrow");
+    function toggleDropdown() {
+        var dropdown = document.getElementById("dropdown-content");
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        } else {
+            dropdown.style.display = "block";
+        }
+    }
 
-            // Toggle the visibility of the dropdown content
+    // Close the dropdown if clicked outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('.username')) {
+            var dropdown = document.getElementById("dropdown-content");
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
-                arrow.innerHTML = "&#9660;"; // Down arrow
-            } else {
-                dropdown.style.display = "block";
-                arrow.innerHTML = "&#9650;"; // Up arrow
             }
         }
-
-        // Close the dropdown if clicked outside of it
-        window.onclick = function(event) {
-            var dropdown = document.getElementById("productlDropdown");
-            var arrow = document.getElementById("arrow");
-            if (!event.target.matches('.dropdown a')) {
-                dropdown.style.display = "none";
-                arrow.innerHTML = "&#9660;"; // Down arrow
-            }
-        }
-
-        // Toggle dropdown on click
-        function toggleDropdown() {
-            var dropdown = document.getElementById("animalDropdown");
-            var arrow = document.getElementById("arrow");
-
-            // Toggle the visibility of the dropdown content
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-                arrow.innerHTML = "&#9660;"; // Down arrow
-            } else {
-                dropdown.style.display = "block";
-                arrow.innerHTML = "&#9650;"; // Up arrow
-            }
-        }
-
-        // Close the dropdown if clicked outside of it
-        window.onclick = function(event) {
-            var dropdown = document.getElementById("animalDropdown");
-            var arrow = document.getElementById("arrow");
-            if (!event.target.matches('.dropdown a')) {
-                dropdown.style.display = "none";
-                arrow.innerHTML = "&#9660;"; // Down arrow
-            }
-        }
+    }
 
         // Custom SweetAlert2 logout confirmation
         function confirmLogout() {

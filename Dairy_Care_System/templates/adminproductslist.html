@@ -329,6 +329,8 @@ h2 {
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
+
+
 <body>
 <!-- Navigation Bar-->
 <ul>
@@ -373,7 +375,7 @@ h2 {
             <p><strong>Added at:</strong> {{ product.added_at }}</p>
             <p><strong>Updated at:</strong> {{ product.updated_at }}</p><br><br>
             <div class="button-group" style="display: flex; justify-content: space-between;">
-                <a href="{% url 'updateproduct' product.product_id %}" class="update-button"><i class="fa fa-edit" aria-hidden="true"></i> Update</a>
+                <!-- <a href="{% url 'updateproduct' product.product_id %}" class="update-button"><i class="fa fa-edit" aria-hidden="true"></i> Update</a> -->
                 
                 {% if product.status %}
                     <a href="#" onclick="openModal('delete', '{% url 'deleteproduct' product.product_id %}', '{{ product.product_name }}');" class="delete-button"><i class="fas fa-trash"></i> <b>Delete</b></a>

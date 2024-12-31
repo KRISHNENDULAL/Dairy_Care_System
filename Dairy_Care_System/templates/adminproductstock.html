@@ -122,17 +122,6 @@
             text-shadow: 2px 2px 5px rgba(74, 72, 72, 0.1);
         }
 
-        /* table {
-            width: 110%;
-            border-collapse: collapse;
-            margin-left: 2px;
-            margin-top: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        } */
-
         th, td {
             padding: 15px;
             text-align: left;
@@ -148,8 +137,9 @@
         }
 
         td {
+            text-align: center;
             background-color: #fafafa;
-            color: #333;
+            color: #000000;
         }
 
         tr:nth-child(even) td {
@@ -161,18 +151,18 @@
         }
 
         .back-link {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 25px;
-    color: black;
-    text-decoration: none;
-    font-family: 'Comic Sans MS', cursive;
-}
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 25px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
 
-.back-link:hover {
-    text-decoration: underline;
-}
+        .back-link:hover {
+            text-decoration: underline;
+        }
 
         @media (max-width: 768px) {
             table, th, td {
@@ -189,24 +179,9 @@
     
 </head>
 <body>
-    <!-- Navigation Bar-->
-<!-- <ul>
-    <div class="header">
-        <div class="nav-item">
-            <li>
-                <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                <div class="dropdown-content" id="dropdown-content">
-                    <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                    <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-            </li>
-        </div>
-    </div>
-</ul> -->
 
 <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
 <br>
-
 
     <h1><u><strong>Stock Details</strong></u></h1><br>
     <div class="table-container">
@@ -230,10 +205,10 @@
                 <td>{{ product.product_category }}</td>
                 <td>{{ product.product_description }}</td>
                 <td>{{ product.product_quantity }} {{ product.quantity_unit }}</td>
-                <td>{{ product.status|yesno:"Available,Not Available" }}</td>
+                <td>{{ product.status|yesno:"Available,Unavailable" }}</td>
                 <td>{{ product.employee.username }}</td>
-                <td>{{ product.added_at|date:"Y-m-d H:i" }}</td>
-                <td>{{ product.updated_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ product.added_at|date:"M. d, Y; H:i" }}</td>
+                <td>{{ product.updated_at|date:"M. d, Y; H:i" }}</td>
             </tr>
             {% empty %}
             <tr>

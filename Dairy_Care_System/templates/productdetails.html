@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <title>{{ product.product_name }} - Product Details</title>
-    <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
         /* General reset */
         * {
@@ -306,15 +306,6 @@
                 <div class="quantity-input">
                     <label for="quantity"><strong>Enter Quantity:</strong></label>
                     <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.product_quantity }}" placeholder="Quantity" required>
-
-
-                    <!-- <select id="quantityUnit" name="quantity_unit" class="unit-select">
-                        <option value="" disabled selected>Select Unit</option>
-                        <option value="litres">Litres (l)</option>
-                        <option value="ml">Millilitres (ml)</option>
-                        <option value="kg">Kilograms (kg)</option>
-                        <option value="g">Grams (g)</option>
-                    </select> -->
                 </div>
                 <br>
 

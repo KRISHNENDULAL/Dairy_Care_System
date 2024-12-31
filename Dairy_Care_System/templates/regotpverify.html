@@ -69,7 +69,7 @@
 
         .header li a:hover {
             background-color: #ddd;
-            border-radius: 5px;
+            border-radius: 30px;
             transform: scale(1.1);
         }
 
@@ -95,6 +95,12 @@
             margin-top: 10px;
             float: left;
             font-size: 30px;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+    
         }
 
         .verify-container {
@@ -104,17 +110,44 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            animation: scaleIn 0.8s ease-out;
+        }
+
+        .verify-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
+            font-size: 40px;
+            margin-bottom: 28px;
+            color: #000000;
+        }
+
+        h2 u {
+            text-decoration: none;
+            border-bottom: 2px solid #0853a4;
+            padding-bottom: 2px;
         }
 
         .form-group {
             margin-bottom: 15px;
             text-align: left;
+            opacity: 0;
+            animation: slideIn 0.5s ease-out forwards;
+            animation-delay: 0.5s;
         }
 
         .form-group label {
@@ -143,6 +176,9 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-delay: 0.7s;
         }
 
         button:hover {
@@ -152,6 +188,9 @@
         .login-link {
             margin-top: 15px;
             font-size: 14px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-delay: 0.9s;
         }
 
         .login-link a {
@@ -168,6 +207,7 @@
             font-size: 15px;
             margin-top: 10px;
             display: none;
+            animation: shake 0.5s ease-out;
         }
 
         footer {
@@ -175,6 +215,34 @@
             color: #ffffff;
             padding: 10px 0;
             position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
     </style>
 </head>
@@ -197,7 +265,7 @@
 <!-- Content Section -->
 <div class="content">
     <div class="verify-container">
-        <h2>Verify Your OTP</h2><br>
+        <h2><u>Verify Your OTP</u></h2><br>
         <form method="POST">
             {% csrf_token %}
             <div class="form-group">

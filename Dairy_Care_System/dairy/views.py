@@ -618,17 +618,32 @@ def adminfeedbackreview(request):
 
 
 def feedbackreview(request):
-    user_id = request.session.get('user_id')  # Retrieve the logged-in user's ID from the session
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
     
     if user_id:
-        # Filter feedback for products added by the logged-in user
-        feedback_list = Feedback_table.objects.filter(
-            product__employee_id=user_id
-        ).select_related('user', 'product__employee').order_by('-created_at')
+        try:
+            # Fetch the user object using user_id
+            user = Users_table.objects.get(user_id=user_id)
+            
+            # Filter feedback for products added by the logged-in user
+            feedback_list = Feedback_table.objects.filter(
+                product__employee_id=user_id
+            ).select_related('user', 'product__employee').order_by('-created_at')
+            
+            # Prepare the context for the template
+            context = {
+                'username': user.username,  # Pass the username to the template
+                'feedback_list': feedback_list,  # Pass the feedback list to the template
+            }
+            
+            return render(request, 'feedbackreview.html', context)
         
-        return render(request, 'feedbackreview.html', {'feedback_list': feedback_list})
+        except Users_table.DoesNotExist:
+            return redirect('login')  # Redirect to login if user does not exist
+    
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
     
 
 def custfeedback(request):
@@ -1081,6 +1096,27 @@ def adminproductstock(request):
         return redirect('login')
     
 
+def farmerproductstock(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Fetch all products from the Products_table
+        products = Products_table.objects.filter(employee_id=user_id)
+        
+        # Pass both the username and products to the template
+        context = {
+            'username': user.username,
+            'products': products
+        }
+        return render(request, 'farmerproductstock.html', context)
+    else:
+        # Redirect to login if user is not authenticated
+        return redirect('login')
+    
 
 def productstock(request):
     # Retrieve user_id from the session
@@ -1830,31 +1866,36 @@ def adminstocknotification(request):
 def stocknotification(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
-
+    
     if user_id:
         # Fetch the user object using user_id
         user = Users_table.objects.get(user_id=user_id)
-
+        
         # Fetch products added by the logged-in user (assuming Products_table has a reference to the user)
         user_products = Products_table.objects.filter(employee=user)
-
+        
         # Fetch all notifications related to the logged-in user's products
         notifications = Notifications_table.objects.filter(
             product__in=user_products  # Only get notifications related to the products of this user
         ).order_by('-created_at')
-
+        
         # Get the count of unread notifications
         unread_count = notifications.filter(is_read=False).count()
-
+        
         # Mark all fetched notifications as read
         notifications.filter(is_read=False).update(is_read=True)
-
-        return render(request, 'stocknotification.html', {
+        
+        # Prepare the context for rendering the template
+        context = {
             'notifications': notifications,
-            'unread_count': unread_count  # Pass the unread count to the template
-        })
+            'unread_count': unread_count,  # Pass the unread count to the template
+            'username': user.username,  # Pass the username to the template
+        }
+        return render(request, 'stocknotification.html', context)
     else:
-        return redirect('login')  # Redirect to login if no user is logged in
+        # Redirect to login if no user is logged in
+        return redirect('login')
+
 
 
 

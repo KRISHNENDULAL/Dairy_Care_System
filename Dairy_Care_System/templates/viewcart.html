@@ -7,7 +7,7 @@
     <!-- Include Google Fonts and Font Awesome for icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <!-- Custom CSS -->
     <style>
         body {
@@ -135,37 +135,37 @@
         }
 
         .checkout {
-    display: flex;
-    justify-content: space-between; /* This will place the two buttons at opposite ends */
-    align-items: center; /* This will vertically align them in the center */
-    margin: 20px 0; /* Add some spacing above and below the buttons */
-}
+            display: flex;
+            justify-content: space-between; /* This will place the two buttons at opposite ends */
+            align-items: center; /* This will vertically align them in the center */
+            margin: 20px 0; /* Add some spacing above and below the buttons */
+        }
 
-.btn-checkout {
-    background-color: #049918;
-    padding: 12px 20px;
-    font-size: 16px;
-    color: white; /* Ensure text is visible on the button */
-    text-decoration: none; /* Remove underline from the anchor */
-    border-radius: 5px; /* Optional: Add rounded corners */
-}
+        .btn-checkout {
+            background-color: #049918;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: white; /* Ensure text is visible on the button */
+            text-decoration: none; /* Remove underline from the anchor */
+            border-radius: 5px; /* Optional: Add rounded corners */
+        }
 
-.btn-checkout:hover {
-    background-color: #08b210;
-}
+        .btn-checkout:hover {
+            background-color: #08b210;
+        }
 
-.btn-shop {
-    background-color: #bb0606;
-    padding: 12px 20px;
-    font-size: 16px;
-    color: white; /* Ensure text is visible on the button */
-    text-decoration: none; /* Remove underline from the anchor */
-    border-radius: 5px; /* Optional: Add rounded corners */
-}
+        .btn-shop {
+            background-color: #bb0606;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: white; /* Ensure text is visible on the button */
+            text-decoration: none; /* Remove underline from the anchor */
+            border-radius: 5px; /* Optional: Add rounded corners */
+        }
 
-.btn-shop:hover {
-    background-color: #e90505;
-}
+        .btn-shop:hover {
+            background-color: #e90505;
+        }
 
 
         .empty-cart {
@@ -261,40 +261,6 @@
             </div>
         </div>
     </ul>
-
-    <!-- Navigation Bar-->
-    <!-- <ul>
-        <div class="header">
-            <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Pre-Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Feedback</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                    <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="{% url 'customerpage' %}"><i class="fas fa-home"></i> Dashboard</a>
-                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </li>
-            </div>
-        </div>
-    </ul> -->
 
 <div class="main-content">
 

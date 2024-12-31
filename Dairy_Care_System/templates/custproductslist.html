@@ -4,7 +4,7 @@
 <head>
     <title>Products Page</title>
     <link rel="stylesheet" href="{% static 'css/custproductslist.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
         body {
             background: url('{% static "images/productslist.jpg" %}') no-repeat center center fixed;
@@ -25,44 +25,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
+
+
 <body>
-
-    <!-- Navigation Bar-->
-    <!-- <ul>
-        <div class="header">
-            <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Pre-Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Feedback</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                    <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="{% url 'customerpage' %}"><i class="fas fa-home"></i> Dashboard</a>
-                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </li>
-            </div>
-        </div>
-    </ul> -->
-
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
+        <!-- <h3>Dairy Care System</h3><br><br><br> -->
         <a href="#"></i> Dairy Care System</a><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
@@ -170,25 +138,6 @@
                 }
             });
         }
-
-        // Toggle the sidebar and shrink/expand the content and header when the hamburger icon is clicked
-        /* function toggleNav() {
-            var sidebar = document.getElementById("sidebar");
-            var header = document.getElementsByClassName("header")[0]; 
-            var mainContent = document.getElementsByClassName("main-content")[0]; 
-
-            if (sidebar.style.left === "0px") {
-                // If the sidebar is open, close it
-                sidebar.style.left = "-250px"; 
-                header.style.marginLeft = "0"; // Reset header margin
-                mainContent.style.marginLeft = "0"; // Reset content margin
-            } else {
-                // If the sidebar is closed, open it
-                sidebar.style.left = "0";
-                header.style.marginLeft = "250px"; // Shrink header when sidebar appears
-                mainContent.style.marginLeft = "250px"; // Shrink content when sidebar appears
-            }
-        } */
     </script>
 
 </body>

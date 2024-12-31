@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Orders</title>
-    <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,21 +84,21 @@
         }
 
         /* Styling for the Cancel Order Button in the order list */
-    .cancel-order-btn {
-        background-color: #e20b21;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 15px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s;
-    }
+        .cancel-order-btn {
+            background-color: #e20b21;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
 
-    .cancel-order-btn:hover {
-        background-color: #e2071d;
-        transform: scale(1.05);
-    }
+        .cancel-order-btn:hover {
+            background-color: #e2071d;
+            transform: scale(1.05);
+        }
 
         /* Modal styles */
         .modal {
@@ -136,51 +136,51 @@
         }
 
         .modal-footer {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between; /* Ensures the buttons are placed at the two ends */
-}
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between; /* Ensures the buttons are placed at the two ends */
+        }
 
         .modal-footer button {
             padding: 10px 20px;
-    font-size: 16px;
-    margin: 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         .confirm-btn {
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s;
-    }
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
 
-    .confirm-btn:hover {
-        background-color: #218838;
-        transform: scale(1.05);
-    }
+        .confirm-btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
 
-    .cancel-btn {
-        background-color: #dc3545;
-        color: white;
-        padding: 10px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s;
-    }
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
 
-    .cancel-btn:hover {
-        background-color: #c82333;
-        transform: scale(1.05);
-    }
+        .cancel-btn:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
 
         .success-message {
             margin-top: 15px;
@@ -229,40 +229,6 @@
             </div>
         </div>
     </ul>
-
-    <!-- Navigation Bar-->
-    <!-- <ul>
-        <div class="header">
-            <div class="nav-item">
-                <li><b><a href="{% url 'custproductslist' %}"><i class="fas fa-shopping-basket"></i> Products List</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'orderhistory' %}"><i class="fas fa-shopping-bag"></i> Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Pre-Orders</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li><b><a href="{% url 'feedbackpage' %}"><i class="fas fa-comments"></i> Feedback</a></b></li>
-            </div>
-            <div class="nav-item">
-                <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
-                    <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="{% url 'customerpage' %}"><i class="fas fa-home"></i> Dashboard</a>
-                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </li>
-            </div>
-        </div>
-    </ul> -->
     <br><br>
 
     <center><h1>Your Orders</h1></center>
@@ -270,7 +236,7 @@
         <!-- Order Cards -->
         {% for order in orders %}
         <div class="order-card">
-            <span>{{ forloop.counter }}</span>
+            <span>{{ order.order_date|date:"M. d, Y" }}</span>
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>

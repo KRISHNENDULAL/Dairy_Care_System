@@ -4,7 +4,7 @@
 <head>
     <title>Customer Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/customerpage.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custheadsidenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
         body {
             background: url('{% static "images/customerpage.jpg" %}') no-repeat center center fixed;
@@ -17,6 +17,171 @@
         .sidenav a i, .dropdown-content a i {
             margin-right: 10px; /* Space between icon and text */
         }
+
+
+    /* Chatbot icon styling */
+    .chatbot-icon {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: linear-gradient(135deg, #3498db, #2ecc71);
+        border-radius: 50%;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .chatbot-icon:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+    }
+
+    .chatbot-icon i {
+        color: white;
+        font-size: 30px;
+    }
+
+    /* Chat Popup Styling */
+    .chat-popup {
+        position: fixed;
+        bottom: 110px;
+        right: 30px;
+        width: 350px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        display: none;
+        z-index: 1000;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .chat-popup-header {
+        background: linear-gradient(135deg, #3498db, #2ecc71);
+        color: white;
+        padding: 20px;
+        font-weight: 600;
+        font-size: 18px;
+        text-align: center;
+        position: relative;
+    }
+
+    .chat-popup-body {
+        padding: 20px;
+        max-height: 350px;
+        overflow-y: auto;
+        background: #f8f9fa;
+    }
+
+    /* Message Styling */
+    .user-message, .bot-message {
+        margin-bottom: 15px;
+        max-width: 80%;
+        clear: both;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .user-message {
+        float: right;
+        background: linear-gradient(135deg, #3498db, #2ecc71);
+        color: white;
+        border-radius: 15px 15px 0 15px;
+        padding: 12px 18px;
+    }
+
+    .bot-message {
+        float: left;
+        background: white;
+        color: #2c3e50;
+        border-radius: 15px 15px 15px 0;
+        padding: 12px 18px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .chat-popup-footer {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-popup-footer input {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        outline: none;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .chat-popup-footer input:focus {
+        border-color: #3498db;
+    }
+
+    .chat-popup-footer button {
+        background: linear-gradient(135deg, #3498db, #2ecc71);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .chat-popup-footer button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Scrollbar Styling */
+    .chat-popup-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-popup-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .chat-popup-body::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+    }
+
+    .chat-popup-body::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
     </style>
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -27,6 +192,7 @@
 
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
+        <!-- <h3>Dairy Care System</h3><br><br><br> -->
         <a href="#"></i> Dairy Care System</a><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
@@ -42,20 +208,17 @@
         <div class="header">
             <div class="nav-item">
                 <li>
-                    <b>
-                        <a href="#" class="username" onclick="toggleDropdown()">
-                            <i class="fas fa-user-circle"></i> {{ username }}
-                        </a>
-                    </b>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <!-- Change Logout link to trigger a custom SweetAlert -->
-                        <a href="#" onclick="confirmLogout()" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </li>
             </div>
         </div>
-    </ul><br><br><br>
+    </ul>
+
+    <br><br><br>
 
     <center>
         <!-- Message and Quote -->
@@ -65,12 +228,92 @@
         </div><br><br>
         <div class="quote">
             A satisfied customer is the best business strategy of all.
-        </div><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
         <footer>
             <b><p>&copy; 2024 Dairy Care System. All rights reserved.</p></b>
         </footer>
     </center>
+
+    <!-- Chatbot Icon -->
+<div class="chatbot-icon" onclick="toggleChatPopup()">
+    <i class="fas fa-comments"></i>
+</div>
+
+<!-- Chatbot Popup -->
+<div class="chat-popup" id="chatPopup">
+    <div class="chat-popup-header">
+        Chat Assistant
+    </div>
+    <div class="chat-popup-body" id="chatBody">
+        <!-- Chat messages will appear here -->
+    </div>
+    <div class="chat-popup-footer">
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Toggle Chat Popup Visibility with animation
+    function toggleChatPopup() {
+        const chatPopup = document.getElementById('chatPopup');
+        if (chatPopup.style.display === 'block') {
+            chatPopup.style.animation = 'slideUp 0.3s ease-out reverse';
+            setTimeout(() => {
+                chatPopup.style.display = 'none';
+            }, 300);
+        } else {
+            chatPopup.style.display = 'block';
+            chatPopup.style.animation = 'slideUp 0.3s ease-out';
+            // Focus on input when chat opens
+            document.getElementById('chatInput').focus();
+        }
+    }
+
+    // Handle Sending Message
+    function sendMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const chatBody = document.getElementById('chatBody');
+        const message = chatInput.value.trim();
+
+        if (message) {
+            // Add user message
+            appendMessage('user', message);
+            chatInput.value = '';
+
+            // Simulate bot response
+            setTimeout(() => {
+                const responses = [
+                    "How can I help you today?",
+                    "I'm here to assist with your dairy product needs!",
+                    "Let me know if you have any questions about our products.",
+                    "I'd be happy to help you find what you're looking for."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                appendMessage('bot', randomResponse);
+            }, 1000);
+        }
+    }
+
+    // Append message to chat
+    function appendMessage(type, text) {
+        const chatBody = document.getElementById('chatBody');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = type === 'user' ? 'user-message' : 'bot-message';
+        messageDiv.textContent = text;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // Handle Enter key press
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

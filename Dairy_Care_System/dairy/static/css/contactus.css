@@ -28,7 +28,7 @@ li a {
 
 li a:hover {
     background-color: #ddd;
-    border-radius: 5px;
+    border-radius: 30px;
     transform: scale(1.1); /* Scale up the item on hover */
 }
 
@@ -42,6 +42,14 @@ li a:hover {
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
 }
 
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.15),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
 h1 {
     text-align: center;
     color: black;
@@ -51,22 +59,105 @@ h1 {
     font-family: Copperplate, Papyrus, fantasy;
 }
 
+h1 u {
+    text-decoration: none;
+    border-bottom: 3px solid #0853a4;
+    padding-bottom: 2px;
+}
+
 p.description {
     text-align: center;
-    font-size: 16px;
+    font-size: 17px;
     color: rgb(131, 72, 27);
     margin-bottom: 30px;
+    line-height: 1.6;
+    
 }
 
 .contact-info {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     font-size: 16px;
     color: black;
     margin-bottom: 20px;
 }
 
 .contact-info div {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    animation: slideIn 0.5s ease-out forwards;
+    transition: transform 0.3s ease;
 }
+
+.contact-info div:hover {
+    transform: translateX(10px);
+    background: rgba(8, 83, 164, 0.1);
+}
+
+.contact-info div i {
+    margin-right: 15px;
+    color: #0853a4;
+    font-size: 20px;
+    width: 25px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.contact-info div:hover i {
+    transform: scale(1.2);
+}
+
+.contact-info strong {
+    color: #0853a4;
+    margin-right: 8px;
+}
+
+/* Google Maps iframe styling */
+.contact-info iframe {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.contact-info iframe:hover {
+    transform: scale(1.02);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animation delays for contact info items */
+.contact-info div:nth-child(1) { animation-delay: 0.2s; }
+.contact-info div:nth-child(2) { animation-delay: 0.4s; }
+.contact-info div:nth-child(3) { animation-delay: 0.6s; }
+.contact-info div:nth-child(4) { animation-delay: 0.8s; }
 
 .header {
     display: flex;
@@ -89,10 +180,16 @@ p.description {
     margin-top: 10px; /* Space from the top of the header */
     float: left; /* Aligns the icon to the left */
     font-size: 30px; /* Increase the size of the icon (adjust as needed) */
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.home-icon:hover {
+    transform: scale(1.1);
+    
 }
 
 footer {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 50px;
     color: black;
 }

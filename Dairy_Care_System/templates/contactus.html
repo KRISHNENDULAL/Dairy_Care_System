@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
     <link rel="stylesheet" href="{% static 'css/contactus.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
     <style>
         body {
@@ -15,18 +16,15 @@
         }
 
         footer {
-    position: absolute;
-    bottom: 20px; /* Adjust this value to move it upwards */
-    width: 98%;
-    text-align: center;
-    color: black;
-}
+            position: absolute;
+            bottom: 20px; /* Adjust this value to move it upwards */
+            width: 98%;
+            text-align: center;
+            color: black;
+        }
     </style>
 </head>
 <body>
-    <!-- <a href="{% url 'home' %}" class="home-link">
-        <img src="{% static 'images/homeblack.jpg' %}" alt="Home">
-    </a> -->
 
 <!-- Navigation Bar -->
 <ul>
@@ -57,7 +55,12 @@
         </p>
         <div class="contact-info">
             <div><i class="fas fa-user" style="margin-right: 10px; color: #0853a4;"></i> <strong>Name:</strong> Admin</div><br>
-            <div><i class="fas fa-envelope" style="margin-right: 10px; color: #0853a4;"></i> <strong>Email:</strong> dairycaresystem25@gmail.com</div><br>
+            <div>
+                <i class="fas fa-envelope" style="margin-right: 10px; color: #0853a4;"></i> 
+                <strong>Email:</strong> 
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=dairycaresystem25@gmail.com" target="_blank">dairycaresystem25@gmail.com</a>
+            </div>
+            <br>
             <div><i class="fas fa-phone" style="margin-right: 10px; color: #0853a4;"></i> <strong>Phone Number:</strong> 8547045699</div><br>
             <div>
              <!-- Google Map Embed -->
@@ -66,10 +69,13 @@
               width="350" height="100" style="border:0;" 
               allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
             </iframe>
-        </div>
-    </div></div>
-    <center><footer>
-        <b><p>&copy; 2024 Dairy Care System. All rights reserved.</p></b>
-    </center></footer>
+            </div>
+        </div><br><br>
+        <footer>
+            <b><p>&copy; 2024 Dairy Care System. All rights reserved.</p></b>
+        </footer>
+    </div>
+    
+    
 </body>
 </html>

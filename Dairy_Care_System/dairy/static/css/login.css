@@ -4,6 +4,7 @@
     align-items: center;
     height: 107vh;
     padding-right: 150px; /* Adjust as needed for spacing from the right edge */
+    animation: fadeIn 0.8s ease-out; /* Add container animation */
 }
 
 .login-box {
@@ -13,6 +14,7 @@
     padding: 30px;
     width: 350px;
     text-align: center;
+    animation: slideIn 0.8s ease-out; /* Add login-box animation */
 }
 
 h2 {
@@ -25,7 +27,12 @@ h2 {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
+    opacity: 0;
+    animation: slideUp 0.5s ease-out forwards;
 }
+
+.form-group:nth-child(1) { animation-delay: 0.3s; }
+.form-group:nth-child(2) { animation-delay: 0.6s; }
 
 .form-group label {
     width: 100px; /* Adjust width as needed */
@@ -60,6 +67,9 @@ h2 {
 .forgot-password {
     margin-top: 20px;
     font-size: 14px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: 0.8s;
 }
 
 .google-signin {
@@ -71,6 +81,9 @@ h2 {
     padding: 10px;
     margin-top: 10px;
     cursor: pointer;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: 1.2s;
 }
 
 .google-signin img {
@@ -82,18 +95,6 @@ h2 {
     font-size: 16px;
 }
 
-/* .home-link {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    text-decoration: none;
-}
-
-.home-link img {
-    width: 50px;
-    height: 50px;
-} */
-
 /* Home Icon Style */
 .home-icon {
     color: #000000; /* Color for the home icon */
@@ -101,6 +102,12 @@ h2 {
     margin-top: 10px; /* Space from the top of the header */
     float: left; /* Aligns the icon to the left */
     font-size: 30px; /* Increase the size of the icon (adjust as needed) */
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.home-icon:hover {
+    transform: scale(1.1);
+    
 }
 
 .error-message {
@@ -161,35 +168,74 @@ footer {
 }
 
 ul {
-list-style-type: none;
-margin: 0; /* Remove default margin */
-padding: 5px; /* You can adjust this as needed */
-overflow: hidden;
-background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
-position: fixed; /* Fix the header to the top */
-top: 0; /* Align to the top of the viewport */
-left: 0; /* Align to the left of the viewport */
-right: 0; /* Align to the right of the viewport */
-z-index: 1000; /* Ensure it stays above other content */
+    list-style-type: none;
+    margin: 0; /* Remove default margin */
+    padding: 5px; /* You can adjust this as needed */
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.8); /* Light background for header */
+    position: fixed; /* Fix the header to the top */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left of the viewport */
+    right: 0; /* Align to the right of the viewport */
+    z-index: 1000; /* Ensure it stays above other content */
 }
 
 li {
-float: right;
-margin-right: 10px;
-font-size: 20px;
+    float: right;
+    margin-right: 10px;
+    font-size: 20px;
 }
 
 li a {
-display: block;
-color: black;
-text-align: center;
-text-decoration: none;
-padding: 10px 12px;
-transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform to transition */
+    display: block;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    padding: 10px 12px;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform to transition */
 }
 
 li a:hover {
-background-color: #ddd;
-border-radius: 5px;
-transform: scale(1.1); /* Scale up the item on hover */
+    background-color: #ddd;
+    border-radius: 30px;
+    transform: scale(1.1); /* Scale up the item on hover */
+}
+
+/* Add animation keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Add hover effect to the login box */
+.login-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
