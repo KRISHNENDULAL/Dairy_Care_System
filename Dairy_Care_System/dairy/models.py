@@ -83,7 +83,8 @@ class Notifications_table(models.Model):
     message = models.CharField(max_length=255)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    product = models.ForeignKey(Products_table, on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(Products_table, on_delete=models.CASCADE)
+    farmer = models.ForeignKey(Users_table, on_delete=models.CASCADE)
 
 
 
@@ -94,6 +95,8 @@ class PreOrder(models.Model):
     date_of_delivery = models.DateField(blank=True, null=True)
     additional_notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    farmer = models.ForeignKey(Users_table, on_delete=models.CASCADE, related_name="products")
+    status = models.CharField(max_length=10, default="Pending")  # New field for order status
 
     def __str__(self):
         return f"Pre-Order: {self.product.product_name} by {self.user.username}"

@@ -20,6 +20,7 @@ li {
 li a {
     display: block;
     color: black;
+    font-size: 17px;
     text-align: center;
     text-decoration: none;
     padding: 10px 12px;
@@ -27,7 +28,6 @@ li a {
 }
 
 li a:hover {
-    background-color: #ddd;
     border-radius: 30px;
     transform: scale(1.1); /* Scale up the item on hover */
 }

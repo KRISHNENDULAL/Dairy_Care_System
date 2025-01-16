@@ -240,6 +240,7 @@
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
+            <a href="#" class="view-summary"><strong>Track Order</strong></a>
             <!-- Cancel Order Button -->
             {% if order.get_status_display != "Canceled" %}
             <button class="cancel-order-btn" data-order-id="{{ order.id }}">Cancel Order</button>
@@ -380,3 +381,4 @@ goBackBtn.onclick = function() {
 </body>
 
 </html>
+

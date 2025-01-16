@@ -75,6 +75,22 @@
             background-color: #f1f1f1;
         }
 
+        /* .button-pending {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button-placed {
+            background-color: green;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        } */
+
         /* Footer Styles */
         .footer {
             text-align: center;
@@ -91,6 +107,7 @@
 <body>
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
+        <!-- <h3>Dairy Care System</h3><br><br><br> -->
         <a href="#"></i> Dairy Care System</a><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
@@ -120,7 +137,7 @@
             </div>
         </div>
     </ul>
-    <br><br>
+    <br><br><br>
 
     <center><h1>Your Pre-Orders</h1></center>
     <div class="container">
@@ -130,10 +147,12 @@
                     <tr>
                         <!-- <th>No.</th> -->
                         <th>Product</th>
+                        <th>Owner</th>
                         <th>Quantity</th>
                         <th>Date of Delivery</th>
                         <th>Additional Notes</th>
                         <th>Ordered At</th>
+                        <!-- <th>Status</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -145,22 +164,27 @@
                             <a href="{% url 'custproductslist' %}" style="text-decoration: underline; color: #000000;">
                                 <b>{{ preorder.product.product_name }}</b></a>          
                         </td>
+                        <td>{{ preorder.farmer.username }}</td>
                         <td>{{ preorder.quantity }}</td>
                         <td>{{ preorder.date_of_delivery }}</td>
                         <td>{{ preorder.additional_notes }}</td>
                         <td>{{ preorder.created_at }}</td>
+                        <!-- <td>
+                            {% if preorder.status == 'Pending' %}
+                                <button class="button-pending">{{ preorder.status}}</button>
+                            {% elif preorder.status == 'Placed' %}
+                                <button class="button-placed">{{ preorder.status}}</button>
+                            {% endif %}
+                        </td> -->
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p>You have no pre-orders yet.</p>
+            <center><p>No preorders available for your products.</p></center>
         {% endif %}
         <br><br></div>
 
-    <div class="footer"><strong>
-        Thank you for your continued support!
-    </strong></div><br><br><br>
 
     <!-- Font Awesome for icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>

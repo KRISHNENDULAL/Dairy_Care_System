@@ -162,9 +162,11 @@ h2 {
 }
 
 footer {
+    position: absolute;
+    bottom: 5px; 
+    width: 98%;
     text-align: center;
-    margin-top: 10px;
-    color: #000000;
+    color: rgb(0, 0, 0);
 }
 
 ul {
@@ -189,6 +191,7 @@ li {
 li a {
     display: block;
     color: black;
+    font-size: 17px;
     text-align: center;
     text-decoration: none;
     padding: 10px 12px;
@@ -196,7 +199,6 @@ li a {
 }
 
 li a:hover {
-    background-color: #ddd;
     border-radius: 30px;
     transform: scale(1.1); /* Scale up the item on hover */
 }

@@ -130,6 +130,20 @@
             display: block;
         }
 
+        h2 i {
+            animation: bell 2s infinite;
+            color: #000000;
+        }
+        
+        @keyframes bell {
+            0% { transform: rotate(0); }
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-15deg); }
+            60% { transform: rotate(7deg); }
+            80% { transform: rotate(-7deg); }
+            100% { transform: rotate(0); }
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -166,6 +180,7 @@
         <a href="{% url 'addproducts' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
         <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>  Animals List</a>
         <a href="{% url 'addanimal' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+        <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>  Pre-Order Details</a><br>
         <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications
@@ -191,7 +206,7 @@
 
     <div class="notification-wrapper">
         <div class="notification-header">
-            <h2>Notifications on Stock Variations</h2>
+            <h2><i class="fas fa-bell"></i> Notifications on Stock Variations</h2>
         </div><br>
         
         <div class="notification-container">

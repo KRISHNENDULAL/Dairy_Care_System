@@ -49,6 +49,7 @@ urlpatterns = [
     path('restoreproduct/<int:product_id>/',views.restoreproduct, name='restoreproduct'),
     path('productslist',views.productslist,name='productslist'),
     path('productstock',views.productstock,name='productstock'),
+    path('preorderfarm',views.preorderfarm,name='preorderfarm'),
     path('stocknotification', views.stocknotification, name='stocknotification'),
     path('farmerproductstock',views.farmerproductstock,name='farmerproductstock'),
 
@@ -64,6 +65,7 @@ urlpatterns = [
 
 
     path('customerpage',views.customerpage,name='customerpage'),
+    path('chatbot-response/', views.chatbot_response, name='chatbot_response'),
     path('feedbackpage',views.feedbackpage,name='feedbackpage'),
     path('custproductslist',views.custproductslist,name='custproductslist'),
     path('productdetails/', views.productdetails, name='productdetails'),

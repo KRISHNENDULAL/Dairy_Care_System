@@ -37,8 +37,17 @@
     <textarea id="productDescription" name="product_description" rows="4"></textarea>
     <div id="descriptionError" class="error-message"></div>
 
-    <label for="productName">Category:</label>
-    <input type="text" id="productCategory" name="product_category">
+    <label for="productCategory">Category:</label>
+    <select id="productCategory" name="product_category">
+        <option value="" disabled selected>Select a Category</option>
+        <option value="milk">Milk</option>
+        <option value="spreads">Spreads</option>
+        <option value="non-fermented">Non-Fermented</option>
+        <option value="fermented">Fermented</option>
+        <option value="powders">Powders</option>
+        <option value="desserts">Desserts</option>
+        <option value="beverages">Beverages</option>
+    </select>
     <div id="categoryError" class="error-message"></div>
 
     <label for="productQuantity">Stock:</label>

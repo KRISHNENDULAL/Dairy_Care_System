@@ -69,10 +69,11 @@
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
         <a href="#">Dairy Care System</a><br><br>
-        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a><br>
+        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a>
         <a href="{% url 'addproducts' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
-        <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>  Animals List</a><br>
+        <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>  Animals List</a>
         <a href="{% url 'addanimal' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+        <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>  Pre-Order Details</a><br>
         <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications

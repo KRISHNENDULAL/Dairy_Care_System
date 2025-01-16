@@ -75,7 +75,7 @@
                 {% csrf_token %}
                 <!-- <label for="product">Select below:</label> -->
                 <select id="product" name="product" required>
-                    <option value="">--Select to give feedback--</option>
+                    <option value="">--Select your product to give feedback--</option>
                     <!-- <option value="feedback">Overall Feedback</option> -->
                     {% for product in products %}
                         <option value="{{ product.product_id }}">{{ product.product_name }}</option>

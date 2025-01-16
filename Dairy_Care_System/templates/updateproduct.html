@@ -31,6 +31,20 @@
             <textarea id="product_description" name="product_description" required>{{ product.product_description }}</textarea>
             <span class="error" id="productDescriptionError"></span>
 
+            <label for="productCategory">Category:</label>
+            <select id="productCategory" name="product_category" required>
+                <option value="" disabled selected>Select a Category</option>
+                <option value="milk" {% if product.product_category == 'milk' %}selected{% endif %}>Milk</option>
+                <option value="spreads" {% if product.product_category == 'spreads' %}selected{% endif %}>Spreads</option>
+                <option value="non-fermented" {% if product.product_category == 'non-fermented' %}selected{% endif %}>Non-Fermented</option>
+                <option value="fermented" {% if product.product_category == 'fermented' %}selected{% endif %}>Fermented</option>
+                <option value="powders" {% if product.product_category == 'powders' %}selected{% endif %}>Powders</option>
+                <option value="desserts" {% if product.product_category == 'desserts' %}selected{% endif %}>Desserts</option>
+                <option value="beverages" {% if product.product_category == 'beverages' %}selected{% endif %}>Beverages</option>
+            </select>
+            <div id="categoryError" class="error-message"></div><br>
+
+
             <label for="quantity">Stock:</label>
             <input type="text" id="quantity" name="product_quantity" value="{{ product.product_quantity }}" required>
             <span class="error" id="quantityError"></span>

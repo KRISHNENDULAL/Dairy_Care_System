@@ -24,7 +24,21 @@
             margin-bottom: 30px;
             font-family: Copperplate, Papyrus, fantasy;
             font-size: 3.0em;
+            position: relative; /* Ensure the pseudo-element is positioned relative to the heading */
         }
+
+        h1:after {
+            content: '';
+            display: block;
+            width: 400px; /* Adjust width as needed */
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #000000, transparent);
+            position: absolute;
+            bottom: -2px; /* Adjust spacing below the text */
+            left: 50%; /* Center the line */
+            transform: translateX(-50%);
+        }
+
         .feedback-list {
             max-width: 1200px; /* Increased width */
             margin: auto;
@@ -111,10 +125,10 @@
                 </li>
             </div>
         </div>
-    </ul>
+    </ul><br>
 
     <!-- <a href="{% url 'customerpage' %}" class="back-link"><b>&larr; BACK</b></a> -->
-    <h1>Feedbacks</h1>
+    <h1>Your Feedbacks</h1><br>
 
     <div class="feedback-list">
         {% if feedback_list %}

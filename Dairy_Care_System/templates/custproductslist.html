@@ -17,8 +17,6 @@
         .sidenav a i, .dropdown-content a i {
             margin-right: 10px; /* Space between icon and text */
         }
-
-
     </style>
 
     <!-- Add Font Awesome and SweetAlert2 CSS -->
@@ -26,11 +24,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
-
 <body>
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav">
-        <!-- <h3>Dairy Care System</h3><br><br><br> -->
         <a href="#"></i> Dairy Care System</a><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
@@ -53,7 +49,6 @@
                     </b>
                     <div class="dropdown-content" id="dropdown-content">
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <!-- Change Logout link to trigger a custom SweetAlert -->
                         <a href="#" onclick="confirmLogout()" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </li>
@@ -66,18 +61,20 @@
     <center>
         <div class="search-bar-container">
             <form method="GET" action="{% url 'custproductslist' %}">
-                <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+                <input type="text" name="search" id="search-bar" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+                <button type="button" id="voice-search-button" class="search-button">
+                    <i class="fas fa-microphone"></i>
+                </button>
                 <button type="submit" class="search-button">Search</button>
             </form>
         </div>
     </center>
 
     <!-- Main content that shifts when the sidebar opens -->
-    
     <div class="products-container">
         {% for product in products %}
         <div class="product">
-            <form action="{% url 'productdetails' %}" method="POST"  style="cursor: pointer;">
+            <form action="{% url 'productdetails' %}" method="POST" style="cursor: pointer;">
                 {% csrf_token %}
                 <input type="hidden" name="product_id" value="{{ product.product_id }}">
                 <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; width: 100%; text-align: center;">
@@ -95,7 +92,7 @@
     </div>
     </div>
 
-    <!-- Add SweetAlert2 and Font Awesome JavaScript -->
+    <!-- Add SweetAlert2, Font Awesome, and Web Speech API JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
@@ -133,12 +130,154 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redirect to logout URL
                     window.location.href = "{% url 'logout' %}";
                 }
             });
         }
+
+        // Voice Search functionality using Web Speech API
+        const voiceSearchButton = document.getElementById('voice-search-button');
+        const searchBar = document.getElementById('search-bar');
+
+        voiceSearchButton.addEventListener('click', () => {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    Swal.fire({
+                        title: 'Listening...',
+                        text: 'Please speak now to search products..',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                };
+
+                recognition.onspeechend = () => {
+                    recognition.stop();
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    searchBar.value = transcript;
+                };
+
+                recognition.onerror = (event) => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: event.error,
+                        icon: 'error',
+                    });
+                };
+
+                recognition.start();
+            } else {
+                Swal.fire({
+                    title: 'Unsupported',
+                    text: 'Your browser does not support voice search.',
+                    icon: 'error',
+                });
+            }
+        });
     </script>
 
 </body>
 </html>
+
+
+<!-- // Voice Search functionality
+const voiceSearchButton = document.getElementById('voice-search-button');
+const searchBar = document.getElementById('search-bar');
+
+voiceSearchButton.addEventListener('click', () => {
+    // Check browser support for SpeechRecognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        
+        // Configure recognition settings
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        // Show listening indicator
+        Swal.fire({
+            title: 'Listening...',
+            html: 'Speak now to search products',
+            icon: 'info',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Start listening
+        recognition.start();
+
+        // Handle results
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            searchBar.value = transcript;
+            
+            // Close the listening indicator
+            Swal.close();
+
+            // Show what was recognized
+            Swal.fire({
+                title: 'You said:',
+                text: transcript,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                // Submit the search form
+                searchBar.form.submit();
+            });
+        };
+
+        // Handle errors
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Could not recognize speech. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        };
+
+        // Handle end of speech
+        recognition.onend = () => {
+            if (!searchBar.value) {
+                Swal.fire({
+                    title: 'No speech detected',
+                    text: 'Please try again',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+            }
+        };
+
+    } else {
+        // Browser doesn't support speech recognition
+        Swal.fire({
+            title: 'Not Supported',
+            text: 'Your browser does not support voice search. Please use Chrome or Edge.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+
+// Add visual feedback for the voice button
+voiceSearchButton.addEventListener('mousedown', () => {
+    voiceSearchButton.style.transform = 'scale(0.95)';
+});
+
+voiceSearchButton.addEventListener('mouseup', () => {
+    voiceSearchButton.style.transform = 'scale(1)';
+}); -->

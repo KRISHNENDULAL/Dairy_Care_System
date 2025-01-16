@@ -215,3 +215,8 @@ LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
 RAZORPAY_KEY_ID = 'rzp_test_K3m91dIeZXVDcE'
 RAZORPAY_SECRET_KEY = '5Pc3YEyRGnv8eASHMCzbs1tp'
 
+
+# Set GOOGLE_APPLICATION_CREDENTIALS environment variable
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"D:\dairybot-ygjc-759d6cf0768e.json"
+
+

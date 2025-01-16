@@ -22,7 +22,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Q  # Import Q for case-insensitive query
 import razorpay
+from google.cloud import dialogflow_v2 as dialogflow
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -444,30 +446,6 @@ def reguserlist(request, role=None):
         return redirect('login')  # Redirect to login if no user is logged in
 
 
-""" def regdeleteuser(request, user_id):
-    user = get_object_or_404(Users_table, user_id=user_id)
-    user.status = False  # Set status to inactive
-    user.save()  # Save changes to the database
-    # Send email notification
-    subject = 'Account Deactivation Notification - Dairy Care System ⚠️'
-    message = (
-        f"Hello {user.username},\n\n"
-        "We want to inform you that your account has been deactivated.\n\n"
-        "If you believe this action was taken in error, please reach out to our support team at "
-        "dairycaresystem25@gmail.com for assistance.\n\n"
-        "Thank you for being a part of our community. We hope to resolve this matter quickly.\n\n"
-        "Best regards,\n"
-        "The Dairy Care System Team\n\n\n\n\n"
-        "Disclaimer: This is an automated message. If you did not request this change, please contact our support team immediately."
-    )
-
-    from_email = settings.EMAIL_HOST_USER
-    recipient_list = [user.email]         
-
-    send_mail(subject, message, from_email, recipient_list)
-    return redirect('reguserlist', 'all')  # Redirect to the user list page """
-
-
 def regdeleteuser(request, user_id):
     reason = request.GET.get('reason')
     if not reason:
@@ -560,6 +538,31 @@ def farmownerpage(request):
         return render(request, 'farmownerpage.html', context)
     else:
         return redirect('login')
+    
+
+
+PROJECT_ID = 'dairybot-ygjc'  # Replace with your Dialogflow project ID
+
+def chatbot_response(request):
+    # Get the user message from the request
+    user_message = request.GET.get('message', '')
+
+    # Set up Dialogflow session
+    session_id = "12345"  # You can use a unique ID for each user
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(PROJECT_ID, session_id)
+
+    # Prepare the text input
+    text_input = dialogflow.TextInput(text=user_message, language_code="en")
+    query_input = dialogflow.QueryInput(text=text_input)
+
+    # Send the request to Dialogflow
+    response = session_client.detect_intent(request={"session": session, "query_input": query_input})
+    bot_reply = response.query_result.fulfillment_text
+
+    # Send the bot's reply back to the user
+    return JsonResponse({"response": bot_reply})
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -726,11 +729,6 @@ def addproducts(request):
         quantity_unit = request.POST.get('quantity_unit')
         product_price = request.POST.get('product_price')  # Get the price from the POST data
         
-        # Check if product with the same name (case-insensitive) already exists
-        if Products_table.objects.filter(product_name__iexact=product_name).exists():
-            messages.error(request, 'Product with this name already exists.')
-            return render(request, 'addproducts.html')  # Return to the same form with an error message
-        
         # Get user_id from the session
         employee_user_id = request.session.get('user_id')  # Assuming 'user_id' is stored in the session for employees
 
@@ -740,6 +738,11 @@ def addproducts(request):
         except Users_table.DoesNotExist:
             messages.error(request, 'Employee not found.')
             return redirect('productslist')  # Handle user not found
+
+        # Check if a product with the same name exists for the current farmer
+        if Products_table.objects.filter(product_name__iexact=product_name, employee=employee).exists():
+            messages.error(request, 'You already have a product with this name.')
+            return render(request, 'addproducts.html')  # Return to the same form with an error message
 
         # Create a new product entry
         product = Products_table(
@@ -758,10 +761,11 @@ def addproducts(request):
         if product_photo:
             ProductImage.objects.create(product=product, image=product_photo)
 
-        messages.success(request, f'Product "{product_name}" added successfully!')
+        # messages.success(request, f'Product "{product_name}" added successfully!')
         return redirect('productslist')
 
     return render(request, 'addproducts.html')
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -1040,6 +1044,7 @@ def updateproduct(request, product_id):
     if request.method == 'POST':
         product.product_name = request.POST.get('product_name')
         product.product_description = request.POST.get('product_description')
+        product.product_category = request.POST.get('product_category')  # Updated for category
         product.product_quantity = request.POST.get('product_quantity')
         product.quantity_unit = request.POST.get('quantity_unit')
         product.product_price = request.POST.get('product_price')
@@ -1052,7 +1057,7 @@ def updateproduct(request, product_id):
             ProductImage.objects.filter(product=product).delete()  # Delete all old images
             ProductImage.objects.create(product=product, image=product_photo)  # Add new image
 
-        return redirect('editproduct')  # Redirect to a detail page after update
+        return redirect('productslist')  # Redirect to a detail page after update
 
     context = {
         'product': product,
@@ -1065,13 +1070,13 @@ def deleteproduct(request, product_id):
     product = get_object_or_404(Products_table, product_id=product_id)
     product.status = False  # Set status to 0 (deleted)
     product.save()
-    return redirect('editproduct')  # Redirect to the product listing page
+    return redirect('productslist')  # Redirect to the product listing page
 
 def restoreproduct(request, product_id):
     product = get_object_or_404(Products_table, product_id=product_id)
     product.status = True  # Set status to 1 (active)
     product.save()
-    return redirect('editproduct')  # Redirect to the product listing page
+    return redirect('productslist')  # Redirect to the product listing page
 
 
 def adminproductstock(request):
@@ -1210,6 +1215,9 @@ def preorder(request):
         if quantity > product.product_quantity:
             messages.error(request, "Quantity exceeds available stock.")
             return redirect(request.path + f'?product_id={product_id}')  # Reload page with error message
+        
+        # Fetch the farmer from the product's `farmer_id`
+        farmer = get_object_or_404(Users_table, user_id=product.employee_id)
 
         # Create new pre-order
         PreOrder.objects.create(
@@ -1217,7 +1225,8 @@ def preorder(request):
             quantity=quantity,
             date_of_delivery=date_of_delivery,
             additional_notes=additional_notes,
-            user=user
+            user=user,
+            farmer=farmer
         )
 
         messages.success(request, f"Your pre-order for {product.product_name} was successfully placed!")
@@ -1255,6 +1264,25 @@ def preorderlisting(request):
         return render(request, 'preorderlisting.html', context)
     else:
         return redirect('login')  # Redirect to login if user_id is not in the session
+    
+
+def preorderfarm(request):
+    # Get the logged-in farmer's ID from the session
+    farmer_id = request.session.get('user_id')
+
+    if farmer_id:  # Check if the farmer is logged in
+        # Fetch preorders where the logged-in farmer is the owner of the products
+        preorders = PreOrder.objects.filter(farmer_id=farmer_id)
+
+        # Pass the preorders to the template
+        context = {
+            'username': request.session.get('username'),  # Pass username for display
+            'preorders': preorders,  # Filtered preorders for the farmer
+        }
+        return render(request, 'preorderfarm.html', context)
+    else:
+        # Redirect to login if farmer_id is not found in the session
+        return redirect('login')
     
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -1421,7 +1449,7 @@ def add_health_record(request, animal_id):
         
         health_record.save()  # Save the health record
 
-        messages.success(request, 'Health record added successfully!')
+        # messages.success(request, 'Health record added successfully!')
         return redirect('animal_health_status', animal_id=animal_id)
 
     return render(request, 'add_health_record.html', {'animal_id': animal_id})
@@ -1826,6 +1854,8 @@ def checkoutorder(request):
             if cart_item.product.product_quantity < 2:
                 Notifications_table.objects.create(
                     message=f"Alert: Stock for '{cart_item.product.product_name}' is critically low (below 2 units). Immediate restocking is required.",
+                    product=cart_item.product,  # Link to the product
+                    farmer=user  # Link to the user who added the product
                 )
 
         user_cart.delete()
@@ -1895,8 +1925,6 @@ def stocknotification(request):
     else:
         # Redirect to login if no user is logged in
         return redirect('login')
-
-
 
 
 # View to display the order summary after placing an order
