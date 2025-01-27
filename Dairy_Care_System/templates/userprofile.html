@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         /* Basic styles */
         body {
@@ -20,21 +23,36 @@
         ul {
             list-style-type: none;
             margin: 0;
-            padding: 5px;
+            padding: 0;
             overflow: hidden;
-            background-color: #000000;
             display: flex;
+            background-color: #000;
             align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .brand-name {
+            display: flex;
+            font-family: Copperplate, Papyrus, fantasy;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            padding-left: 20px;
+            gap: 10px;
+        }
+
+        .brand-name i {
+            color: #4361ee;
+            font-size: 28px;
         }
 
         .header {
-            width: 100%;
             display: flex;
-            justify-content: flex-end;
             align-items: center;
-            margin: 0 5px;
-            padding: 5px 10px;
-            font-family: 'Arial', sans-serif;
+            margin-right: 20px;
+            gap: 20px;
         }
 
         .nav-item {
@@ -193,7 +211,7 @@
         }
 
         .button {
-            background: #3498db;
+            background: rgb(157, 4, 4);
             color: white;
             padding: 12px 30px;
             border-radius: 8px;
@@ -207,17 +225,79 @@
         }
 
         .button:hover {
-            background: #2980b9;
+            background: #df2828;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
 
         .button:nth-child(2) {
-            background: #2c3e50;
+            background: #196502;
         }
 
         .button:nth-child(2):hover {
-            background: #34495e;
+            background: #1cb404;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background-color: rgba(0, 0, 0, 0.5); /* Black background with transparency */
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto; /* Centered vertically and horizontally */
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%; /* Modal width */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: #218838;
+        }
+
+        .btn-cancel:hover {
+            background-color: #c82333;
         }
 
         /* Responsive Design */
@@ -247,24 +327,23 @@
             animation: fadeIn 0.5s ease-out forwards;
         }
     </style>
-
-    <!-- Add Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Add Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Add SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
+                <li><b></b></li>
+            </div>
+            <div class="nav-item">
                 <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ user.username }}</a></b>
+                    <b><a href="#" class="username" onclick="toggleDropdown()">
+                        <i class="fas fa-user-circle"></i> {{ user.username }}
+                    </a></b>
                     <div class="dropdown-content" id="dropdown-content">
-                        <a href="#" onclick="goBack()">&larr; Back</a>
+                        <a href="#" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</a>
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </li>
@@ -281,6 +360,16 @@
             <p><i class="icon fas fa-user"></i><strong>Username:</strong> {{ user.username }}</p>
             <p><i class="icon fas fa-envelope"></i><strong>Email:</strong> {{ user.email }}</p>
             <p><i class="icon fas fa-phone"></i><strong>Phone:</strong> {{ user.phone }}</p>
+            
+                <!-- <p><i class="icon fas fa-phone"></i><strong>Phone:</strong> 
+                    {{ user.phone }}
+                    {% if not user.is_phone_verified %}
+                        <button class="verify-button" onclick="openOtpModal()">Verify</button>
+                    {% else %}
+                        <span class="verified-text">Verified</span>
+                    {% endif %}
+                </p> -->
+            
             <p><i class="icon fas fa-user-tag"></i><strong>Role:</strong> {{ user.get_role_display }}</p>
         </div>
 
@@ -288,8 +377,80 @@
         <div class="action-buttons">
             <a href="{% url 'updateuserprofile' %}" class="button"><i class="fas fa-user-edit"></i> Update Profile</a>
             <a href="{% url 'changepassword' %}" class="button"><i class="fas fa-key"></i> Change Password</a>
+            
+            <!-- Show delete button only if user is active -->
+            {% if user.status %}
+                <a href="#" class="button" onclick="openModal('delete', '{{ user.username }}', '{% url 'deleteaccount' user.user_id %}');"><i class="fas fa-trash"></i> <b>Delete Account</b></a>
+            {% endif %}
+            
         </div>
     </div>
+
+    
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Dairy Care System</div>
+            <div class="modal-body" id="modal-body">
+                Are you sure you want to proceed?
+            </div>
+            <div class="modal-footer">
+                <button class="btn-confirm" id="btn-confirm" onclick="confirmAction()">Yes, Deactivate</button>
+                <button class="btn-cancel" onclick="closeModal()">No, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <script>
+        // Modal functions
+        function openModal(action, username, url) {
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modal-body');
+            const confirmButton = document.getElementById('btn-confirm');
+
+            // Check if user has pending orders
+            fetch('/pendingorders/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_pending_orders) {
+                    modalBody.innerText = `You have pending orders. Are you sure you want to deactivate your account, ${username}?`;
+                    confirmButton.onclick = function () {
+                        cancelPendingOrders();
+                        window.location.href = url;
+                    };
+                } else {
+                    modalBody.innerText = `Are you sure you want to deactivate your account, ${username}?`;
+                    confirmButton.onclick = function () {
+                        window.location.href = url;
+                    };
+                }
+                modal.style.display = 'block';
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function cancelPendingOrders() {
+            // Code to cancel all pending orders
+            fetch('/cancelorder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'user_id': '{{ user.user_id }}' })
+            });
+        }
+    </script>
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -355,3 +516,22 @@
 
 </body>
 </html>
+
+
+
+<!-- OTP Modal -->
+    <!-- <div id="otp-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">Phone Verification</div>
+            <div class="modal-body">
+                <p>An OTP has been sent to your phone number. Please enter it below:</p>
+                <input type="text" id="otp-input" maxlength="4" placeholder="Enter 4-digit OTP">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-confirm" onclick="verifyOtp()">Verify</button>
+                <button class="btn-cancel" onclick="closeOtpModal()">Cancel</button>
+            </div>
+        </div>
+    </div> -->
+
+

@@ -5,118 +5,118 @@
     <title>{{ animal.animal_name }} Health Status</title>
     <style>
         /* Reset some default styles */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
 
-/* Main container */
-h1 {
-    text-align: center;
-    margin-top: 20px;
-    color: #4A4A4A;
-}
+        /* Main container */
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #4A4A4A;
+        }
 
-/* Link styling */
-a {
-    text-decoration: none;
-    color: #007BFF;
-}
+        /* Link styling */
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
 
-a:hover {
-    text-decoration: underline;
-}
+        a:hover {
+            text-decoration: underline;
+        }
 
-/* Table styling */
-table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: white;
-}
+        /* Table styling */
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #dddddd;
-}
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dddddd;
+        }
 
-th {
-    background-color: #007BFF;
-    color: white;
-}
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
 
-tr:hover {
-    background-color: #f1f1f1;
-}
+        tr:hover {
+            background-color: #f1f1f1;
+        }
 
-/* No records message styling */
-td[colspan="7"] {
-    text-align: center;
-    font-style: italic;
-    color: #999;
-}
+        /* No records message styling */
+        td[colspan="7"] {
+            text-align: center;
+            font-style: italic;
+            color: #999;
+        }
 
-/* Back to Animals List button */
-.back-button {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    text-align: center;
-    color: rgb(0, 0, 0);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        /* Back to Animals List button */
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            text-align: center;
+            color: rgb(0, 0, 0);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-.back-button:hover {
-    text-decoration: underline;
-}
+        .back-button:hover {
+            text-decoration: underline;
+        }
 
-/* Button styles */
-.add-button {
-    position: absolute; /* Use absolute positioning */
-    top: 20px; /* Adjust vertical position */
-    right: 20px; /* Aligns the button to the right corner */
-    background-color: #007BFF; /* Button color */
-    color: white; /* Text color */
-    padding: 10px 15px; /* Padding */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 14px; /* Font size */
-    text-decoration: none; /* Remove underline */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
+        /* Button styles */
+        .add-button {
+            position: absolute; /* Use absolute positioning */
+            top: 20px; /* Adjust vertical position */
+            right: 20px; /* Aligns the button to the right corner */
+            background-color: #007BFF; /* Button color */
+            color: white; /* Text color */
+            padding: 10px 15px; /* Padding */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 14px; /* Font size */
+            text-decoration: none; /* Remove underline */
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
+        }
 
-.add-button:hover {
-    background-color: #0056b3; /* Darker on hover */
-}
+        .add-button:hover {
+            background-color: #0056b3; /* Darker on hover */
+        }
 
-/* Button styles */
-.update-button {
-    display: inline-block; /* Align buttons next to each other */
-    background-color: #007BFF; /* Button color */
-    color: white; /* Text color */
-    padding: 10px 15px; /* Padding */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 14px; /* Font size */
-    text-decoration: none; /* Remove underline */
-    margin-right: 10px; /* Space between buttons */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
+        /* Button styles */
+        .update-button {
+            display: inline-block; /* Align buttons next to each other */
+            background-color: #007BFF; /* Button color */
+            color: white; /* Text color */
+            padding: 10px 15px; /* Padding */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 14px; /* Font size */
+            text-decoration: none; /* Remove underline */
+            margin-right: 10px; /* Space between buttons */
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
+        }
 
-.update-button:hover {
-    background-color: #0056b3; /* Darker on hover */
-}
+        .update-button:hover {
+            background-color: #0056b3; /* Darker on hover */
+        }
 
-/* Main modal background styling */
-.modal {
+        /* Main modal background styling */
+        .modal {
             display: none;
             position: fixed;
             z-index: 1;
@@ -129,15 +129,15 @@ td[colspan="7"] {
 
         /* Modal content styling */
         .modal-content {
-    position: relative; /* Or 'absolute' if it's contained within a parent */
-    top: -20px; /* Adjust this value as needed */
-    margin: 0 auto;
-    max-width: 500px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+            position: relative; /* Or 'absolute' if it's contained within a parent */
+            top: -20px; /* Adjust this value as needed */
+            margin: 0 auto;
+            max-width: 500px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
         /* Close button styling */
         .close-button {

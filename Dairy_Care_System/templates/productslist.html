@@ -142,7 +142,7 @@
 
         .search-bar {
             padding: 10px;
-            width: 60%;
+            width: 50%;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
@@ -162,93 +162,128 @@
             background-color: #105314;
         }
 
+        /* Dropdown styling */
+        #productCategory {
+            width: 200px;
+            padding: 10px;
+            font-size: 16px;
+            color: #555; /* Text color */
+            background-color: #f9f9f9; /* Light background */
+            border: 2px solid #ccc; /* Border styling */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: all 0.3s ease; /* Smooth transitions */
+            outline: none;
+        }
+
+        /* Hover and focus effects */
+        #productCategory:hover,
+        #productCategory:focus {
+            border-color: #5c85d6; /* Highlighted border color */
+            background-color: #fff; /* Brighter background */
+            color: #333; /* Darker text color */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+        }
+
+        /* Disabled option styling */
+        #productCategory option:disabled {
+            color: #aaa; /* Greyed-out color */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #productCategory {
+                width: 200px; /* Slightly narrower on smaller screens */
+            }
+        }
+
         /* Style for modal */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.6); /* Black with opacity */
-}
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.6); /* Black with opacity */
+        }
 
-.modal-content {
-    background-color: white;
-    margin: 15% auto; /* Centered vertically and horizontally */
-    padding: 20px;
-    border-radius: 10px;
-    width: 30%; /* Modal width */
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+        .modal-content {
+            background-color: white;
+            margin: 15% auto; /* Centered vertically and horizontally */
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%; /* Modal width */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-.modal-header {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #000000;
-}
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #000000;
+        }
 
-.modal-body {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
+        .modal-body {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
 
-.modal-footer {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-}
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-.btn-confirm, .btn-cancel {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        .btn-confirm, .btn-cancel {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-.btn-confirm.delete {
-    background-color: green; /* Red for delete */
-}
+        .btn-confirm.delete {
+            background-color: green; /* Red for delete */
+        }
 
-.btn-confirm.restore {
-    background-color: green; /* Green for restore */
-}
+        .btn-confirm.restore {
+            background-color: green; /* Green for restore */
+        }
 
-.btn-cancel {
-    background-color: red;
-    color: white;
-}
+        .btn-cancel {
+            background-color: red;
+            color: white;
+        }
 
-.btn-confirm:hover {
-    opacity: 0.9;
-}
+        .btn-confirm:hover {
+            opacity: 0.9;
+        }
 
-.btn-cancel:hover {
-    background-color: red;
-}
+        .btn-cancel:hover {
+            background-color: red;
+        }
 
-.button-group a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-weight: bold;
-}
+        .button-group a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-.delete-button {
-    background-color: red;
-    color: white;
-    border-radius: 5px;
-}
+        .delete-button {
+            background-color: red;
+            color: white;
+            border-radius: 5px;
+        }
 
-.restore-button {
-    background-color: green;
-    color: white;
-    border-radius: 5px;
-}
+        .restore-button {
+            background-color: green;
+            color: white;
+            border-radius: 5px;
+        }
 
     </style>
     <!-- Add SweetAlert2 CSS -->
@@ -259,12 +294,12 @@
 <body>
 
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#">Dairy Care System</a><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br>
         <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a>
-        <a href="{% url 'addproducts' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
+        <a href="{% url 'addproducts' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
         <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>  Animals List</a>
         <a href="{% url 'addanimal' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+        <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>  Order Details</a><br>
         <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>  Pre-Order Details</a><br>
         <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
@@ -276,6 +311,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -296,6 +332,17 @@
     <div class="search-bar-container">
         <form method="GET" action="{% url 'productslist' %}">
             <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+            <!-- Category Dropdown -->
+            <select id="productCategory" name="product_category">
+                <option value="" disabled {% if not selected_category %}selected{% endif %}>Category search...</option>
+                <option value="milk" {% if selected_category == "milk" %}selected{% endif %}>Milk</option>
+                <option value="spreads" {% if selected_category == "spreads" %}selected{% endif %}>Spreads</option>
+                <option value="non-fermented" {% if selected_category == "non-fermented" %}selected{% endif %}>Non-Fermented</option>
+                <option value="fermented" {% if selected_category == "fermented" %}selected{% endif %}>Fermented</option>
+                <option value="powders" {% if selected_category == "powders" %}selected{% endif %}>Powders</option>
+                <option value="desserts" {% if selected_category == "desserts" %}selected{% endif %}>Desserts</option>
+                <option value="beverages" {% if selected_category == "beverages" %}selected{% endif %}>Beverages</option>
+            </select>
             <button type="submit" class="search-button">Search</button>
         </form>
     </div>

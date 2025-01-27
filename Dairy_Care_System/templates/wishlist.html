@@ -100,8 +100,7 @@
 </head>
 <body>
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#"></i> Dairy Care System</a><br><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
         <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
@@ -113,6 +112,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -167,7 +167,7 @@
         </div><br><br>
         {% empty %}
         <p style="font-size: 30px; color:white">Your wishlist is currently empty.</p><br>
-        <a href="{% url 'custproductslist' %}" style="font-size: 25px; color:rgb(255, 0, 0)">Continue Shopping</a></strong>
+        <a href="{% url 'custproductslist' %}" style="font-size: 25px; color:rgb(12, 204, 191)">Continue Shopping</a></strong>
         {% endfor %}
     </center>
 

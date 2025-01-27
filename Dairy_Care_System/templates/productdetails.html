@@ -86,7 +86,7 @@
 
         .product-title {
             font-size: 28px;
-            color: #333;
+            color: #000000;
             font-weight: bold;
             margin-bottom: 15px;
         }
@@ -105,10 +105,11 @@
             margin-bottom: 25px;
         }
 
-        .availability {
-            color: #228b22;
+        .product-status {
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 27px;
+            color: #08b019;
             font-weight: bold;
-            margin-bottom: 10px;
         }
 
         /* Buttons */
@@ -150,7 +151,7 @@
         }
 
         .buy-button:hover {
-            background-color: rgb(15, 156, 15);
+            background: linear-gradient(135deg, #09d502, #095c00);
             transform: scale(1.02);
         }
 
@@ -160,7 +161,7 @@
         }
 
         .wish-button:hover {
-            background-color: #ec2929;
+            background: linear-gradient(135deg, #ff5a3d, #b40000);
             transform: scale(1.02);
         }
 
@@ -170,7 +171,7 @@
         }
 
         .order-button:hover {
-            background-color: #061f9e;
+            background: linear-gradient(135deg, #2d3eff, rgb(4, 15, 88));
             transform: scale(1.02);
         }
 
@@ -227,6 +228,7 @@
         }
 
         .give-feedback-link:hover {
+            background: linear-gradient(135deg, #2980b9, #070f9f);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
         }
@@ -285,8 +287,7 @@
     <!-- <a href="{% url 'custproductslist' %}" class="back-link">&larr; BACK</a> -->
 
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#"></i> Dairy Care System</a><br><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
         <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
@@ -298,6 +299,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -325,20 +327,24 @@
 
             <!-- Right section: Product details -->
             <div class="product-details">
-                <h1 class="product-title">{{ product.product_name }}</h1><br>
+                <h1 class="product-title">{{ product.product_name }}</h1>
 
-                <p class="product-price">Rs. {{ product.product_price }}</p><br>
+                <p class="product-price"><i class="fas fa-rupee-sign"></i>. {{ product.product_price }}</p>
 
                 <p class="product-description">{{ product.product_description }}</p>
 
-                <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p><br>
+                <p class="product-status">Product {{ product_status }}</p><br>   
+
+                <p><strong>Product Owner:</strong> {{ product.employee.username }}</p><br>
+
+                <p><strong>Category:</strong> {{ product.product_category }}</p><br>             
 
                 <!-- Quantity and Unit Input (in the same line) -->
                 <div class="quantity-input">
                     <label for="quantity"><strong>Enter Quantity:</strong></label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.product_quantity }}" placeholder="Quantity" required>
+                    <input type="number" id="quantity" name="quantity" value="{% if product.product_quantity > 0 %}1{% else %}0{% endif %}" min="1" max="{{ product.product_quantity }}" placeholder="Quantity" required>
                 </div>
-                <br>
+                <br><br>
 
                 <div class="product-actions">
                     <form method="POST" action="{% url 'productdetails' %}">
@@ -354,7 +360,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ product.product_id }}">
                             <input type="hidden" name="quantity" id="cart-quantity" value="1">
-                            <button class="btn buy-button" type="submit" id="add-to-cart">
+                            <button class="btn buy-button" type="submit" id="add-to-cart" {% if product.product_quantity == 0 %}disabled{% endif %}>
                                 <i class="fas fa-shopping-cart"></i> Add to Cart</button>
                         </form>
                     </div>
@@ -367,7 +373,7 @@
                                 <i class="fas fa-clock"></i> Pre-Order {{ product.product_name }}</button>
                         </form>
                     </div>
-                </div><br><br>
+                </div>
 
                 <!-- Display success message if it exists -->
                 {% if messages %}

@@ -14,317 +14,368 @@
         }
 
         ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 5px;
-    overflow: hidden;
-    background-color: black;
-    display: flex;
-    align-items: center;
-}
+            list-style-type: none;
+            margin: 0;
+            padding: 5px;
+            overflow: hidden;
+            background-color: black;
+            display: flex;
+            align-items: center;
+        }
 
-.header {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 5px;
-    font-family: 'Arial', sans-serif;
-}
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 5px;
+            font-family: 'Arial', sans-serif;
+        }
 
-.nav-item.left {
-    color: white;
-    padding: 5px 8px;
-}
+        .nav-item.left {
+            color: white;
+            padding: 5px 8px;
+        }
 
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-li {
-    margin-right: 10px;
-    font-size: 20px;
-}
+        li {
+            margin-right: 10px;
+            font-size: 20px;
+        }
 
-li a {
-    display: block;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    padding: 10px 12px;
-    transition: background-color 0.3s ease;
-}
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 12px;
+            transition: background-color 0.3s ease;
+        }
 
-li a:hover {
-    background-color: #ddd;
-    border-radius: 5px;
-}
+        li a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+        }
 
-h1 {
-    color: black;
-    font-size: 80px;
-    margin-top: 100px;
-}
+        h1 {
+            color: black;
+            font-size: 80px;
+            margin-top: 100px;
+        }
 
-h2 {
-    color: white;
-    font-size: 20px;
-    margin-left: 10px;
-}
+        h2 {
+            color: white;
+            font-size: 20px;
+            margin-left: 10px;
+        }
 
-/* Dropdown styles */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    right: 0;
-    top: 70px;
-    border-radius: 5px;
-}
+        /* Dropdown styles */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            right: 0;
+            top: 70px;
+            border-radius: 5px;
+        }
 
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-}
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
 
-.dropdown-content a:hover {
-    background-color: #ddd;
-}
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
 
-.nav-item:hover .dropdown-content {
-    display: block;
-}
+        .nav-item:hover .dropdown-content {
+            display: block;
+        }
 
-/* Products container styles */
-.products-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
-    gap: 60px; /* Space between items */
-    padding: 60px; /* Padding around the container */
-}
+        .brand-name {
+            display: flex;
+            font-family: Copperplate, Papyrus, fantasy;
+            align-items: center;
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            padding-left: 20px;
+            gap: 10px;
+        }
 
-.product {
-    border: 1px solid #ccc;
-    border-radius: 8px; /* Rounded corners */
-    overflow: hidden; /* Prevents overflow of content */
-    display: flex;
-    flex-direction: column; /* Align children vertically */
-    justify-content: flex-start; /* Align children at the start to allow dynamic height */
-    padding: 15px;
-    background-color: #fff; /* White background for products */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-    transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
-}
+        .brand-name i {
+            color: #4361ee;
+            font-size: 28px;
+        }
 
-.product:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
-}
+        /* Products container styles */
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust min width as needed */
+            gap: 60px; /* Space between items */
+            padding: 60px; /* Padding around the container */
+        }
 
-.product img {
-    width: 100%; /* Full width of the product container */
-    height: 250px; /* Fixed height for uniformity */
-    object-fit: cover; /* Maintain aspect ratio and cover the area */
-    border-radius: 4px; /* Rounded corners for the image */
-}
+        .product {
+            border: 1px solid #ccc;
+            border-radius: 8px; /* Rounded corners */
+            overflow: hidden; /* Prevents overflow of content */
+            display: flex;
+            flex-direction: column; /* Align children vertically */
+            justify-content: flex-start; /* Align children at the start to allow dynamic height */
+            padding: 15px;
+            background-color: #fff; /* White background for products */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+            transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+        }
 
-.product h3 {
-    font-size: 1.2em; /* Adjust font size */
-    margin: 10px 0; /* Margin for spacing */
-    text-align: center; /* Centering the product name */
-}
+        .product:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+        }
 
-.product p {
-    margin: 5px 0; /* Margin for spacing */
-    font-size: 1.1em;
-    color: #000000;
-    text-align: center; /* Centering the product name */
-}
+        .product img {
+            width: 100%; /* Full width of the product container */
+            height: 250px; /* Fixed height for uniformity */
+            object-fit: cover; /* Maintain aspect ratio and cover the area */
+            border-radius: 4px; /* Rounded corners for the image */
+        }
 
-.product-container-footer {
-    margin-top: auto; /* Push the footer (like the added at date) to the bottom */
-    color: #888;
-    font-size: 0.85em;
-}
+        .product h3 {
+            font-size: 1.2em; /* Adjust font size */
+            margin: 10px 0; /* Margin for spacing */
+            text-align: center; /* Centering the product name */
+        }
 
-.update-button, .delete-button, .restore-button {
-    padding: 10px 25px;
-    font-size: 18px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-}
+        .product p {
+            margin: 5px 0; /* Margin for spacing */
+            font-size: 1.1em;
+            color: #000000;
+            text-align: center; /* Centering the product name */
+        }
 
-.update-button {
-    background-color: #ffc107;
-    color: white;
-}
+        .product-container-footer {
+            margin-top: auto; /* Push the footer (like the added at date) to the bottom */
+            color: #888;
+            font-size: 0.85em;
+        }
 
-.update-button:hover {
-    background-color: #e0a800;
-}
+        .update-button, .delete-button, .restore-button {
+            padding: 10px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
 
-.delete-button {
-    background-color: #dc3545;
-    color: white;
-}
+        .update-button {
+            background-color: #ffc107;
+            color: white;
+        }
 
-.delete-button:hover {
-    background-color: #c82333;
-}
+        .update-button:hover {
+            background-color: #e0a800;
+        }
 
-.restore-button {
-    background-color: #28a745;
-    color: white;
-}
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
 
-.restore-button:hover {
-    background-color: #218838;
-}
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .restore-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .restore-button:hover {
+            background-color: #218838;
+        }
 
 
-.btn-confirm {
-    background-color: #28a745;
-    color: white;
-}
+        .btn-confirm {
+            background-color: #28a745;
+            color: white;
+        }
 
-.btn-cancel {
-    background-color: #dc3545;
-    color: white;
-}
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+        }
 
-.btn-confirm:hover {
-    background-color: #218838;
-}
+        .btn-confirm:hover {
+            background-color: #218838;
+        }
 
-.btn-cancel:hover {
-    background-color: #c82333;
-}
+        .btn-cancel:hover {
+            background-color: #c82333;
+        }
 
-/* Style for search bar */
-.search-bar-container {
-    text-align: center;
-    margin: 20px 0;
-}
+        /* Style for search bar */
+        .search-bar-container {
+            text-align: center;
+            margin: 20px 0;
+        }
 
-.search-bar {
-    padding: 10px;
-    width: 60%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-}
+        .search-bar {
+            padding: 10px;
+            width: 50%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
 
-.search-button {
-    padding: 10px 20px;
-    background-color: #797f00;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-}
+        .search-button {
+            padding: 10px 20px;
+            background-color: #797f00;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
-.search-button:hover {
-    background-color: #105314;
-}
+        .search-button:hover {
+            background-color: #105314;
+        }
 
-/* Style for modal */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.6); /* Black with opacity */
-}
+        /* Dropdown styling */
+        #productCategory {
+            width: 200px;
+            padding: 10px;
+            font-size: 16px;
+            color: #555; /* Text color */
+            background-color: #f9f9f9; /* Light background */
+            border: 2px solid #ccc; /* Border styling */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: all 0.3s ease; /* Smooth transitions */
+            outline: none;
+        }
 
-.modal-content {
-    background-color: white;
-    margin: 15% auto; /* Centered vertically and horizontally */
-    padding: 20px;
-    border-radius: 10px;
-    width: 30%; /* Modal width */
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+        /* Hover and focus effects */
+        #productCategory:hover,
+        #productCategory:focus {
+            border-color: #5c85d6; /* Highlighted border color */
+            background-color: #fff; /* Brighter background */
+            color: #333; /* Darker text color */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+        }
 
-.modal-header {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #000000;
-}
+        /* Disabled option styling */
+        #productCategory option:disabled {
+            color: #aaa; /* Greyed-out color */
+        }
 
-.modal-body {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #productCategory {
+                width: 200px; /* Slightly narrower on smaller screens */
+            }
+        }
 
-.modal-footer {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-}
+        /* Style for modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.6); /* Black with opacity */
+        }
 
-.btn-confirm, .btn-cancel {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        .modal-content {
+            background-color: white;
+            margin: 15% auto; /* Centered vertically and horizontally */
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%; /* Modal width */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-.btn-confirm.delete {
-    background-color: green; /* Red for delete */
-}
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #000000;
+        }
 
-.btn-confirm.restore {
-    background-color: green; /* Green for restore */
-}
+        .modal-body {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
 
-.btn-cancel {
-    background-color: red;
-    color: white;
-}
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-.btn-confirm:hover {
-    opacity: 0.9;
-}
+        .btn-confirm, .btn-cancel {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-.btn-cancel:hover {
-    background-color: red;
-}
+        .btn-confirm.delete {
+            background-color: green; /* Red for delete */
+        }
 
-.button-group a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-weight: bold;
-}
+        .btn-confirm.restore {
+            background-color: green; /* Green for restore */
+        }
 
-.delete-button {
-    background-color: red;
-    color: white;
-    border-radius: 5px;
-}
+        .btn-cancel {
+            background-color: red;
+            color: white;
+        }
 
-.restore-button {
-    background-color: green;
-    color: white;
-    border-radius: 5px;
-}
+        .btn-confirm:hover {
+            opacity: 0.9;
+        }
+
+        .btn-cancel:hover {
+            background-color: red;
+        }
+
+        .button-group a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .delete-button {
+            background-color: red;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .restore-button {
+            background-color: green;
+            color: white;
+            border-radius: 5px;
+        }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -334,6 +385,7 @@ h2 {
 <body>
 <!-- Navigation Bar-->
 <ul>
+    <div class="brand-name"></i><span>Dairy Care System</span></div>
     <div class="header">
         <div class="nav-item">
             <li>
@@ -346,13 +398,24 @@ h2 {
             </li>
         </div>
     </div>
-</ul>
+</ul><br>
 
 <!-- Search Bar -->
 <center>
     <div class="search-bar-container">
         <form method="GET" action="{% url 'adminproductslist' %}">
             <input type="text" name="search" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+            <!-- Category Dropdown -->
+            <select id="productCategory" name="product_category">
+                <option value="" disabled {% if not selected_category %}selected{% endif %}>Category search...</option>
+                <option value="milk" {% if selected_category == "milk" %}selected{% endif %}>Milk</option>
+                <option value="spreads" {% if selected_category == "spreads" %}selected{% endif %}>Spreads</option>
+                <option value="non-fermented" {% if selected_category == "non-fermented" %}selected{% endif %}>Non-Fermented</option>
+                <option value="fermented" {% if selected_category == "fermented" %}selected{% endif %}>Fermented</option>
+                <option value="powders" {% if selected_category == "powders" %}selected{% endif %}>Powders</option>
+                <option value="desserts" {% if selected_category == "desserts" %}selected{% endif %}>Desserts</option>
+                <option value="beverages" {% if selected_category == "beverages" %}selected{% endif %}>Beverages</option>
+            </select>
             <button type="submit" class="search-button">Search</button>
         </form>
     </div>

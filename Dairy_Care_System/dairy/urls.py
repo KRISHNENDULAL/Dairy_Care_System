@@ -21,6 +21,8 @@ urlpatterns = [
     path('changepassword/', views.changepassword, name='changepassword'),
     path('userprofile',views.userprofile,name='userprofile'),
     path('updateuserprofile',views.updateuserprofile,name='updateuserprofile'),
+    # path('send-otp/', views.send_otp, name='send_otp'),
+    # path('verify-otp/', views.verify_otp, name='verify_otp'),
 
 
     path('adminpage',views.adminpage,name='adminpage'),
@@ -34,9 +36,7 @@ urlpatterns = [
     path('reguserlist/<str:role>/',views.reguserlist,name='reguserlist'),
     path('regdeleteuser/<int:user_id>/',views.regdeleteuser, name='regdeleteuser'),
     path('restoreuser/<int:user_id>/',views.restoreuser, name='restoreuser'),
-
-
-    path('employeepage',views.employeepage,name='employeepage'),
+    path('deleteaccount/<int:user_id>/',views.deleteaccount, name='deleteaccount'),
 
 
     path('farmownerpage', views.farmownerpage, name='farmownerpage'),
@@ -50,12 +50,15 @@ urlpatterns = [
     path('productslist',views.productslist,name='productslist'),
     path('productstock',views.productstock,name='productstock'),
     path('preorderfarm',views.preorderfarm,name='preorderfarm'),
+    path('orderdetails',views.orderdetails,name='orderdetails'),
     path('stocknotification', views.stocknotification, name='stocknotification'),
     path('farmerproductstock',views.farmerproductstock,name='farmerproductstock'),
 
     path('addanimal', views.addanimal, name='addanimal'),
     path('animalslist',views.animalslist,name='animalslist'),
+    path('animal/<int:animal_id>/', views.adminanimaldetails, name='adminanimaldetails'),
     path('animal/<int:animal_id>/', views.animaldetails, name='animaldetails'),
+    path('updateanimal/<int:animal_id>/', views.updateanimal, name='updateanimal'),
     path('animal/<int:animal_id>/animalhealthstatus/', views.animal_health_status, name='animal_health_status'),
     path('animal/<int:animal_id>/health/add/', views.add_health_record, name='add_health_record'),
     path('health/update/<int:health_id>/', views.update_health_record, name='update_health_record'),
@@ -84,8 +87,18 @@ urlpatterns = [
     path('checkoutorder/', views.checkoutorder, name='checkoutorder'),
     path('ordersummary/<int:order_id>/', views.ordersummary, name='ordersummary'),
     path('orderhistory/', views.orderhistory, name='orderhistory'),
+    path('pendingorders/', views.pendingorders, name='pendingorders'),
     path('cancelorder/<int:order_id>/', views.cancelorder, name='cancelorder'),
 
+
+    path('employeepage',views.employeepage,name='employeepage'),
+    path('deliveryassigns', views.deliveryassigns, name='deliveryassigns'),
+    path('get_employees/', views.get_employees, name='get_employees'),
+    path('assign_delivery/', views.assign_delivery, name='assign_delivery'),
+    path('deliveryboyassigns', views.deliveryboyassigns, name='deliveryboyassigns'),
+    path('update_order_status/', views.update_order_status, name='update_order_status'),
+
+    path('get_order_tracking/<int:order_id>/', views.get_order_tracking, name='get_order_tracking'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

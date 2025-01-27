@@ -189,6 +189,216 @@
             font-weight: bold;
             padding: 10px;
         }
+        
+        /* Track Order Modal Styles */
+        .track-order-modal {
+            width: 60%;
+            max-width: 400px;
+            padding: 30px;
+        }
+
+        .modal-header h3 {
+            color: #000000;
+            font-size: 24px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tracking-container {
+            padding: 20px 0;
+        }
+
+        .tracking-progress {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .tracking-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        /* Progress Line */
+        .tracking-step::before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% + 30px);
+            background-color: #e2e8f0;
+            z-index: 1;
+        }
+
+        .tracking-step:last-child::before {
+            display: none;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #718096;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
+        .step-text h4 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .step-time {
+            color: #718096;
+            font-size: 14px;
+            margin: 5px 0 0;
+        }
+
+        /* Active Step Styles */
+        .tracking-step.active .step-icon {
+            background-color: #4299e1;
+            color: white;
+        }
+
+        .tracking-step.active::before {
+            background-color: #4299e1;
+        }
+
+        /* Completed Step Styles */
+        .tracking-step.completed .step-icon {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .tracking-step.completed::before {
+            background-color: #48bb78;
+        }
+
+        /* Animation for steps */
+        .tracking-step {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tracking-step:nth-child(1) { animation-delay: 0.1s; }
+        .tracking-step:nth-child(2) { animation-delay: 0.2s; }
+        .tracking-step:nth-child(3) { animation-delay: 0.3s; }
+        .tracking-step:nth-child(4) { animation-delay: 0.4s; }
+
+        .track-order-modal {
+    width: 60%;
+    max-width: 800px;
+    padding: 30px;
+}
+
+.tracking-container {
+    padding: 20px 0;
+}
+
+.tracking-progress {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.tracking-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.tracking-step::before {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 40px;
+    width: 2px;
+    height: calc(100% + 30px);
+    background-color: #e2e8f0;
+    z-index: 1;
+}
+
+.tracking-step:last-child::before {
+    display: none;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #718096;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.step-text {
+    flex: 1;
+}
+
+.step-text h4 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.step-time {
+    color: #718096;
+    font-size: 14px;
+    margin: 5px 0 0;
+}
+
+.tracking-step.active .step-icon {
+    background-color: #4299e1;
+    color: white;
+}
+
+.tracking-step.completed .step-icon {
+    background-color: #48bb78;
+    color: white;
+}
+
+.tracking-step.active::before,
+.tracking-step.completed::before {
+    background-color: #48bb78;
+}
+
 
     </style>
     <!-- Add Font Awesome and SweetAlert2 CSS -->
@@ -199,8 +409,7 @@
 <body>
 
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#"></i> Dairy Care System</a><br><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
         <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
@@ -212,6 +421,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -240,7 +450,7 @@
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
-            <a href="#" class="view-summary"><strong>Track Order</strong></a>
+            <a href="#" class="view-summary" onclick="openTrackOrderModal({{ order.id }})"><strong>Track Order</strong></a>
             <!-- Cancel Order Button -->
             {% if order.get_status_display != "Canceled" %}
             <button class="cancel-order-btn" data-order-id="{{ order.id }}">Cancel Order</button>
@@ -287,6 +497,61 @@
                     <button type="button" class="cancel-btn" id="goBackBtn">No, Go Back</button>
                 </form>
             <!-- </div> -->
+        </div>
+    </div>
+
+    <!-- Add this modal HTML before the closing body tag -->
+    <div id="trackOrderModal" class="modal">
+        <div class="modal-content track-order-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-truck"></i> Track Your Order</h3>
+                <span class="close" onclick="closeTrackOrderModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="tracking-container">
+                    <div class="tracking-progress">
+                        <div class="tracking-step" id="orderPlaced">
+                            <div class="step-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="step-text">
+                                <h4>Order Placed</h4>
+                                <p class="step-time" id="orderPlacedTime"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="tracking-step" id="orderConfirmed">
+                            <div class="step-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="step-text">
+                                <h4>Order Confirmed</h4>
+                                <p class="step-time" id="orderConfirmedTime"></p>
+                            </div>
+                        </div>
+
+                        <div class="tracking-step" id="orderShipped">
+                            <div class="step-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="step-text">
+                                <h4>Order Shipped</h4>
+                                <p class="step-time" id="orderShippedTime"></p>
+                            </div>
+                        </div>
+
+                        <div class="tracking-step" id="orderDelivered">
+                            <div class="step-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="step-text">
+                                <h4>Order Delivered</h4>
+                                <p class="step-time" id="orderDeliveredTime"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -341,23 +606,23 @@
         }
 
         confirmCancelBtn.onclick = function() {
-    const form = document.getElementById("cancelOrderForm");
-    const orderId = orderIdInput.value;
+            const form = document.getElementById("cancelOrderForm");
+            const orderId = orderIdInput.value;
 
-    if (orderId) { // Check if the orderId is not empty
-        form.action = "{% url 'cancelorder' '0' %}".replace("0", orderId); // Default value to avoid errors
-        form.submit();
-    } else {
-        alert('Order ID is missing!'); // Alert if the ID is not found
-    }
-};
+            if (orderId) { // Check if the orderId is not empty
+                form.action = "{% url 'cancelorder' '0' %}".replace("0", orderId); // Default value to avoid errors
+                form.submit();
+            } else {
+                alert('Order ID is missing!'); // Alert if the ID is not found
+            }
+        };
 
-// Close the modal when "No, Go Back" is clicked
-const goBackBtn = document.getElementById("goBackBtn");
+        // Close the modal when "No, Go Back" is clicked
+        const goBackBtn = document.getElementById("goBackBtn");
 
-goBackBtn.onclick = function() {
-    modal.style.display = "none";
-};
+        goBackBtn.onclick = function() {
+            modal.style.display = "none";
+        };
 
         // Custom SweetAlert2 logout confirmation
         function confirmLogout() {
@@ -376,9 +641,75 @@ goBackBtn.onclick = function() {
                 }
             });
         }
+
+        let currentOrderId = null;
+
+        function openTrackOrderModal(orderId) {
+            currentOrderId = orderId;
+            const modal = document.getElementById("trackOrderModal");
+            
+            // Reset all steps
+            document.querySelectorAll('.tracking-step').forEach(step => {
+                step.classList.remove('active', 'completed');
+                const timeElement = step.querySelector('.step-time');
+                if (timeElement) {
+                    timeElement.textContent = '';
+                }
+            });
+
+            // Show loading state
+            modal.style.display = "block";
+
+            // Fetch order tracking details
+            fetch(`/get_order_tracking/${orderId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateTrackingStatus(data.status, data.tracking_info);
+                    } else {
+                        console.error('Error fetching tracking info:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function updateTrackingStatus(currentStatus, trackingInfo) {
+            const statusOrder = ['orderPlaced', 'orderConfirmed', 'orderShipped', 'orderDelivered'];
+            const currentIndex = statusOrder.indexOf(currentStatus);
+
+            statusOrder.forEach((status, index) => {
+                const stepElement = document.getElementById(status);
+                if (!stepElement) return;
+
+                if (index < currentIndex) {
+                    stepElement.classList.add('completed');
+                } else if (index === currentIndex) {
+                    stepElement.classList.add('active');
+                }
+
+                // Update timestamp if available
+                const timeElement = stepElement.querySelector('.step-time');
+                if (timeElement && trackingInfo[status]) {
+                    timeElement.textContent = trackingInfo[status];
+                }
+            });
+        }
+
+        function closeTrackOrderModal() {
+            document.getElementById("trackOrderModal").style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById("trackOrderModal");
+            if (event.target == modal) {
+                closeTrackOrderModal();
+            }
+        }
     </script>
 
 </body>
-
 </html>
 

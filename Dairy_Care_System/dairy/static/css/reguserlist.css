@@ -209,3 +209,60 @@ tr:nth-child(even) {
 .btn-cancel:hover {
     background-color: #c82333;
 }
+
+/* Filter Dropdown Styles */
+.filter-container {
+    display: flex;
+    align-items: center; /* Center items vertically */
+    justify-content: flex-start; /* Align items to the left */
+    margin-bottom: 20px; /* Space below the filter */
+}
+
+.filter-container label {
+    font-size: 18px;
+    color: #06065f;
+    margin-right: 80px; /* Space between label and dropdown */
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.filter-container h1 {
+    margin-left: 280px; /* Space between dropdown and heading */
+    color: #000000;
+    font-size: 40px; /* Adjust font size as needed */
+}
+
+#roleFilter {
+    padding: 10px 15px; /* Increased padding for a better touch target */
+    font-size: 16px;
+    border: 2px solid #4c51bf; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #ffffff; /* White background */
+    color: #333; /* Text color */
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+#roleFilter:hover {
+    border-color: #2b6cb0; /* Change border color on hover */
+    background-color: #f0f4ff; /* Light background color on hover */
+}
+
+#roleFilter:focus {
+    outline: none; /* Remove default outline */
+    border-color: #2b6cb0; /* Change border color on focus */
+    background-color: #ffffff; /* Keep background white on focus */
+    box-shadow: 0 0 5px rgba(43, 108, 176, 0.5); /* Glow effect on focus */
+}
+
+/* Custom dropdown options styling */
+#roleFilter option {
+    padding: 10px; /* Padding for dropdown options */
+    background-color: #ffffff; /* White background for options */
+    color: #333; /* Text color for options */
+}
+
+/* Option hover effect */
+#roleFilter option:hover {
+    background-color: #e0e7ff; /* Light background on hover */
+    color: #2b6cb0; /* Change text color on hover */
+}

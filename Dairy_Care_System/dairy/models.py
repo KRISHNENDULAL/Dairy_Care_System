@@ -9,12 +9,13 @@ class Users_table(models.Model):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=254, unique=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
+    is_phone_verified = models.BooleanField(default=False)
     password = models.CharField(max_length=128)  # For hashed password storage
     
     ROLES = (
         ('admin', 'Admin'),
         ('customer', 'Customer'),
-        ('employee', 'Employee'),
+        ('employee', 'DeliveryEmployee'),
         ('owner', 'Farm Owner'),
     )
     role = models.CharField(max_length=10, choices=ROLES)
@@ -204,6 +205,7 @@ class Order_table(models.Model):
     payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)  # Payment method
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')  # Order status
     order_date = models.DateTimeField(auto_now_add=True)  # Automatically set order date
+    deliveryboy = models.ForeignKey(Users_table, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_orders')  # Reference to assigned delivery personnel
     
     def __str__(self):
         return f"Order {self.id} - {self.user.username}"

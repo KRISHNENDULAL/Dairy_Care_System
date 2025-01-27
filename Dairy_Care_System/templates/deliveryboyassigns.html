@@ -1,0 +1,549 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Deliveries</title>
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/deliveryboyassigns.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
+        }
+
+        .delivery-container {
+            padding: 30px;
+            margin: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-title {
+            text-align: center;
+            color: #081e45;
+            font-family: Copperplate, Papyrus, fantasy;
+            margin-bottom: 40px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            margin-top: 20px;
+        }
+
+        .orders-table th {
+            background: #f8fafc;
+            color: #000000;
+            padding: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .orders-table td {
+            padding: 16px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+
+        .orders-table tr:hover {
+            background-color: #f7fafc;
+            transition: all 0.2s ease;
+        }
+
+        .status-badge {
+            padding: 8px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-confirmed {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-shipped {
+            background-color: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .status-delivered {
+            background-color: #DCFCE7;
+            color: #166534;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .customer-info i {
+            color: #4c51bf;
+            font-size: 1.2rem;
+        }
+
+        .price-column {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .address-cell {
+            max-width: 250px;
+            line-height: 1.4;
+            color: #4a5568;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #4c51bf;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .order-date {
+            color: #718096;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .order-date i {
+            color: #a0aec0;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+
+        .contact-info i {
+            color: #4c51bf;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 1024px) {
+            .delivery-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            margin: 15% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #a0aec0;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .status-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-btn.confirmed {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-btn.shipped {
+            background-color: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .status-btn.delivered {
+            background-color: #DCFCE7;
+            color: #166534;
+        }
+
+        .status-btn i {
+            font-size: 1.2rem;
+        }
+
+        .update-status-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #4c51bf;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .update-status-btn:hover {
+            background: #434190;
+        }
+    </style>
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+    <!-- Side Navigation -->
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
+        <a href="{% url 'deliveryboyassigns' %}"><i class="fas fa-truck"></i> Your Deliveries</a><br>
+        <a href="#"><i class="fas fa-shopping-basket"></i> Delivery Details</a><br>
+        <a href="#"><i class="fas fa-shopping-basket"></i> Feedback Review</a><br>
+        <a href="#"><i class="fas fa-shopping-basket"></i> Products List</a><br>
+        <a href="#"><i class="fas fa-bell"></i>  Notifications</a><br>
+    </div>
+
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <!-- Change Logout link to trigger a custom SweetAlert -->
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul><br><br><br><br><br><br>
+
+    <div class="delivery-container">
+        <h1 class="page-title"><i class="fas fa-truck"></i> My Delivery Assignments</h1>
+        {% csrf_token %}
+        {% if assigned_orders %}
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Delivery Details</th>
+                        <th>Contact Info</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Order Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in assigned_orders %}
+                        <tr data-order-id="{{ order.id }}">
+                            <td>
+                                <div class="customer-info">
+                                    <i class="fas fa-user-circle"></i>
+                                    <strong>{{ order.name }}</strong>
+                                </div>
+                            </td>
+                            <td class="address-cell">
+                                <div class="contact-info">
+                                    <span><i class="fas fa-map-marker-alt"></i>{{ order.delivery_address }}</span>
+                                    <span><i class="fas fa-map-pin"></i>{{ order.pincode }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <span><i class="fas fa-phone"></i>{{ order.phone }}</span>
+                                    <span><i class="fas fa-envelope"></i>{{ order.email }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ order.status|lower }}">
+                                    <i class="fas fa-circle" style="font-size: 8px;"></i>
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td class="price-column">₹{{ order.total_price }}</td>
+                            <td>
+                                <div class="order-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    {{ order.order_date|date:"M d, Y" }}
+                                </div>
+                            </td>
+                            <td>
+                                <button class="update-status-btn" onclick="openStatusModal('{{ order.id }}')">
+                                    <i class="fas fa-edit"></i> Update Status
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <p>No deliveries have been assigned to you yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Add this modal HTML before closing body tag -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-truck"></i> Update Delivery Status</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="status-options">
+                    <button class="status-btn confirmed" onclick="updateStatus('Confirmed')">
+                        <i class="fas fa-check-circle"></i> Confirmed
+                    </button>
+                    <button class="status-btn shipped" onclick="updateStatus('Shipped')">
+                        <i class="fas fa-shipping-fast"></i> Shipped
+                    </button>
+                    <button class="status-btn delivered" onclick="updateStatus('Delivered')">
+                        <i class="fas fa-box-check"></i> Delivered
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+        // Custom SweetAlert2 logout confirmation
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to logout URL
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+
+        let currentOrderId = null;
+
+        // Function to open modal
+        function openStatusModal(orderId) {
+            currentOrderId = orderId;
+            document.getElementById('statusModal').style.display = 'block';
+        }
+
+        // Function to close modal
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+
+        // Close modal when clicking on X
+        document.querySelector('.close').onclick = function() {
+            closeStatusModal();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            let modal = document.getElementById('statusModal');
+            if (event.target == modal) {
+                closeStatusModal();
+            }
+        }
+
+        // Function to update status
+        function updateStatus(status) {
+            if (!currentOrderId) return;
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch('/update_order_status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    order_id: currentOrderId,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the status badge in the table
+                    const row = document.querySelector(`tr[data-order-id="${currentOrderId}"]`);
+                    const statusCell = row.querySelector('.status-badge');
+                    
+                    // Update status badge class and text
+                    statusCell.className = `status-badge status-${status.toLowerCase()}`;
+                    statusCell.innerHTML = `
+                        <i class="fas fa-circle" style="font-size: 8px;"></i>
+                        ${status}
+                    `;
+
+                    // Close modal
+                    closeStatusModal();
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated!',
+                        text: `Order status has been updated to ${status}`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    // Show error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Failed',
+                        text: 'Failed to update the status. Please try again.'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the status.'
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>

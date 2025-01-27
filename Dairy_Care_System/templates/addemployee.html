@@ -19,9 +19,9 @@
 <body><br><br><br>
     
     <div class="container">
-        <a href="{% url 'reguserlist' 'employee' %}" class="back-link">&larr; BACK</a>
+        <a href="{% url 'reguserlist' 'employee' %}" class="back-link"><b>&larr; BACK</b></a>
         <div class="login-box">
-            <h2>Add Employee</h2><br>
+            <h2>Add Delivery Employee</h2><br>
             <form id="employeeForm" method="post">
                 {% csrf_token %}
                 
@@ -47,7 +47,7 @@
                 </div><br>
                 
                 <!-- Submit Button -->
-                <button type="submit">Add Employee</button>
+                <button type="submit">Add Delivery Employee</button>
             </form><br><br>
             
             <!-- Display success/error messages -->

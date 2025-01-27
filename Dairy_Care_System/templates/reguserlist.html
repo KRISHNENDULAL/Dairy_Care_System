@@ -25,18 +25,7 @@
         <div class="nav-item">
             <li><b><a href="{% url 'addemployee' %}"><i class="fas fa-user-plus"></i> Add Employee</a></b></li>
         </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i> Users List</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'reguserlist' 'owner' %}"><i class="fas fa-house-user"></i> Farm Owners List</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'reguserlist' 'customer' %}"><i class="fas fa-user-friends"></i> Customers List</a></b></li>
-        </div>
-        <div class="nav-item">
-            <li><b><a href="{% url 'reguserlist' 'employee' %}"><i class="fas fa-user-tie"></i> Employees List</a></b></li>
-        </div>
+        
         <div class="nav-item">
             <li>
                 <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
@@ -50,8 +39,18 @@
     </div>
 </ul>
 
+
 <div class="container">
-    <h1>{{ role|title }} List</h1>
+    <div class="filter-container" style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 20px;">
+        <label for="roleFilter" style="margin-right: 10px;">Filter by Role:</label>
+        <select id="roleFilter" onchange="filterUsers()">
+            <option value="all">All Users</option>
+            <option value="farm owner">Farm Owners</option>
+            <option value="customer">Customers</option>
+            <option value="deliveryemployee">Delivery Employees</option>
+        </select>
+        <h1>Users List</h1>
+    </div>
     <table>
         <thead>
             <tr>
@@ -220,6 +219,23 @@
             if (result.isConfirmed) {
                 // Redirect to logout URL
                 window.location.href = "{% url 'logout' %}";
+            }
+        });
+    }
+
+    function filterUsers() {
+        const filterValue = document.getElementById('roleFilter').value;
+        const rows = document.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const roleCell = row.querySelector('td:nth-child(4)'); // Assuming the role is in the 4th column
+            if (roleCell) {
+                const roleText = roleCell.textContent.toLowerCase(); // Convert to lowercase for comparison
+                if (filterValue === 'all' || roleText === filterValue) {
+                    row.style.display = ''; // Show the row
+                } else {
+                    row.style.display = 'none'; // Hide the row
+                }
             }
         });
     }

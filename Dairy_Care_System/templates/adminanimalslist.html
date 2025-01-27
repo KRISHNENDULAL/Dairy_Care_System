@@ -131,6 +131,22 @@
             display: block;
         }
 
+        .brand-name {
+            display: flex;
+            font-family: Copperplate, Papyrus, fantasy;
+            align-items: center;
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            padding-left: 20px;
+            gap: 10px;
+        }
+
+        .brand-name i {
+            color: #4361ee;
+            font-size: 28px;
+        }
+
         .back-link {
             position: absolute;
             top: 20px;
@@ -154,6 +170,7 @@
 
     <!-- Navigation Bar-->
     <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -172,14 +189,14 @@
     <!-- Animal Details Section -->
     <div class="animal-container">
         {% for animal in animals %}
-        <div class="animal" onclick="window.location.href='{% url 'animaldetails' animal.animal_id %}'" style="cursor: pointer;">
+        <div class="animal" onclick="window.location.href='{% url 'adminanimaldetails' animal.animal_id %}'" style="cursor: pointer;">
             {% if animal.images.exists %}  <!-- Check if there are images -->
                 <img src="{{ animal.images.first.animal_image.url }}" alt="{{ animal.animal_name }}"> <!-- Display the first image -->
             {% else %}
                 <img src="{% static 'images/default_animal_image.png' %}" alt="Default Image"> <!-- Placeholder if no image -->
             {% endif %}
             <h3><strong>{{ animal.animal_name }}</strong></h3>
-            <p>{{ animal.animal_category }}, {{ animal.breed }}</p>
+            <p>{{ animal.breed }}</p>
             <p><strong>Status:</strong> {% if not animal.status %}Inactive{% else %}Active{% endif %}<p>
         </div>
         {% empty %}

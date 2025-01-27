@@ -1,0 +1,408 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Assignments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f6f9;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #062e72;
+        }
+
+        .page-header h1 {
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            color: #0e0f11;
+        }
+
+        .orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background-color: white;
+        }
+
+        th {
+            background-color: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #032868;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: #46494f;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: #fff8e6;
+            color: #b7791f;
+        }
+
+        .status-processing {
+            background-color: #e6fffa;
+            color: #047481;
+        }
+
+        .status-delivered {
+            background-color: #f0fff4;
+            color: #2f855a;
+        }
+
+        .assign-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #00089d;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .assign-btn:hover {
+            background-color: #342dff;
+            transform: translateY(-1px);
+        }
+
+        .assign-btn:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .order-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-info i {
+            color: #595a5e;
+        }
+
+        .price {
+            font-weight: 600;
+            color: #d20606;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            td, th {
+                padding: 0.75rem;
+            }
+
+            .status-badge {
+                padding: 0.25rem 0.75rem;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            font-family: Copperplate, Papyrus, fantasy;
+            justify-content: space-between;
+            color: #d86111;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 15px;
+            right: 30px;
+            color: #000000;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Styling for the back link in the upper left corner */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 25px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br>
+
+    <div class="page-header">
+        <h1><i class="fas fa-truck"></i> Delivery Assignments</h1>
+        <p>Manage and assign deliveries to delivery partners</p>
+    </div>
+
+    <div class="orders-container">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-user"></i> Customer</th>
+                        <th><i class="fas fa-calendar"></i> Order Date</th>
+                        <th><i class="fas fa-rupee-sign"></i> Amount</th>
+                        <th><i class="fas fa-info-circle"></i> Status</th>
+                        <th><i class="fas fa-tasks"></i> Delivery Agent</th>
+                        <th><i class="fas fa-tasks"></i> Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><div class="order-info"><i class="fas fa-user-circle"></i>{{ order.name }}</div></td>
+                        <td>{{ order.order_date|date:"M d, Y" }}</td>
+                        <td class="price">₹{{ order.total_price }}</td>
+                        <td><span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span></td>
+                        <td><div class="order-info"><i class="fas fa-user-circle"></i>
+                            {% if order.deliveryboy %}
+                                {{ order.deliveryboy.username }}
+                            {% else %}
+                                Not Assigned
+                            {% endif %}
+                        </div></td>
+                        <td>
+                            <form action="#" method="POST">
+                                {% csrf_token %}
+                                <button type="button" 
+                                        class="assign-btn" 
+                                        data-order-id="{{ order.id }}" 
+                                        {% if order.status == 'Delivered' %}disabled{% endif %}>
+                                    <i class="fas fa-user-plus"></i>
+                                    {% if order.status == 'Delivered' %}
+                                        Assigned
+                                    {% else %}
+                                        Assign Delivery
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-box-open" style="font-size: 2rem; color: #cbd5e0;"></i>
+                            <p style="margin-top: 1rem; color: #718096;">No orders to assign</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add this modal HTML just before closing body tag -->
+    <div id="assignModal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <span class="close-btn">&times;</span><br>
+            <div class="modal-header">
+                <h2><u>Select Delivery Agent</u></h2>
+            </div>
+            <div class="modal-body">
+                <ul id="employeeList" style="list-style: none; padding: 0;">
+                    <!-- Employee list will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update your existing script section -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const assignButtons = document.querySelectorAll(".assign-btn");
+            const modal = document.getElementById("assignModal");
+            const closeBtn = document.querySelector(".close-btn");
+
+            // Close modal when clicking the close button
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+
+            assignButtons.forEach(button => {
+                button.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const orderId = this.getAttribute("data-order-id");
+                    const currentRow = this.closest('tr');
+
+                    // Show the modal
+                    modal.style.display = "block";
+
+                    // Fetch employees
+                    fetch('/get_employees/')
+                        .then(response => response.json())
+                        .then(data => {
+                            const employeeList = document.getElementById("employeeList");
+                            employeeList.innerHTML = "";
+
+                            data.employees.forEach(employee => {
+                                const li = document.createElement("li");
+                                li.style.padding = "10px";
+                                li.style.cursor = "pointer";
+                                li.style.borderBottom = "1px solid #eee";
+                                li.innerHTML = `
+                                    <div style="display: flex; align-items: center;">
+                                        <i class="fas fa-user-circle" style="margin-right: 10px; color: #4c51bf;"></i>
+                                        <div>
+                                            <div style="font-weight: bold;">${employee.username}</div>
+                                            <div style="color: #666; font-size: 0.9em;">
+                                                <i class="fas fa-phone" style="margin-right: 5px;"></i>
+                                                ${employee.phone || 'No phone number'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                li.addEventListener("click", function() {
+                                    assignDeliveryBoy(orderId, employee.user_id, employee.username, currentRow);
+                                });
+
+                                li.addEventListener("mouseover", function() {
+                                    this.style.backgroundColor = "#f0f0f0";
+                                });
+
+                                li.addEventListener("mouseout", function() {
+                                    this.style.backgroundColor = "transparent";
+                                });
+
+                                employeeList.appendChild(li);
+                            });
+                        })
+                        .catch(error => console.error("Error fetching employees:", error));
+                });
+            });
+
+            function assignDeliveryBoy(orderId, employeeId, employeeName, row) {
+                fetch('/assign_delivery/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    },
+                    body: JSON.stringify({
+                        id: orderId,
+                        deliveryboy: employeeId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the delivery boy column
+                        const deliveryBoyCell = row.querySelector('td:nth-child(5)');
+                        deliveryBoyCell.innerHTML = `
+                            <div class="order-info">
+                                <i class="fas fa-user-circle"></i>
+                                ${employeeName}
+                            </div>`;
+
+                        // Update the button
+                        const button = row.querySelector('.assign-btn');
+                        button.innerHTML = '<i class="fas fa-check"></i> Assigned';
+                        button.disabled = true;
+
+                        // Close modal
+                        modal.style.display = "none";
+                    } else {
+                        alert("Failed to assign delivery partner. Please try again.");
+                    }
+                })
+                .catch(error => console.error("Error assigning delivery boy:", error));
+            }
+        });
+    </script>
+
+</body>
+</html>

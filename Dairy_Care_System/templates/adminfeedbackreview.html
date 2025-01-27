@@ -86,6 +86,7 @@
                         <th>Product</th>
                         <th>Owner</th>
                         <th>Rating (/5)</th>
+                        <th>Analysis</th>
                         <th>Feedback</th>
                         <th>Submitted At</th>
                     </tr>
@@ -98,6 +99,15 @@
                         <td>{{ feedback.product.employee.username }}</td>
                         <td>
                             {{ feedback.rating }} <span class="rating"><i class="fas fa-star"></i></span>
+                        </td>
+                        <td>
+                            {% if feedback.rating >= 4 %}
+                                😊
+                            {% elif feedback.rating == 3 %}
+                                😐
+                            {% else %}
+                                😞
+                            {% endif %}
                         </td>
                         <td>{{ feedback.feedback_text }}</td>
                         <td>{{ feedback.created_at|date:"Y-m-d H:i" }}</td>

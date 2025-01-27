@@ -22,12 +22,12 @@
 
 
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#">Dairy Care System</a><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br>
         <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a>
         <a href="{% url 'addproducts' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
         <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>  Animals List</a>
         <a href="{% url 'addanimal' %}" style="padding-left: 50px; font-size: 1.3em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+        <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>  Order Details</a><br>
         <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>  Pre-Order Details</a><br>
         <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
@@ -39,6 +39,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -50,7 +51,7 @@
                 </li>
             </div>
         </div>
-    </ul>
+    </ul><br><br>
 
     <!-- Animal Details Section -->
     <div class="animal-container">

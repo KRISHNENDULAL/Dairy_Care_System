@@ -24,16 +24,21 @@
 </head>
 
 <body>
-    <!-- <a href="{% url 'userprofile' %}" class="back-link">&larr; BACK</a> -->
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
+                <li><b></b></li>
+            </div>
+            <div class="nav-item">
                 <li>
-                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ user.username }}</a></b>
+                    <b><a href="#" class="username" onclick="toggleDropdown()">
+                        <i class="fas fa-user-circle"></i> {{ user.username }}
+                    </a></b>
                     <div class="dropdown-content" id="dropdown-content">
-                        <a href="#" onclick="goBack()">&larr; Back</a>
+                        <a href="#" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</a>
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </li>

@@ -10,9 +10,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-import random
-import string
-import logging
+from django.utils.dateparse import parse_date
 from django.utils.crypto import get_random_string
 from django.urls import reverse
 from django.contrib.auth import logout 
@@ -21,10 +19,16 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Q  # Import Q for case-insensitive query
-import razorpay
 from google.cloud import dialogflow_v2 as dialogflow
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
+import razorpay
+import random
+import string
+import logging
+import json
+from datetime import datetime
 
 
 
@@ -279,7 +283,7 @@ def addemployee(request):
         user.save()
 
         # Print success message only after saving the user
-        messages.success(request, f"Employee '{username}' added successfully and email sent with login credentials.")
+        messages.success(request, f"Delivery Employee '{username}' added successfully and email sent with login credentials.")
 
         # Get the current site
         current_site = get_current_site(request)
@@ -318,6 +322,7 @@ def addemployee(request):
     return render(request, 'addemployee.html')
 
 
+
 def login(request):
     if request.method == 'POST':
         username_or_email = request.POST.get('username')
@@ -353,49 +358,8 @@ def login(request):
     return render(request, 'login.html')
 
 
-# def login(request):
-#     if request.method == 'POST':
-#         username_or_email = request.POST.get('username')
-#         password = request.POST.get('password')
 
-#         # First, check in the custom Users_table
-#         user = Users_table.objects.filter(username=username_or_email).first() or Users_table.objects.filter(email=username_or_email).first()
-
-#         if user and user.status == 1:
-#             # Validate password for Users_table entries
-#             if check_password(password, user.password):
-#                 request.session['user_id'] = user.user_id
-#                 request.session['username'] = user.username
-
-#                 # Redirect based on user role in Users_table
-#                 if user.role == 'customer':
-#                     return redirect('customerpage')
-#                 elif user.role == 'employee':
-#                     return redirect('employeepage')
-#                 elif user.role == 'admin':
-#                     return redirect('adminpage')
-#             else:
-#                 messages.error(request, 'Invalid credentials')
-        
-#         else:
-#             # Check in Django's auth_user table if not found in Users_table
-#             auth_user = authenticate(request, username=username_or_email, password=password)
-#             if auth_user:
-#                 # Set session data for auth_user table users
-#                 request.session['user_id'] = auth_user.id  # Use id as primary key
-#                 request.session['username'] = auth_user.username
-
-#                 # Assuming users from auth_user should go to 'customerpage' by default
-#                 return redirect('customerpage')
-#             else:
-#                 messages.error(request, 'Invalid credentials or deactivated account')
-
-#         return render(request, 'login.html')
-
-#     return render(request, 'login.html')
-
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def changepassword(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if not user_id:
@@ -423,6 +387,7 @@ def changepassword(request):
     return render(request, 'changepassword.html', context)
 
 
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def reguserlist(request, role=None):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
@@ -439,11 +404,12 @@ def reguserlist(request, role=None):
         context = {
             'username': user.username,  # Pass the logged-in username to the template
             'users': users,  # Pass the list of users based on the role
-            'role': role,    # Pass the role to identify if it’s customer, employee, or all
+            'role': role,    # Pass the role to identify if it's customer, employee, or all
         }
         return render(request, 'reguserlist.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
 
 
 def regdeleteuser(request, user_id):
@@ -476,6 +442,7 @@ def regdeleteuser(request, user_id):
     return redirect('reguserlist', 'all')  # Redirect to the user list page
 
 
+
 def restoreuser(request, user_id):
     user = get_object_or_404(Users_table, user_id=user_id)
     user.status = True  # Set status back to active
@@ -498,6 +465,33 @@ def restoreuser(request, user_id):
 
     send_mail(subject, message, from_email, recipient_list)
     return redirect('reguserlist', 'all')  # Redirect to the user list page
+
+
+
+def deleteaccount(request, user_id):
+    
+    user = get_object_or_404(Users_table, user_id=user_id)
+    user.status = False  # Set status to inactive
+    user.save()  # Save changes to the database
+    
+    # Send email notification
+    subject = 'Account Deletion Notification - Dairy Care System ⚠️'
+    message = (
+        f"Hello {user.username},\n\n"
+        "We want to inform you that your account has been deactivated.\n\n"
+        "If you believe this action was taken in error, please reach out to our support team at "
+        "dairycaresystem25@gmail.com for assistance.\n\n"
+        "Thank you for being a part of our community. We hope to resolve this matter quickly.\n\n"
+        "Best regards,\n"
+        "The Dairy Care System Team\n\n\n\n\n"
+        "Disclaimer: This is an automated message. If you did not request this change, please contact our support team immediately."
+    )
+
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [user.email]
+
+    send_mail(subject, message, from_email, recipient_list)
+    return redirect('home')  
 
 
 
@@ -528,6 +522,8 @@ def employeepage(request):
         return redirect('login')  # Redirect to login if no user is logged in 
     
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def farmownerpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
@@ -615,11 +611,15 @@ def feedbackpage(request):
         return redirect('login')
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminfeedbackreview(request):
     feedback_list = Feedback_table.objects.all().order_by('-created_at')
     return render(request, 'adminfeedbackreview.html', {'feedback_list': feedback_list})
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def feedbackreview(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     
@@ -649,6 +649,7 @@ def feedbackreview(request):
 
     
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def custfeedback(request):
     user_id = request.session.get('user_id')  # Retrieve the logged-in user's ID from the session
 
@@ -687,6 +688,7 @@ def userprofile(request):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def updateuserprofile(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -709,9 +711,35 @@ def updateuserprofile(request):
     return render(request, 'updateuserprofile.html', context)
 
 
-# def user_logout(request):
-#     logout(request)
-#     return redirect('home')  # Redirect to home page or login page
+
+# def send_otp(request):
+#     if request.user.is_authenticated:
+#         otp = random.randint(1000, 9999)
+#         request.session['otp'] = otp  # Store OTP in session
+#         # Here, implement logic to send OTP to `request.user.phone`
+#         print(f"OTP sent to {request.user.phone}: {otp}")  # Debugging purpose
+#         return JsonResponse({'success': True, 'message': 'OTP sent successfully!'})
+#     return JsonResponse({'success': False, 'message': 'User not authenticated.'})
+
+
+
+# @csrf_exempt
+# def verify_otp(request):
+#     if request.method == 'POST' and request.user.is_authenticated:
+#         data = json.loads(request.body)
+#         user_otp = data.get('otp')
+#         session_otp = request.session.get('otp')
+
+#         if str(user_otp) == str(session_otp):
+#             user = Users_table.objects.get(user_id=request.user.user_id)
+#             user.is_phone_verified = True
+#             user.save()
+#             return JsonResponse({'success': True, 'message': 'Phone verified successfully!'})
+#         else:
+#             return JsonResponse({'success': False, 'message': 'Invalid OTP. Please try again.'})
+#     return JsonResponse({'success': False, 'message': 'Invalid request.'})
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def logout(request):
@@ -775,26 +803,33 @@ def adminproductslist(request):
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
 
-        # Get the search query from the GET request (if any)
-        search_query = request.GET.get('search', '')
+        # Get the search query and selected category from the GET request
+        search_query = request.GET.get('search', '').strip()
+        selected_category = request.GET.get('product_category', '').strip()
 
-        # If a search query exists, filter products based on the search term
+        # Start with a base query for active products
+        products = Products_table.objects.all()
+
+        # Apply search filter if a search query is provided
         if search_query:
-            products = Products_table.objects.filter(product_name__icontains=search_query)
-        else:
-            # Fetch all products if no search query is provided
-            products = Products_table.objects.all()
+            products = products.filter(product_name__icontains=search_query)
+
+        # Apply category filter if a category is selected
+        if selected_category:
+            products = products.filter(product_category=selected_category)
 
         context = {
             'username': user.username,  # Pass the username to the template
-            'products': products,       # Pass the filtered or all products to the template
-            'search_query': search_query,  # Pass the search query to retain the input value in the search bar
+            'products': products,       # Pass the filtered products to the template
+            'search_query': search_query,  # Retain the search query in the input field
+            'selected_category': selected_category,  # Retain the selected category
         }
 
         return render(request, 'adminproductslist.html', context)
 
     else:
         return redirect('login')  # Redirect to login if no user is logged in
+
     
 
 
@@ -807,27 +842,32 @@ def productslist(request):
         
         # Get the search query from the GET request (if any)
         search_query = request.GET.get('search', '')
+        selected_category = request.GET.get('product_category', '')  # Selected category
         
-        # Filter products added by the logged-in user (matching employee_id with user_id)
+        # Base query: Filter products added by the logged-in user
+        products = Products_table.objects.filter(
+            employee_id=user_id  # Use employee_id instead of added_by
+        ).select_related('employee')
+        
+        # Apply additional filters based on search query and selected category
         if search_query:
-            products = Products_table.objects.filter(
-                product_name__icontains=search_query,
-                employee_id=user_id  # Use employee_id instead of added_by
-            ).select_related('employee')
-        else:
-            products = Products_table.objects.filter(
-                employee_id=user_id  # Use employee_id instead of added_by
-            ).select_related('employee')
+            products = products.filter(product_name__icontains=search_query)
+        
+        if selected_category:
+            products = products.filter(product_category=selected_category)
 
         # Fetch distinct categories for products added by the logged-in user
         categories = Products_table.objects.filter(
             employee_id=user_id
         ).values_list('product_category', flat=True).distinct()
+
+        
         
         context = {
             'username': user.username,  # Pass the username to the template
             'products': products,       # Pass the filtered or all products to the template
             'search_query': search_query,  # Pass the search query to retain the input value in the search bar
+            'selected_category': selected_category,  # Pass the selected category to retain the selection in the dropdown
             'categories': categories,  # Pass the categories to the template
         }
         
@@ -841,58 +881,38 @@ def productslist(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def custproductslist(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    
+
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        
+
         search_query = request.GET.get('search', '')  # Get the search query from the GET request
-        
-        # If a search query exists, filter the products based on the search term
+        selected_category = request.GET.get('product_category', '')  # Selected category
+
+        # Fetch all products filtered by status
+        products = Products_table.objects.filter(status=True)
+
+        # Apply search filter if search query is provided
         if search_query:
-            products = Products_table.objects.filter(product_name__icontains=search_query, status=True)
-        else:
-            # Fetch all available products if no search query is provided
-            products = Products_table.objects.filter(status=True)
-        
+            products = products.filter(product_name__icontains=search_query)
+
+        # Apply category filter if a category is selected
+        if selected_category:
+            products = products.filter(product_category=selected_category)
+
         context = {
             'username': user.username,  # Pass the username to the template
             'products': products,       # Pass the filtered or all products to the template
             'search_query': search_query,  # Pass the search query to the template (optional for retaining input value)
+            'selected_category': selected_category,  # Pass the selected category to retain its value
         }
         return render(request, 'custproductslist.html', context)
-    
+
     else:
         return redirect('login')  # Redirect to login if no user is logged in
 
-    
-
-# def productdetails(request):
-#     if request.method == 'POST':
-#         product_id = request.POST.get('product_id')
-#         product = get_object_or_404(Products_table, product_id=product_id)
-#         images = product.images.all()  # Get associated images
-
-#         # Wishlist addition logic remains the same
-#         if 'add_to_wishlist' in request.POST:
-#             user_id = request.session.get('user_id')
-#             if user_id:
-#                 user = Users_table.objects.get(user_id=user_id)
-#                 wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
-
-#                 if created:
-#                     messages.success(request, f'{product.product_name} added to wishlist successfully!')
-#                 else:
-#                     messages.info(request, f'{product.product_name} is already in your wishlist.')
-#             else:
-#                 messages.error(request, 'You need to log in to add to your wishlist.')
-
-#         context = {
-#             'product': product,
-#             'images': images,
-#         }
-#         return render(request, 'productdetails.html', context)
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def productdetails(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
 
@@ -905,6 +925,9 @@ def productdetails(request):
         product_id = request.POST.get('product_id')
         product = get_object_or_404(Products_table, product_id=product_id)
         images = product.images.all()  # Get associated images
+
+        # Determine product availability status
+        product_status = "Available" if product.product_quantity > 0 else "Out of Stock"
 
         # Wishlist addition logic
         if 'add_to_wishlist' in request.POST:
@@ -923,6 +946,7 @@ def productdetails(request):
             'images': images,
             'username': user.username,  # Pass the username to the template
             'feedbacks': feedbacks,  # Pass feedbacks to the template
+            'product_status': product_status,  # Pass product status to the template
         }
         return render(request, 'productdetails.html', context)
 
@@ -932,42 +956,6 @@ def productdetails(request):
     }
     return render(request, 'productdetails.html', context)
 
-
-
-# def productdetails(request):
-#     user_id = request.session.get('user_id')  # Retrieve user_id from the session
-
-#     if not user_id:
-#         return redirect('login')  # Redirect to login if no user is logged in
-
-#     user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-
-#     if request.method == 'POST':
-#         product_id = request.POST.get('product_id')
-#         product = get_object_or_404(Products_table, product_id=product_id)
-#         images = product.images.all()  # Get associated images
-
-#         # Wishlist addition logic
-#         if 'add_to_wishlist' in request.POST:
-#             wishlist_item, created = WishlistItem.objects.get_or_create(user=user, product=product)
-
-#             if created:
-#                 messages.success(request, f'{product.product_name} added to wishlist successfully!')
-#             else:
-#                 messages.info(request, f'{product.product_name} is already in your wishlist.')
-
-#         context = {
-#             'product': product,
-#             'images': images,
-#             'username': user.username,  # Pass the username to the template
-#         }
-#         return render(request, 'productdetails.html', context)
-
-#     # If not a POST request, simply pass the user's username
-#     context = {
-#         'username': user.username,
-#     }
-#     return render(request, 'productdetails.html', context)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -1005,6 +993,7 @@ def wishlist(request):
         return render(request, 'wishlist.html', {'wishlist': wishlist_items, 'username': user.username})
     else:
         return redirect('login')
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -1066,6 +1055,7 @@ def updateproduct(request, product_id):
     return render(request, 'updateproduct.html', context)
 
 
+
 def deleteproduct(request, product_id):
     product = get_object_or_404(Products_table, product_id=product_id)
     product.status = False  # Set status to 0 (deleted)
@@ -1079,6 +1069,8 @@ def restoreproduct(request, product_id):
     return redirect('productslist')  # Redirect to the product listing page
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminproductstock(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
@@ -1101,6 +1093,8 @@ def adminproductstock(request):
         return redirect('login')
     
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def farmerproductstock(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
@@ -1123,6 +1117,8 @@ def farmerproductstock(request):
         return redirect('login')
     
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def productstock(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
@@ -1143,7 +1139,6 @@ def productstock(request):
     else:
         # Redirect to login if user is not authenticated
         return redirect('login')
-
 
 # def preorder(request):
 #     if request.method == "POST":
@@ -1188,6 +1183,9 @@ def productstock(request):
 #     product = get_object_or_404(Products_table, product_id=product_id)
 #     return render(request, "preorder.html", {"product": product})
 
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def preorder(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
 
@@ -1249,6 +1247,8 @@ def preorder(request):
     return render(request, "preorder.html", context)
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def preorderlisting(request):
     # Get user_id from the session
     user_id = request.session.get('user_id')
@@ -1266,6 +1266,8 @@ def preorderlisting(request):
         return redirect('login')  # Redirect to login if user_id is not in the session
     
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def preorderfarm(request):
     # Get the logged-in farmer's ID from the session
     farmer_id = request.session.get('user_id')
@@ -1284,6 +1286,7 @@ def preorderfarm(request):
         # Redirect to login if farmer_id is not found in the session
         return redirect('login')
     
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminanimalslist(request):
@@ -1380,7 +1383,22 @@ def addanimal(request):
     return render(request, 'addanimal.html')
 
 
-def animaldetails(request, animal_id):
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def adminanimaldetails(request, animal_id): 
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    # Initialize context dictionary
+    context = {}
+
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context['username'] = user.username  # Pass the username to the template
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+
     # Fetch the specific animal with related images
     animal = get_object_or_404(Animals_table.objects.prefetch_related('images'), animal_id=animal_id)
 
@@ -1390,11 +1408,83 @@ def animaldetails(request, animal_id):
         animal_age_years = (current_date - animal.date_of_birth).days // 365  # Calculate age in years
         animal.age_in_years = animal_age_years  # Add a custom attribute to hold the age
 
-    context = {
-        'animal': animal,
-    }
+    # Pass the animal details to the context
+    context['animal'] = animal
+
+    return render(request, 'adminanimaldetails.html', context)
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def animaldetails(request, animal_id): 
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+    
+    # Initialize context dictionary
+    context = {}
+
+    if user_id:
+        # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context['username'] = user.username  # Pass the username to the template
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+    # Fetch the specific animal with related images
+    animal = get_object_or_404(Animals_table.objects.prefetch_related('images'), animal_id=animal_id)
+
+    # Calculate the age of the animal
+    if animal.date_of_birth:
+        current_date = timezone.now().date()  # Get the current date
+        animal_age_years = (current_date - animal.date_of_birth).days // 365  # Calculate age in years
+        animal.age_in_years = animal_age_years  # Add a custom attribute to hold the age
+
+    # Pass the animal details to the context
+    context['animal'] = animal
 
     return render(request, 'animaldetails.html', context)
+
+
+
+def updateanimal(request, animal_id):
+    # Fetch the animal object using the provided ID
+    animal = get_object_or_404(Animals_table, animal_id=animal_id)
+    
+    # Fetch the existing images for the animal
+    images = AnimalImages.objects.filter(animal=animal)
+
+    # If the form is submitted, update the animal details
+    if request.method == 'POST':
+        # Manually update the animal fields from POST data
+        animal.animal_name = request.POST.get('animal_name', animal.animal_name)
+        animal.breed = request.POST.get('breed', animal.breed)
+
+        # Ensure the date_of_birth is parsed correctly
+        date_of_birth_str = request.POST.get('date_of_birth')
+        if date_of_birth_str:
+            animal.date_of_birth = parse_date(date_of_birth_str)
+
+        animal.gender = request.POST.get('gender', animal.gender)
+        animal.milk_capacity = request.POST.get('milk_capacity', animal.milk_capacity)
+        
+        # Handle image upload - update images if a new one is uploaded
+        if request.FILES.get('animal_image'):
+            # Delete old images
+            images.delete()  # Delete all existing images for the animal
+            
+            new_image = request.FILES['animal_image']
+            AnimalImages.objects.create(animal=animal, animal_image=new_image)
+
+        # Save the updated animal details
+        animal.save()
+
+        # Redirect to animal details page after update
+        return redirect('animaldetails', animal_id=animal.animal_id)  
+
+    # Render the template with the animal and its current images
+    return render(request, 'updateanimal.html', {'animal': animal, 'images': images})
+
+
 
 def delete_animal(request, animal_id):
     animal = get_object_or_404(Animals_table, pk=animal_id)
@@ -1411,7 +1501,8 @@ def restore_animal(request, animal_id):
     return redirect('animaldetails', animal_id=animal_id)
     
 
-# View for animal health status
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def animal_health_status(request, animal_id):
     animal = get_object_or_404(Animals_table, animal_id=animal_id)
     health_records = AnimalHealth_table.objects.filter(animal=animal)  # Use the foreign key 'animal'
@@ -1454,7 +1545,9 @@ def add_health_record(request, animal_id):
 
     return render(request, 'add_health_record.html', {'animal_id': animal_id})
 
-# View to update an existing health record
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_health_record(request, health_id):
     health_record = get_object_or_404(AnimalHealth_table, health_id=health_id)
 
@@ -1474,6 +1567,8 @@ def update_health_record(request, health_id):
     return render(request, 'update_health_record.html', {'health_record': health_record})
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminmilkdetails(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
@@ -1500,6 +1595,7 @@ def adminmilkdetails(request):
     
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def milkdetails(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
@@ -1598,7 +1694,8 @@ def delete_from_cart(request, cart_id):
     return redirect('viewcart') """
 
 
-# Add a product to the cart
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_to_cart(request):
     if request.method == 'POST':
         # Get product_id from the POST data
@@ -1623,6 +1720,7 @@ def add_to_cart(request):
             cart_item.save()
 
         return redirect('viewcart')  # Redirect to the cart view after adding the item
+
 
 # View the cart
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -1652,7 +1750,7 @@ def viewcart(request):
         return redirect('login')
 
 
-# Update the quantity of a product in the cart
+
 def update_cart(request, cart_id):
     if request.method == 'POST':
         cart_item = get_object_or_404(Cart, pk=cart_id)
@@ -1874,6 +1972,8 @@ def checkoutorder(request):
     })
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminstocknotification(request):
     # Fetch unread notifications
     notifications = Notifications_table.objects.filter(is_read=False).order_by('-created_at')
@@ -1893,6 +1993,8 @@ def adminstocknotification(request):
     })
 
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def stocknotification(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')
@@ -1927,7 +2029,8 @@ def stocknotification(request):
         return redirect('login')
 
 
-# View to display the order summary after placing an order
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def ordersummary(request, order_id):
     # order_id = request.GET.get('order_id')
     # if not order_id:
@@ -1949,7 +2052,8 @@ def ordersummary(request, order_id):
     return render(request, 'ordersummary.html', context)
 
 
-# View to display the order history
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def orderhistory(request):
     # Retrieve user_id from the session
     user_id = request.session.get('user_id')  
@@ -1999,6 +2103,129 @@ def cancelorder(request, order_id):
 
 
 
+# Check if the user has any pending orders
+def pendingorders(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        pending_orders = Order_table.objects.filter(user_id=user_id, status='pending')
+        return JsonResponse({'has_pending_orders': pending_orders.exists()})
+    return JsonResponse({'has_pending_orders': False})
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def orderdetails(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+
+    if user_id:
+        # Fetch the farm owner object using user_id
+        farm_owner = Users_table.objects.get(user_id=user_id)
+
+        # Fetch all products added by the logged-in farm owner
+        products = Products_table.objects.filter(employee_id=farm_owner)
+
+        # Fetch all orders that contain the products added by the farm owner
+        orders = Order_table.objects.filter(order_items__product__in=products).distinct().order_by('-order_date')
+
+        # Pass both orders and username to the template
+        context = {
+            'username': farm_owner.username,
+            'orders': orders,
+        }
+
+        return render(request, 'orderdetails.html', context)
+    else:
+        # Redirect to login if no user is logged in
+        return redirect('login')
+    
+
+
+def deliveryassigns(request):
+    orders = Order_table.objects.all().order_by('-order_date')  # Fetch all orders
+    return render(request, 'deliveryassigns.html', {'orders': orders})
+
+
+
+def get_employees(request):
+    if request.method == "GET":
+        # Fetch users with role='employee' including phone number
+        employees = Users_table.objects.filter(role='employee').values('user_id', 'username', 'phone')
+        return JsonResponse({"employees": list(employees)})
+    return JsonResponse({"employees": []})
+
+
+@csrf_exempt
+def assign_delivery(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        order_id = data.get("id")
+        employee_id = data.get("deliveryboy")
+
+        try:
+            order = Order_table.objects.get(id=order_id)
+            employee = Users_table.objects.get(user_id=employee_id)
+
+            order.deliveryboy = employee
+            order.status = "Shipped"
+            order.save()
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def deliveryboyassigns(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+
+    if user_id:
+        try:
+            # Fetch the user object using user_id
+            user = Users_table.objects.get(user_id=user_id)
+
+            # Fetch all orders assigned to this delivery boy
+            assigned_orders = Order_table.objects.filter(deliveryboy=user).order_by('-order_date')
+
+            context = {
+                'username': user.username,  # Pass the username to the template
+                'assigned_orders': assigned_orders,  # Pass assigned orders to the template
+            }
+            return render(request, 'deliveryboyassigns.html', context)
+        except Users_table.DoesNotExist:
+            # Handle case where user does not exist (e.g., invalid session data)
+            return redirect('login')
+    else:
+        # Redirect to login if no user is logged in
+        return redirect('login')
+
+
+
+@csrf_exempt
+def update_order_status(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            new_status = data.get('status')
+            
+            # Get the order and update its status
+            order = Order_table.objects.get(id=order_id)
+            order.status = new_status
+            order.save()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+
 """def login(request):
     return render(request, 'login.html')
 
@@ -2010,3 +2237,42 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+def get_order_tracking(request, order_id):
+    try:
+        order = Order_table.objects.get(id=order_id)
+        
+        # Map the status to tracking steps
+        status_mapping = {
+            'Placed': 'orderPlaced',
+            'Confirmed': 'orderConfirmed',
+            'Shipped': 'orderShipped',
+            'Delivered': 'orderDelivered'
+        }
+        
+        current_status = status_mapping.get(order.status, 'orderPlaced')
+        
+        # Get tracking information with timestamps
+        tracking_info = {
+            'orderPlaced': order.created_at.strftime("%B %d, %Y %I:%M %p"),
+            'orderConfirmed': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Confirmed', 'Shipped', 'Delivered'] else None,
+            'orderShipped': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Shipped', 'Delivered'] else None,
+            'orderDelivered': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status == 'Delivered' else None
+        }
+
+        return JsonResponse({
+            'success': True,
+            'status': current_status,
+            'tracking_info': tracking_info
+        })
+    except Order_table.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Order not found'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+

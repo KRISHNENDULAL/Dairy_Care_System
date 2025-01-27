@@ -6,17 +6,30 @@ ul {
     display: flex;
     background-color: #000;
     align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+
+.brand-name {
+    display: flex;
+    font-family: Copperplate, Papyrus, fantasy;
+    align-items: center;
+    color: white;
+    font-size: 27px;
+    font-weight: bold;
+    padding-left: 20px;
+    gap: 10px;
+}
+
+.brand-name i {
+    color: #4361ee;
+    font-size: 28px;
 }
 
 .header {
-    width: 100%;
     display: flex;
-    font-size: 20px;
-    justify-content: flex-end;
     align-items: center;
-    margin: 0 3px;
-    padding: 3px 10px;
-    font-family: 'Arial', sans-serif;
+    margin-right: 20px;
 }
 
 .nav-item {

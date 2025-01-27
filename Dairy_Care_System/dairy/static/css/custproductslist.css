@@ -83,7 +83,7 @@ p {
 
 .search-bar {
     padding: 10px;
-    width: 60%;
+    width: 50%;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
@@ -101,4 +101,39 @@ p {
 
 .search-button:hover {
     background-color: #105314;
+}
+
+/* Dropdown styling */
+#productCategory {
+    width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    color: #555; /* Text color */
+    background-color: #f9f9f9; /* Light background */
+    border: 2px solid #ccc; /* Border styling */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: all 0.3s ease; /* Smooth transitions */
+    outline: none;
+}
+
+/* Hover and focus effects */
+#productCategory:hover,
+#productCategory:focus {
+    border-color: #5c85d6; /* Highlighted border color */
+    background-color: #fff; /* Brighter background */
+    color: #333; /* Darker text color */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+}
+
+/* Disabled option styling */
+#productCategory option:disabled {
+    color: #aaa; /* Greyed-out color */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #productCategory {
+        width: 200px; /* Slightly narrower on smaller screens */
+    }
 }

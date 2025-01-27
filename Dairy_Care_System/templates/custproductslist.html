@@ -26,8 +26,7 @@
 
 <body>
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <a href="#"></i> Dairy Care System</a><br><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
         <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
@@ -39,6 +38,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -61,7 +61,19 @@
     <center>
         <div class="search-bar-container">
             <form method="GET" action="{% url 'custproductslist' %}">
-                <input type="text" name="search" id="search-bar" class="search-bar" placeholder="Search for products..." value="{{ request.GET.search|default_if_none:'' }}">
+                <input type="text" name="search" id="search-bar" class="search-bar" placeholder="Search for products..." value="{{ search_query }}">
+                <!-- Category Dropdown -->
+                <select id="productCategory" name="product_category">
+                    <option value="" disabled {% if not selected_category %}selected{% endif %}>Category search...</option>
+                    <option value="milk" {% if selected_category == "milk" %}selected{% endif %}>Milk</option>
+                    <option value="spreads" {% if selected_category == "spreads" %}selected{% endif %}>Spreads</option>
+                    <option value="non-fermented" {% if selected_category == "non-fermented" %}selected{% endif %}>Non-Fermented</option>
+                    <option value="fermented" {% if selected_category == "fermented" %}selected{% endif %}>Fermented</option>
+                    <option value="powders" {% if selected_category == "powders" %}selected{% endif %}>Powders</option>
+                    <option value="desserts" {% if selected_category == "desserts" %}selected{% endif %}>Desserts</option>
+                    <option value="beverages" {% if selected_category == "beverages" %}selected{% endif %}>Beverages</option>
+                </select>
+                <!-- Search and Voice Buttons -->
                 <button type="button" id="voice-search-button" class="search-button">
                     <i class="fas fa-microphone"></i>
                 </button>

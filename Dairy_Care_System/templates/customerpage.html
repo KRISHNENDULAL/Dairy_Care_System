@@ -143,45 +143,44 @@
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
 
-    /* Animations */
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
-    }
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
+        /* Scrollbar Styling */
+        .chat-popup-body::-webkit-scrollbar {
+            width: 6px;
         }
-        to {
-            opacity: 1;
+
+        .chat-popup-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
-    }
 
-    /* Scrollbar Styling */
-    .chat-popup-body::-webkit-scrollbar {
-        width: 6px;
-    }
+        .chat-popup-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
 
-    .chat-popup-body::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    .chat-popup-body::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 3px;
-    }
-
-    .chat-popup-body::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
+        .chat-popup-body::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -191,9 +190,7 @@
 <body>
 
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav">
-        <!-- <h3>Dairy Care System</h3><br><br><br> -->
-        <a href="#"></i> Dairy Care System</a><br><br><br>
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'custproductslist' %}" id="products"><i class="fas fa-shopping-basket"></i> Products List</a><br>
         <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Your Wishlist</a><br>
         <a href="{% url 'viewcart' %}"><i class="fas fa-shopping-cart"></i> Your Cart</a><br>
@@ -205,6 +202,7 @@
 
     <!-- Navigation Bar -->
     <ul>
+        <div class="brand-name"><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>

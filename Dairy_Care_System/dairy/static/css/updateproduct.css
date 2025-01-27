@@ -5,7 +5,6 @@
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    float: left; /* Aligns the container to the right */
 }
 
 h1, h2 {
