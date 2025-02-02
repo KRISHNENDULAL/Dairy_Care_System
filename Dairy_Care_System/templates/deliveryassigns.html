@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Assignments</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         * {
             margin: 0;
@@ -144,7 +145,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
 
@@ -156,7 +156,6 @@
             background: white;
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
 
@@ -217,10 +216,10 @@
         .back-link:hover {
             text-decoration: underline;
         }
+        
     </style>
 </head>
 <body>
-    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br>
 
     <div class="page-header">
         <h1><i class="fas fa-truck"></i> Delivery Assignments</h1>
@@ -260,10 +259,14 @@
                                 <button type="button" 
                                         class="assign-btn" 
                                         data-order-id="{{ order.id }}" 
-                                        {% if order.status == 'Delivered' %}disabled{% endif %}>
-                                    <i class="fas fa-user-plus"></i>
+                                        {% if order.status == 'Delivered' or order.status == 'Cancelled' %}disabled{% endif %}>
+                                    <i class="fas {% if order.deliveryboy %}fa-user-minus{% else %}fa-user-plus{% endif %}"></i>
                                     {% if order.status == 'Delivered' %}
                                         Assigned
+                                    {% elif order.status == 'Cancelled' %}
+                                        Order Cancelled
+                                    {% elif order.deliveryboy %}
+                                        Unassign Delivery
                                     {% else %}
                                         Assign Delivery
                                     {% endif %}
@@ -374,7 +377,8 @@
                     },
                     body: JSON.stringify({
                         id: orderId,
-                        deliveryboy: employeeId
+                        deliveryboy: employeeId,
+                        action: 'assign'
                     })
                 })
                 .then(response => response.json())
@@ -390,8 +394,9 @@
 
                         // Update the button
                         const button = row.querySelector('.assign-btn');
-                        button.innerHTML = '<i class="fas fa-check"></i> Assigned';
-                        button.disabled = true;
+                        button.innerHTML = '<i class="fas fa-user-minus"></i> Unassign Delivery';
+                        button.removeEventListener('click', showModal);
+                        button.addEventListener('click', () => unassignDeliveryBoy(orderId, row));
 
                         // Close modal
                         modal.style.display = "none";
@@ -401,8 +406,97 @@
                 })
                 .catch(error => console.error("Error assigning delivery boy:", error));
             }
+
+            function unassignDeliveryBoy(orderId, row) {
+                fetch('/assign_delivery/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    },
+                    body: JSON.stringify({
+                        id: orderId,
+                        deliveryboy: null,
+                        action: 'unassign'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the delivery boy column to show "Not Assigned"
+                        const deliveryBoyCell = row.querySelector('td:nth-child(5)');
+                        deliveryBoyCell.innerHTML = `
+                            <div class="order-info">
+                                <i class="fas fa-user-circle"></i>
+                                Not Assigned
+                            </div>`;
+
+                        // Update the button back to "Assign Delivery"
+                        const button = row.querySelector('.assign-btn');
+                        button.innerHTML = '<i class="fas fa-user-plus"></i> Assign Delivery';
+                        
+                        // Remove the unassign click handler and add back the modal handler
+                        button.removeEventListener('click', () => unassignDeliveryBoy(orderId, row));
+                        button.addEventListener('click', showModal);
+                    } else {
+                        alert("Failed to unassign delivery partner. Please try again.");
+                    }
+                })
+                .catch(error => console.error("Error unassigning delivery boy:", error));
+            }
+
+            // Function to show the modal
+            function showModal(event) {
+                event.preventDefault();
+                modal.style.display = "block";
+            }
+
+            // Update the button click handlers based on current state
+            assignButtons.forEach(button => {
+                const row = button.closest('tr');
+                const orderId = button.getAttribute("data-order-id");
+                const hasDeliveryBoy = row.querySelector('td:nth-child(5)').textContent.trim() !== 'Not Assigned';
+
+                if (hasDeliveryBoy && button.disabled === false) {
+                    button.addEventListener('click', () => unassignDeliveryBoy(orderId, row));
+                } else if (!button.disabled) {
+                    button.addEventListener('click', showModal);
+                }
+            });
         });
     </script>
 
 </body>
 </html>
+
+
+
+<!-- <link rel="stylesheet" href="{% static 'css/adminpage.css' %}"> -->
+<!-- Side Navigation (Always Visible) -->
+    <!-- <div id="mySidenav" class="sidenav"><br><br><br><br>
+        <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
+        <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
+        <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
+        <a href="{% url 'deliveryassigns' %}"><i class="fas fa-truck"></i>  Assign Deliveries</a><br>
+        <a href="{% url 'adminanimalslist' %}"><i class="fas fa-paw"></i>  Manage Animals</a><br>
+        <a href="{% url 'adminproductstock' %}"><i class="fas fa-boxes"></i>  Manage Stock</a><br>
+        <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
+        <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+    </div> -->
+
+    <!-- Navigation Bar -->
+    <!-- <ul>
+        <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul><br><br> -->

@@ -4,11 +4,12 @@
 <head>
     <title>Animals List</title>
     <link rel="stylesheet" href="{% static 'css/animalslist.css' %}">
+    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
     <style>
         body {
             background: url('{% static "images/animalslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin: 0;
+            margin-left: 250px;
         }
 
         /* Navigation Bar styles */
@@ -79,7 +80,7 @@
 
         .animal img {
             width: 100%; /* Full width of the product container */
-            height: 250px; /* Fixed height for uniformity */
+            height: 350px; /* Fixed height for uniformity */
             object-fit: cover; /* Maintain aspect ratio and cover the area */
             border-radius: 4px; /* Rounded corners for the image */
         }
@@ -160,6 +161,125 @@
         .back-link:hover {
             text-decoration: underline;
         }
+
+        /* Strong Text */
+        strong {
+            color: #000000;
+        }
+
+        .health-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #053c60;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .health-link:hover {
+            background-color: #034096;
+        }
+
+        /* Success message */
+        .success-message {
+            margin-top: 20px;
+            color: rgb(0, 128, 0);
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        /* Button Group Styles */
+        .button-group {
+            margin-top: 20px;
+        }
+
+        .view-btn, .delete-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            color: white;
+        }
+
+        .view-btn {
+            background-color: green;
+            border-radius: 5px;
+        }
+
+        .delete-btn {
+            background-color: red;
+            border-radius: 5px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            font-size: 18px;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background-color: green;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: red;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: rgb(14, 189, 14);
+        }
+
+        .btn-cancel:hover {
+            background-color: rgb(218, 14, 14);
+        }
+
     </style>
 
     <!-- Add SweetAlert2 and Font Awesome CSS -->
@@ -168,9 +288,22 @@
 </head>
 <body>
 
-    <!-- Navigation Bar-->
+    <!-- Side Navigation (Always Visible) -->
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
+        <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
+        <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
+        <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
+        <a href="{% url 'deliveryassigns' %}"><i class="fas fa-truck"></i>  Assign Deliveries</a><br>
+        <a href="{% url 'adminanimalslist' %}"><i class="fas fa-paw"></i>  Manage Animals</a><br>
+        <a href="{% url 'adminproductstock' %}"><i class="fas fa-boxes"></i>  Manage Stock</a><br>
+        <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
+        <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+    </div>
+
+    <!-- Navigation Bar -->
     <ul>
-        <div class="brand-name"></i><span>Dairy Care System</span></div>
+        <div class="brand-name"><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -184,25 +317,83 @@
         </div>
     </ul>
 
-    <!-- <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br> -->
-
     <!-- Animal Details Section -->
     <div class="animal-container">
         {% for animal in animals %}
-        <div class="animal" onclick="window.location.href='{% url 'adminanimaldetails' animal.animal_id %}'" style="cursor: pointer;">
+        <div class="animal">
             {% if animal.images.exists %}  <!-- Check if there are images -->
                 <img src="{{ animal.images.first.animal_image.url }}" alt="{{ animal.animal_name }}"> <!-- Display the first image -->
             {% else %}
                 <img src="{% static 'images/default_animal_image.png' %}" alt="Default Image"> <!-- Placeholder if no image -->
             {% endif %}
             <h3><strong>{{ animal.animal_name }}</strong></h3>
-            <p>{{ animal.breed }}</p>
+            <p><strong>Breed:</strong> {{ animal.breed }}</p>
             <p><strong>Status:</strong> {% if not animal.status %}Inactive{% else %}Active{% endif %}<p>
+            <p><strong>Age:</strong> {{ animal.age_in_years }} years</p>
+            <p><strong>Gender:</strong> {{ animal.gender }}</p>
+            <p><strong>Milk Capacity:</strong> {{ animal.milk_capacity }} liters</p>
+            <p><strong>Added at:</strong> {{ animal.created_at }}</p>
+            <p><strong>Updated at:</strong> {{ animal.updated_at }}</p>
+            <div class="button-group">
+                <!-- <a href="animalhealthstatus" class="health-link"><i class="fas fa-heartbeat"></i> Health Status</a> -->
+            {% if animal.status %}
+                <a href="#" class="delete-btn" onclick="openModal('delete', '{{ animal.animal_name }}', '{% url 'delete_animal' animal.animal_id %}');"><i class="fas fa-trash"></i> <b>Deactivate</b></a>
+            {% else %}
+                <a href="#" class="view-btn" onclick="openModal('restore', '{{ animal.animal_name }}', '{% url 'restore_animal' animal.animal_id %}');"><i class="fas fa-undo"></i> <b>Reactivate</b></a>
+            {% endif %}
+        </div>
         </div>
         {% empty %}
             <p>No animals available.</p>
         {% endfor %}
     </div>
+
+    <!-- Modal Container -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Dairy Care System</div>
+            <div class="modal-body" id="modal-message"></div>
+            <div class="modal-footer">
+                <button class="btn-confirm" id="confirm-btn">Confirm</button>
+                <button class="btn-cancel" onclick="closeModal();">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Function to open the modal with the corresponding message
+        function openModal(actionType, animalName, url) {
+            var modal = document.getElementById("confirmationModal");
+            var message = document.getElementById("modal-message");
+            var confirmBtn = document.getElementById("confirm-btn");
+
+            if (actionType === 'delete') {
+                message.innerHTML = "Are you sure you want to deactivate the animal <strong>" + animalName + "</strong>?";
+            } else if (actionType === 'restore') {
+                message.innerHTML = "Are you sure you want to reactivate the animal <strong>" + animalName + "</strong>?";
+            }
+
+            // Set the confirm button to redirect to the action's URL
+            confirmBtn.onclick = function() {
+                window.location.href = url;
+            };
+
+            modal.style.display = "block";
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById("confirmationModal").style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            var modal = document.getElementById("confirmationModal");
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

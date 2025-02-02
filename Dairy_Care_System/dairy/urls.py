@@ -28,6 +28,7 @@ urlpatterns = [
     path('adminpage',views.adminpage,name='adminpage'),
     path('adminproductslist',views.adminproductslist,name='adminproductslist'),
     path('adminanimalslist',views.adminanimalslist,name='adminanimalslist'),
+    path('deliveryassigns', views.deliveryassigns, name='deliveryassigns'),
     path('addemployee', views.addemployee, name='addemployee'),
     path('adminmilkdetails/', views.adminmilkdetails, name='adminmilkdetails'),
     path('adminproductstock',views.adminproductstock,name='adminproductstock'),
@@ -41,6 +42,7 @@ urlpatterns = [
 
     path('farmownerpage', views.farmownerpage, name='farmownerpage'),
     path('feedbackreview',views.feedbackreview,name='feedbackreview'),
+    path('diseasedetection',views.diseasedetection,name='diseasedetection'),
 
     path('addproducts',views.addproducts,name='addproducts'),
     path('editproduct', views.editproduct, name='editproduct'),
@@ -56,7 +58,6 @@ urlpatterns = [
 
     path('addanimal', views.addanimal, name='addanimal'),
     path('animalslist',views.animalslist,name='animalslist'),
-    path('animal/<int:animal_id>/', views.adminanimaldetails, name='adminanimaldetails'),
     path('animal/<int:animal_id>/', views.animaldetails, name='animaldetails'),
     path('updateanimal/<int:animal_id>/', views.updateanimal, name='updateanimal'),
     path('animal/<int:animal_id>/animalhealthstatus/', views.animal_health_status, name='animal_health_status'),
@@ -92,13 +93,14 @@ urlpatterns = [
 
 
     path('employeepage',views.employeepage,name='employeepage'),
-    path('deliveryassigns', views.deliveryassigns, name='deliveryassigns'),
+    
+    path('deliverydetailsall', views.deliverydetailsall, name='deliverydetailsall'),
     path('get_employees/', views.get_employees, name='get_employees'),
     path('assign_delivery/', views.assign_delivery, name='assign_delivery'),
     path('deliveryboyassigns', views.deliveryboyassigns, name='deliveryboyassigns'),
     path('update_order_status/', views.update_order_status, name='update_order_status'),
-
     path('get_order_tracking/<int:order_id>/', views.get_order_tracking, name='get_order_tracking'),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

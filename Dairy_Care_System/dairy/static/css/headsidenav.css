@@ -100,7 +100,7 @@ li a:hover {
 
 /* Add margin between icons and text */
 .sidenav a i, .dropdown-content a i {
-    margin-right: 10px; /* Space between icon and text */
+    margin-right: 5px; /* Space between icon and text */
 }
 
 /* Remove the open/close functionality */

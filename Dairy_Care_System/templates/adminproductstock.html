@@ -7,13 +7,14 @@
     <title>Stock Details</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
     <style>
         body {
             background: url("{% static 'images/productstock.jpg' %}") no-repeat center center fixed;
             background-size: cover;
             font-family: 'Arial', sans-serif;
             color: #333;
-            margin: 0;
+            margin-left: 250px;
             padding: 0;
         }
 
@@ -180,8 +181,34 @@
 </head>
 <body>
 
-<a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
-<br>
+<!-- Side Navigation (Always Visible) -->
+<div id="mySidenav" class="sidenav"><br><br><br><br>
+    <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
+    <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
+    <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
+    <a href="{% url 'deliveryassigns' %}"><i class="fas fa-truck"></i>  Assign Deliveries</a><br>
+    <a href="{% url 'adminanimalslist' %}"><i class="fas fa-paw"></i>  Manage Animals</a><br>
+    <a href="{% url 'adminproductstock' %}"><i class="fas fa-boxes"></i>  Manage Stock</a><br>
+    <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
+    <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+    <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+</div>
+
+<!-- Navigation Bar -->
+<ul>
+    <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
+    <div class="header">
+        <div class="nav-item">
+            <li>
+                <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                <div class="dropdown-content" id="dropdown-content">
+                    <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </div>
+    </div>
+</ul><br>
 
     <h1><strong>Stock Details</strong></h1>
     <div class="table-container">

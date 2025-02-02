@@ -2089,7 +2089,7 @@ def cancelorder(request, order_id):
             product.save()
 
         # Update order status to canceled
-        order.status = 'Canceled'  # Assuming you have a status field in Order_table
+        order.status = 'Cancelled'  # Assuming you have a status field in Order_table
         order.save()
 
         # Add a success message
@@ -2141,9 +2141,22 @@ def orderdetails(request):
     
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def deliveryassigns(request):
-    orders = Order_table.objects.all().order_by('-order_date')  # Fetch all orders
-    return render(request, 'deliveryassigns.html', {'orders': orders})
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        try:
+            user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+            orders = Order_table.objects.all().order_by('-order_date')  # Fetch all orders
+            context = {
+                'username': user.username,  # Pass the username to the template
+                'orders': orders,  # Pass the orders to the template
+            }
+            return render(request, 'deliveryassigns.html', context)
+        except Users_table.DoesNotExist:
+            return redirect('login')  # Redirect to login if user doesn't exist
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
 
 
 
@@ -2161,13 +2174,19 @@ def assign_delivery(request):
         data = json.loads(request.body)
         order_id = data.get("id")
         employee_id = data.get("deliveryboy")
+        action = data.get("action", "assign")
 
         try:
             order = Order_table.objects.get(id=order_id)
-            employee = Users_table.objects.get(user_id=employee_id)
-
-            order.deliveryboy = employee
-            order.status = "Shipped"
+            
+            if action == "assign":
+                employee = Users_table.objects.get(user_id=employee_id)
+                order.deliveryboy = employee
+                order.status = "Confirmed"
+            else:  # unassign
+                order.deliveryboy = None
+                order.status = "Pending"  # or whatever your initial status is
+            
             order.save()
 
             return JsonResponse({"success": True})
@@ -2188,6 +2207,36 @@ def deliveryboyassigns(request):
             # Fetch the user object using user_id
             user = Users_table.objects.get(user_id=user_id)
 
+            # Fetch all orders assigned to this delivery boy with specific statuses
+            assigned_orders = Order_table.objects.filter(
+                deliveryboy=user, 
+                status__in=['Pending', 'Confirmed', 'Shipped', 'Out']
+            ).order_by('-order_date')
+
+            context = {
+                'username': user.username,  # Pass the username to the template
+                'assigned_orders': assigned_orders,  # Pass assigned orders to the template
+            }
+            return render(request, 'deliveryboyassigns.html', context)
+        except Users_table.DoesNotExist:
+            # Handle case where user does not exist (e.g., invalid session data)
+            return redirect('login')
+    else:
+        # Redirect to login if no user is logged in
+        return redirect('login')
+    
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def deliverydetailsall(request):
+    # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
+
+    if user_id:
+        try:
+            # Fetch the user object using user_id
+            user = Users_table.objects.get(user_id=user_id)
+
             # Fetch all orders assigned to this delivery boy
             assigned_orders = Order_table.objects.filter(deliveryboy=user).order_by('-order_date')
 
@@ -2195,7 +2244,7 @@ def deliveryboyassigns(request):
                 'username': user.username,  # Pass the username to the template
                 'assigned_orders': assigned_orders,  # Pass assigned orders to the template
             }
-            return render(request, 'deliveryboyassigns.html', context)
+            return render(request, 'deliverydetailsall.html', context)
         except Users_table.DoesNotExist:
             # Handle case where user does not exist (e.g., invalid session data)
             return redirect('login')
@@ -2226,18 +2275,6 @@ def update_order_status(request):
 
 
 
-"""def login(request):
-    return render(request, 'login.html')
-
-def registration(request):
-    return render(request, 'registration.html')
-
-def addproducts(request): 
-    return render(request, 'addproducts.html') 
-
-def productslist(request):
-    return render(request, 'login.html')  """
-
 def get_order_tracking(request, order_id):
     try:
         order = Order_table.objects.get(id=order_id)
@@ -2247,6 +2284,7 @@ def get_order_tracking(request, order_id):
             'Placed': 'orderPlaced',
             'Confirmed': 'orderConfirmed',
             'Shipped': 'orderShipped',
+            'Out': 'orderOut',
             'Delivered': 'orderDelivered'
         }
         
@@ -2255,8 +2293,9 @@ def get_order_tracking(request, order_id):
         # Get tracking information with timestamps
         tracking_info = {
             'orderPlaced': order.created_at.strftime("%B %d, %Y %I:%M %p"),
-            'orderConfirmed': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Confirmed', 'Shipped', 'Delivered'] else None,
-            'orderShipped': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Shipped', 'Delivered'] else None,
+            'orderConfirmed': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Confirmed', 'Shipped', 'Out', 'Delivered'] else None,
+            'orderShipped': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Shipped', 'Out'] else None,
+            'orderOut': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Out', 'Delivered'] else None,
             'orderDelivered': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status == 'Delivered' else None
         }
 
@@ -2275,4 +2314,32 @@ def get_order_tracking(request, order_id):
             'success': False,
             'error': str(e)
         })
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def diseasedetection(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context = {
+            'username': user.username,  # Pass the username to the template
+        }
+        return render(request, 'diseasedetection.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in 
+
+
+
+"""def login(request):
+    return render(request, 'login.html')
+
+def registration(request):
+    return render(request, 'registration.html')
+
+def addproducts(request): 
+    return render(request, 'addproducts.html') 
+
+def productslist(request):
+    return render(request, 'login.html')  """
 

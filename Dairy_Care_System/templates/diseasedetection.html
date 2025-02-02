@@ -2,45 +2,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Animals List</title>
+    <title>Farm Owner Page</title>
     <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
-    <link rel="stylesheet" href="{% static 'css/animalslist.css' %}">
     <style>
         body {
-            background: url('{% static "images/animalslist.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin-left: 250px;
+            margin: 0;
+            margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
+        }
+
+        /* Notification badge styles */
+        .notification-badge {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 15px;
         }
     </style>
-
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 
-
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav"><br><br>
-        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Products List</a>
+        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>Products List</a>
         <a href="{% url 'addproducts' %}" style="padding-left: 30px; font-size: 1.2em;"><i class="fa fa-cart-plus"></i>Add Product</a><br>
         <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>Animals List</a>
         <a href="{% url 'addanimal' %}" style="padding-left: 30px; font-size: 1.2em;"><i class="fas fa-plus-circle"></i>Add Animal</a><br>
         <a href="{% url 'diseasedetection' %}" style="padding-left: 30px; font-size: 1.2em;"><i class="fas fa-heartbeat"></i>Health Checker</a><br>
-        <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>  Order Details</a><br>
-        <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>  Pre-Order Details</a><br>
-        <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br>
-        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
-        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications
-            <!--  class="notification-badge" <span class="badge" id="notification-count">{{ unread_count }}</span>  -->
-        </a><br>
-        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+        <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>Order Details</a><br>
+        <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>Pre-Order Details</a><br>
+        <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>Milk Details</a><br>
+        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>Stock Details</a><br>
+        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i>Notifications</a><br>
+        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>Feedback Review</a><br>
     </div>
 
     <!-- Navigation Bar -->
     <ul>
-        <div class="brand-name"></i><span>Dairy Care System</span></div>
+        <div class="brand-name"><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
@@ -52,50 +67,37 @@
                 </li>
             </div>
         </div>
-    </ul><br><br>
+    </ul>
 
-    <!-- Animal Details Section -->
-    <div class="animal-container">
-        {% for animal in animals %}
-        <div class="animal" onclick="window.location.href='{% url 'animaldetails' animal.animal_id %}'" style="cursor: pointer;">
-            {% if animal.images.exists %}  <!-- Check if there are images -->
-                <img src="{{ animal.images.first.animal_image.url }}" alt="{{ animal.animal_name }}"> <!-- Display the first image -->
-            {% else %}
-                <img src="{% static 'images/default_animal_image.png' %}" alt="Default Image"> <!-- Placeholder if no image -->
-            {% endif %}
-            <h3><strong>{{ animal.animal_name }}</strong></h3>
-            <p>{{ animal.breed }}</p>
-            <p><strong>Status:</strong> {% if not animal.status %}Inactive{% else %}Active{% endif %}<p>
-        </div>
-        {% empty %}
-            <p>No animals available.</p>
-        {% endfor %}
-    </div>
+
+
+
+
+
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
     <script>
         // Toggle dropdown on click
-        function toggleDropdown() {
+    function toggleDropdown() {
+        var dropdown = document.getElementById("dropdown-content");
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        } else {
+            dropdown.style.display = "block";
+        }
+    }
+
+    // Close the dropdown if clicked outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('.username')) {
             var dropdown = document.getElementById("dropdown-content");
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
             }
         }
-
-        // Close the dropdown if clicked outside of it
-        window.onclick = function(event) {
-            if (!event.target.matches('.username')) {
-                var dropdown = document.getElementById("dropdown-content");
-                if (dropdown.style.display === "block") {
-                    dropdown.style.display = "none";
-                }
-            }
-        }
+    }
 
         // Custom SweetAlert2 logout confirmation
         function confirmLogout() {

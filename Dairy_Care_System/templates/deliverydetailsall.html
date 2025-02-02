@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Deliveries</title>
+    <title>History of Deliveries</title>
     <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
         body {
@@ -335,7 +335,7 @@
     </ul><br><br><br><br><br><br>
 
     <div class="delivery-container">
-        <h1 class="page-title"><i class="fas fa-truck"></i> My Delivery Assignments</h1>
+        <h1 class="page-title"><i class="fas fa-truck"></i> My Delivery Assignment History</h1>
         {% csrf_token %}
         {% if assigned_orders %}
             <table class="orders-table">
@@ -387,11 +387,17 @@
                             <td>
                                 <button class="update-status-btn" 
                                         onclick="openStatusModal('{{ order.id }}')"
-                                        {% if order.status == 'Cancelled' or order.status == 'Delivered' %} disabled style="opacity: 0.5; cursor: not-allowed; background-color: #cccccc;" {% endif %}>
+                                        {% if order.status == 'Cancelled' or order.status == 'Delivered' %}
+                                            disabled 
+                                            style="opacity: 0.5; cursor: not-allowed; background-color: #cccccc;"
+                                        {% endif %}>
                                     <i class="fas fa-edit"></i>
-                                    {% if order.status == 'Cancelled' %} Order Cancelled
-                                    {% elif order.status == 'Delivered' %} Order Delivered
-                                    {% else %} Update Status
+                                    {% if order.status == 'Cancelled' %}
+                                        Order Cancelled
+                                    {% elif order.status == 'Delivered' %}
+                                        Order Delivered
+                                    {% else %}
+                                        Update Status
                                     {% endif %}
                                 </button>
                             </td>

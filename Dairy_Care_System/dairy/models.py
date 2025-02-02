@@ -190,6 +190,7 @@ class Order_table(models.Model):
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
         ('Shipped', 'Shipped'),
+        ('Out', 'Out for Delivery'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
     )
