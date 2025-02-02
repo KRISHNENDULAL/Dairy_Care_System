@@ -2,33 +2,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Farm Owner Page</title>
+    <title>Livestock Health Checker</title>
     <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/diseasedetection.css' %}">
     <style>
-        body {
-            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
-        }
-
-        /* Notification badge styles */
-        .notification-badge {
-            position: relative;
-            display: inline-block;
-            margin-left: 5px;
-        }
-
-        .badge {
-            position: absolute;
-            top: -5px;
-            left: 10px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 5px;
-            font-size: 15px;
-        }
+    body {
+        background: url('{% static "images/detection.jpg" %}') no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
+    }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -41,13 +24,13 @@
     <!-- Side Navigation (Always Visible) -->
     <div id="mySidenav" class="sidenav"><br><br>
         <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i>Products List</a>
-        <a href="{% url 'addproducts' %}" style="padding-left: 30px; font-size: 1.2em;"><i class="fa fa-cart-plus"></i>Add Product</a><br>
+        <a href="{% url 'addproducts' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fa fa-cart-plus"></i>Add Product</a><br>
         <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i>Animals List</a>
-        <a href="{% url 'addanimal' %}" style="padding-left: 30px; font-size: 1.2em;"><i class="fas fa-plus-circle"></i>Add Animal</a><br>
-        <a href="{% url 'diseasedetection' %}" style="padding-left: 30px; font-size: 1.2em;"><i class="fas fa-heartbeat"></i>Health Checker</a><br>
+        <a href="{% url 'addanimal' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-plus-circle"></i>Add Animal</a><br>
+        <a href="{% url 'diseasedetection' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-heartbeat"></i>Health Checker</a><br>
         <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>Order Details</a><br>
         <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>Pre-Order Details</a><br>
-        <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>Milk Details</a><br>
+        <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>Milk Details</a><br> -->
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>Stock Details</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i>Notifications</a><br>
         <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>Feedback Review</a><br>
@@ -70,10 +53,62 @@
     </ul>
 
 
+    <div class="container">
+        <h2>Livestock Disease Detection</h2><br>
+        <div class="upload-box">
+            <p>Simply upload an image and let our system do the rest.</p><br>
+            <form id="diseaseDetectionForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="imageUpload" name="livestock_image" accept="image/*" required>
+                <br><br>
+                <center><img id="preview" src="#" alt="Image Preview" style="display:none; max-width:300px;"/></center>
+                <br><br>
+                <button type="submit">Detect Disease</button><br><br>
+                <p id="loading">Processing... Please wait.</p>
+            </form>
+            <div id="results"></div>
+        </div>
 
+        <div id="history">
+            <h3>Detection History</h3>
+            <ul id="historyList"></ul>
+        </div>
 
+    </div>
 
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
 
+        document.getElementById('diseaseDetectionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            setTimeout(() => {
+                const disease = "Foot-and-Mouth Disease"; // Simulated result
+                const confidence = "95%";
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('results').innerHTML = `Detected Disease: ${disease} <br> Confidence: ${confidence}`;
+                document.getElementById('results').style.display = 'block';
+                
+                const historyList = document.getElementById('historyList');
+                const listItem = document.createElement('li');
+                listItem.textContent = `${disease} - Confidence: ${confidence}`;
+                historyList.appendChild(listItem);
+            }, 2000);
+        });
+    </script>
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

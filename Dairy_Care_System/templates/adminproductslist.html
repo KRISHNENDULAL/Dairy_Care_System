@@ -5,13 +5,13 @@
     <title>Products Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/adminpage.css' %}"> -->
 
     <style>
         body {
             background: url('{% static "images/productslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin-left: 250px;
+            /* margin-left: 250px; */
         }
 
         ul {
@@ -377,6 +377,21 @@
             color: white;
             border-radius: 5px;
         }
+
+        /* Styling for the back link in the upper left corner */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 25px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -385,7 +400,7 @@
 
 <body>
 <!-- Side Navigation (Always Visible) -->
-<div id="mySidenav" class="sidenav"><br><br><br><br>
+<!-- <div id="mySidenav" class="sidenav"><br><br><br><br>
     <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
     <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
     <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
@@ -395,10 +410,10 @@
     <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
     <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
     <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
-</div>
+</div> -->
 
 <!-- Navigation Bar -->
-<ul>
+<!-- <ul>
     <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
     <div class="header">
         <div class="nav-item">
@@ -411,8 +426,9 @@
             </li>
         </div>
     </div>
-</ul><br>
+</ul> -->
 
+<a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br><br>
 <!-- Search Bar -->
 <center>
     <div class="search-bar-container">

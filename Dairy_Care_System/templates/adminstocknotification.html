@@ -7,16 +7,16 @@
     <title>Notifications</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <!-- Add Font Awesome CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <!-- Add Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- <link rel="stylesheet" href="{% static 'css/adminpage.css' %}"> -->
     <style>
         /* Global styles */
         body {
             font-family: 'Arial', sans-serif;
             background: url('{% static "images/notification.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin-left: 250px;
+            /* margin-left: 250px; */
             padding: 0;
             height: 100vh;
         }
@@ -150,6 +150,20 @@
             display: block;
         }
 
+        h2 i {
+            animation: bell 2s infinite;
+            color: #000000;
+        }
+        
+        @keyframes bell {
+            0% { transform: rotate(0); }
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-15deg); }
+            60% { transform: rotate(7deg); }
+            80% { transform: rotate(-7deg); }
+            100% { transform: rotate(0); }
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -176,7 +190,7 @@
 <body>
     
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav"><br><br><br><br>
+    <!-- <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
         <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
         <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
@@ -186,10 +200,10 @@
         <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
         <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
         <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
-    </div>
+    </div> -->
 
     <!-- Navigation Bar -->
-    <ul>
+    <!-- <ul>
         <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
@@ -202,11 +216,12 @@
                 </li>
             </div>
         </div>
-    </ul>
+    </ul> -->
 
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a>
     <div class="notification-wrapper">
         <div class="notification-header">
-            <h2>Notifications on Stock Variations</h2>
+            <h2><i class="fas fa-bell"></i> Notifications on Stock Variations</h2>
         </div>
         
         <div class="notification-container">

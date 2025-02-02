@@ -1,0 +1,108 @@
+.container {
+    text-align: center;
+    margin-top: 30px;
+    padding: 30px;
+    max-width: 800px; /* Limit the width of the container */
+    margin-left: auto; /* Center the container */
+    margin-right: auto; /* Center the container */
+}
+
+h2 {
+    color: #000000; /* Attractive color for the heading */
+    margin-top: 20px;
+    font-family: 'Copperplate', 'Papyrus', fantasy;
+    font-size: 45px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(23, 15, 143, 0.5);
+    letter-spacing: 2px;
+    position: relative;
+    display: inline-block;
+}
+
+h2:after {
+    content: '';
+    display: block;
+    width: 90%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #000000, transparent); /* Gradient effect */
+    position: absolute;
+    bottom: -2px;
+    left: 10%;
+}
+
+.upload-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 10px; /* Space above the upload box */
+}
+
+.upload-box p {
+    font-family: 'Copperplate', 'Papyrus', fantasy;
+    font-size: 1.4em; /* Increase font size for better readability */
+    color: #000000; /* Darker text color */
+}
+
+#preview {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+    border: 2px solid #000000; /* Border around the preview image */
+    border-radius: 10px; /* Rounded corners for the image */
+}
+
+#loading {
+    display: none;
+    font-size: 18px;
+    color: #000;
+    margin-top: 10px;
+}
+
+#results {
+    display: none;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #037011;
+}
+
+#history {
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+button {
+    background-color: #051f7d; /* Attractive button color */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding for the button */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Increase font size */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #2759ee; /* Darker shade on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%; /* Full width on smaller screens */
+        padding: 20px; /* Less padding */
+    }
+
+    h2 {
+        font-size: 36px; /* Smaller font size for headings */
+    }
+
+    button {
+        width: 100%; /* Full width buttons on small screens */
+    }
+}

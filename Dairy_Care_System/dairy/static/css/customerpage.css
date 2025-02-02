@@ -34,3 +34,165 @@ footer {
     color: black;
 }
 
+/* Chatbot icon styling */
+.chatbot-icon {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.chatbot-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.chatbot-icon i {
+    color: white;
+    font-size: 30px;
+}
+
+/* Chat Popup Styling */
+.chat-popup {
+    position: fixed;
+    bottom: 110px;
+    right: 30px;
+    width: 350px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: none;
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+}
+
+.chat-popup-header {
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: white;
+    padding: 20px;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+    position: relative;
+}
+
+.chat-popup-body {
+    padding: 20px;
+    max-height: 350px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+/* Message Styling */
+.user-message, .bot-message {
+    margin-bottom: 15px;
+    max-width: 80%;
+    clear: both;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.user-message {
+    float: right;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: white;
+    border-radius: 15px 15px 0 15px;
+    padding: 12px 18px;
+}
+
+.bot-message {
+    float: left;
+    background: white;
+    color: #2c3e50;
+    border-radius: 15px 15px 15px 0;
+    padding: 12px 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.chat-popup-footer {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-popup-footer input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.chat-popup-footer input:focus {
+    border-color: #3498db;
+}
+
+.chat-popup-footer button {
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.chat-popup-footer button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scrollbar Styling */
+.chat-popup-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-popup-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.chat-popup-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.chat-popup-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

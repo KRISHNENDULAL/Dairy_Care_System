@@ -4,12 +4,12 @@
 <head>
     <title>Animals List</title>
     <link rel="stylesheet" href="{% static 'css/animalslist.css' %}">
-    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/adminpage.css' %}"> -->
     <style>
         body {
             background: url('{% static "images/animalslist.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            margin-left: 250px;
+            /* margin-left: 250px; */
         }
 
         /* Navigation Bar styles */
@@ -289,7 +289,7 @@
 <body>
 
     <!-- Side Navigation (Always Visible) -->
-    <div id="mySidenav" class="sidenav"><br><br><br><br>
+    <!-- <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
         <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
         <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
@@ -299,10 +299,10 @@
         <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
         <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
         <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
-    </div>
+    </div> -->
 
     <!-- Navigation Bar -->
-    <ul>
+    <!-- <ul>
         <div class="brand-name"><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
@@ -315,8 +315,9 @@
                 </li>
             </div>
         </div>
-    </ul>
+    </ul> -->
 
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br><br>
     <!-- Animal Details Section -->
     <div class="animal-container">
         {% for animal in animals %}
