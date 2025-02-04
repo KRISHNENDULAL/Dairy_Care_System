@@ -379,9 +379,9 @@
             <a href="{% url 'changepassword' %}" class="button"><i class="fas fa-key"></i> Change Password</a>
             
             <!-- Show delete button only if user is active -->
-            {% if user.status %}
+            <!-- {% if user.status %}
                 <a href="#" class="button" onclick="openModal('delete', '{{ user.username }}', '{% url 'deleteaccount' user.user_id %}');"><i class="fas fa-trash"></i> <b>Delete Account</b></a>
-            {% endif %}
+            {% endif %} -->
             
         </div>
     </div>

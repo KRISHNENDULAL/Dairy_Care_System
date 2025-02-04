@@ -18,6 +18,84 @@
             margin-right: 10px; /* Space between icon and text */
         }
 
+        .chat-popup {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background: #03652c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-body {
+            height: 300px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .chat-footer {
+            padding: 10px;
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .chat-footer button {
+            background: #37100d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .user-message, .bot-message {
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #f5f5f5;
+            margin-right: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -77,21 +155,34 @@
 
     <!-- Chatbot Popup -->
     <div class="chat-popup" id="chatPopup">
-        <div class="chat-popup-header">
-            Chat Assistant
+        <div class="chat-header">
+            <span>Dairy Care System</span>
+            <button class="close-btn" onclick="toggleChatPopup()">×</button>
         </div>
-        <div class="chat-popup-body" id="chatBody">
-            <!-- Chat messages will appear here -->
+        <div class="chat-body" id="chatBody">
+            <!-- Welcome message will be added by JavaScript -->
         </div>
-        <div class="chat-popup-footer">
-            <input type="text" id="chatInput" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     </div>
 
-
     <script>
-        // Toggle Chat Popup Visibility with animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add welcome message when chat is first opened
+            const welcomeMessage = "Hello! I'm your Dairy Care Assistant. How can I help you today? You can ask me about:\n" +
+                "• Our dairy products\n" +
+                "• Ordering process\n" +
+                "• Delivery information\n" +
+                "• Account related queries";
+            
+            const chatBody = document.getElementById('chatBody');
+            appendMessage('bot', welcomeMessage);
+        });
+
         function toggleChatPopup() {
             const chatPopup = document.getElementById('chatPopup');
             if (chatPopup.style.display === 'block') {
@@ -102,49 +193,40 @@
             } else {
                 chatPopup.style.display = 'block';
                 chatPopup.style.animation = 'slideUp 0.3s ease-out';
-                // Focus on input when chat opens
                 document.getElementById('chatInput').focus();
             }
         }
 
-        // Handle Sending Message
         function sendMessage() {
             const chatInput = document.getElementById('chatInput');
-            const chatBody = document.getElementById('chatBody');
             const message = chatInput.value.trim();
 
             if (message) {
-                // Add user message
                 appendMessage('user', message);
                 chatInput.value = '';
 
-                // Send message to the server via AJAX
+                // Send to backend
                 fetch("{% url 'chatbot_response' %}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF token is included
+                        'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify({ message: message })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Add bot response
                     if (data.response) {
                         appendMessage('bot', data.response);
-                    } else {
-                        appendMessage('bot', "I'm sorry, I didn't understand that.");
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    appendMessage('bot', "There was an error processing your request. Please try again.");
+                    appendMessage('bot', "I'm sorry, I'm having trouble connecting. Please try again.");
                 });
             }
         }
 
-
-        // Append message to chat
         function appendMessage(type, text) {
             const chatBody = document.getElementById('chatBody');
             const messageDiv = document.createElement('div');
@@ -154,14 +236,13 @@
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        // Handle Enter key press
+        // Handle Enter key
         document.getElementById('chatInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
     </script>
-
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -209,64 +290,3 @@
 
 </body>
 </html>
-
-
-<!-- <script>
-    // Toggle Chat Popup Visibility with animation
-    function toggleChatPopup() {
-        const chatPopup = document.getElementById('chatPopup');
-        if (chatPopup.style.display === 'block') {
-            chatPopup.style.animation = 'slideUp 0.3s ease-out reverse';
-            setTimeout(() => {
-                chatPopup.style.display = 'none';
-            }, 300);
-        } else {
-            chatPopup.style.display = 'block';
-            chatPopup.style.animation = 'slideUp 0.3s ease-out';
-            // Focus on input when chat opens
-            document.getElementById('chatInput').focus();
-        }
-    }
-
-    // Handle Sending Message
-    function sendMessage() {
-        const chatInput = document.getElementById('chatInput');
-        const chatBody = document.getElementById('chatBody');
-        const message = chatInput.value.trim();
-
-        if (message) {
-            // Add user message
-            appendMessage('user', message);
-            chatInput.value = '';
-
-            // Simulate bot response
-            setTimeout(() => {
-                const responses = [
-                    "How can I help you today?",
-                    "I'm here to assist with your dairy product needs!",
-                    "Let me know if you have any questions about our products.",
-                    "I'd be happy to help you find what you're looking for."
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                appendMessage('bot', randomResponse);
-            }, 1000);
-        }
-    }
-
-    // Append message to chat
-    function appendMessage(type, text) {
-        const chatBody = document.getElementById('chatBody');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = type === 'user' ? 'user-message' : 'bot-message';
-        messageDiv.textContent = text;
-        chatBody.appendChild(messageDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    // Handle Enter key press
-    document.getElementById('chatInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-</script> -->

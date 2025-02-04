@@ -539,25 +539,161 @@ def farmownerpage(request):
 
 PROJECT_ID = 'dairybot-ygjc'  # Replace with your Dialogflow project ID
 
+@csrf_exempt
 def chatbot_response(request):
-    # Get the user message from the request
-    user_message = request.GET.get('message', '')
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '').lower()
 
-    # Set up Dialogflow session
-    session_id = "12345"  # You can use a unique ID for each user
-    session_client = dialogflow.SessionsClient()
-    session = session_client.session_path(PROJECT_ID, session_id)
+            # Comprehensive dairy-related responses
+            responses = {
+                'products_general': {
+                    'keywords': ['products', 'items', 'available', 'sell', 'offering'],
+                    'response': "We offer a wide range of dairy products including:\n"
+                               "• Fresh Milk (Full cream, Toned, Double-toned)\n"
+                               "• Curd and Yogurt\n"
+                               "• Butter and Ghee\n"
+                               "• Cheese varieties\n"
+                               "• Paneer\n"
+                               "• Cream\n"
+                               "You can view all products and their prices in our Products List section."
+                },
+                
+                'milk_specific': {
+                    'keywords': ['milk', 'fresh milk', 'milk types', 'milk variety'],
+                    'response': "Our milk varieties include:\n"
+                               "• Full Cream Milk (6% fat)\n"
+                               "• Toned Milk (3% fat)\n"
+                               "• Double Toned Milk (1.5% fat)\n"
+                               "• Skimmed Milk (0.3% fat)\n"
+                               "All our milk is pasteurized and packed fresh daily."
+                },
+                
+                'product_quality': {
+                    'keywords': ['quality', 'fresh', 'pure', 'natural', 'organic'],
+                    'response': "We maintain the highest quality standards:\n"
+                               "• All products are sourced from our own dairy farms\n"
+                               "• Regular quality checks and testing\n"
+                               "• No artificial preservatives\n"
+                               "• Hygienically packed\n"
+                               "• Temperature-controlled storage and delivery"
+                },
+                
+                'storage': {
+                    'keywords': ['store', 'storage', 'keep', 'refrigerate', 'preserve'],
+                    'response': "Storage recommendations:\n"
+                               "• Milk: Refrigerate at 4°C, consume within 2-3 days\n"
+                               "• Curd: Refrigerate, consume within 5-7 days\n"
+                               "• Butter: Refrigerate, use within 2-3 weeks\n"
+                               "• Cheese: Refrigerate, check package for expiry\n"
+                               "• Ghee: Store in cool, dry place, can last 6-12 months"
+                },
+                
+                'delivery': {
+                    'keywords': ['delivery', 'shipping', 'deliver', 'ship', 'when'],
+                    'response': "Our delivery service:\n"
+                               "• Daily morning delivery (6 AM - 9 AM)\n"
+                               "• Evening delivery slot (4 PM - 7 PM)\n"
+                               "• Free delivery for orders above ₹500\n"
+                               "• Temperature-controlled delivery vehicles\n"
+                               "• Real-time order tracking available"
+                },
+                
+                'ordering': {
+                    'keywords': ['order', 'buy', 'purchase', 'booking', 'cart'],
+                    'response': "How to order:\n"
+                               "1. Browse our Products List\n"
+                               "2. Add items to cart\n"
+                               "3. Select delivery time slot\n"
+                               "4. Choose payment method\n"
+                               "5. Place order\n"
+                               "You can also set up daily/weekly subscriptions!"
+                },
+                
+                'payment': {
+                    'keywords': ['payment', 'pay', 'price', 'cost', 'rates'],
+                    'response': "Payment options:\n"
+                               "• Online payment (Credit/Debit cards)\n"
+                               "• UPI payments\n"
+                               "• Net banking\n"
+                               "• Cash on delivery\n"
+                               "• Monthly subscription billing available"
+                },
+                
+                'subscription': {
+                    'keywords': ['subscription', 'daily', 'weekly', 'monthly', 'regular'],
+                    'response': "Subscription benefits:\n"
+                               "• Regular delivery at preferred time\n"
+                               "• 10% discount on subscription orders\n"
+                               "• Flexible pause/resume option\n"
+                               "• Easy quantity modification\n"
+                               "• Monthly billing facility"
+                },
+                
+                'returns': {
+                    'keywords': ['return', 'refund', 'replace', 'exchange', 'damaged'],
+                    'response': "Our return policy:\n"
+                               "• Report issues within 24 hours of delivery\n"
+                               "• Immediate replacement for quality issues\n"
+                               "• Full refund for valid complaints\n"
+                               "• Photo evidence might be required\n"
+                               "Contact our support team for assistance."
+                },
+                
+                'farm_info': {
+                    'keywords': ['farm', 'source', 'cattle', 'cow', 'buffalo'],
+                    'response': "About our farms:\n"
+                               "• Own dairy farms with healthy cattle\n"
+                               "• Regular veterinary care\n"
+                               "• Organic feed for cattle\n"
+                               "• Modern milking facilities\n"
+                               "• Strict hygiene protocols"
+                },
+                
+                'contact': {
+                    'keywords': ['contact', 'help', 'support', 'reach', 'complaint'],
+                    'response': "Contact us:\n"
+                               "• Customer Care: +91-XXXXXXXXXX\n"
+                               "• Email: dairycaresystem25@gmail.com\n"
+                               "• Working hours: 8 AM - 8 PM\n"
+                               "• Emergency support available 24/7\n"
+                               "• Feedback form available on website"
+                },
+                
+                'offers': {
+                    'keywords': ['offer', 'discount', 'deal', 'save', 'promotion'],
+                    'response': "Current offers:\n"
+                               "• 10% off on subscription orders\n"
+                               "• Buy 3 get 1 free on curd products\n"
+                               "• Free delivery above ₹500\n"
+                               "• Referral bonus: ₹100 off\n"
+                               "Check our website for more offers!"
+                }
+            }
 
-    # Prepare the text input
-    text_input = dialogflow.TextInput(text=user_message, language_code="en")
-    query_input = dialogflow.QueryInput(text=text_input)
+            # Check for matching keywords and return appropriate response
+            for category in responses.values():
+                if any(keyword in user_message for keyword in category['keywords']):
+                    return JsonResponse({'response': category['response']})
 
-    # Send the request to Dialogflow
-    response = session_client.detect_intent(request={"session": session, "query_input": query_input})
-    bot_reply = response.query_result.fulfillment_text
+            # Default response if no keywords match
+            return JsonResponse({
+                'response': "I'm here to help with any dairy-related queries! You can ask about:\n"
+                           "• Our dairy products and their quality\n"
+                           "• Ordering and delivery\n"
+                           "• Storage recommendations\n"
+                           "• Payment options and offers\n"
+                           "• Farm information\n"
+                           "Please rephrase your question or choose from these topics."
+            })
 
-    # Send the bot's reply back to the user
-    return JsonResponse({"response": bot_reply})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 
