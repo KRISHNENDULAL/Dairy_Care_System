@@ -77,7 +77,7 @@ h2:after {
 }
 
 button {
-    background-color: #051f7d; /* Attractive button color */
+    background: linear-gradient(45deg, #043669, #1599ea);
     color: white; /* White text color */
     padding: 10px 20px; /* Padding for the button */
     border: none; /* Remove default border */
@@ -88,7 +88,7 @@ button {
 }
 
 button:hover {
-    background-color: #2759ee; /* Darker shade on hover */
+    background: linear-gradient(45deg, #1599ea, #043669);
 }
 
 /* Responsive Design */

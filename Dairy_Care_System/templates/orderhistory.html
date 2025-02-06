@@ -12,14 +12,15 @@
             font-family: Arial, sans-serif;
             margin-left: 250px;
             padding: 0;
-            background-color: #f4f4f4;
+            background: url('{% static "images/customerpage.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
             color: #333;
         }
 
         h1 {
             text-align: center;
-            color: #07509f;
-            margin-top: 20px;
+            color: #000000;
+            margin-top: 30px;
             font-family: Copperplate, Papyrus, fantasy;
             font-size: 45px;
             font-weight: bold;
@@ -408,11 +409,12 @@
             {% endfor %}
         </div>
         {% endif %}
+        <div class="footer"><strong>
+            Thank you for shopping with us!
+        </strong></div>
         </center><br>
     </div>
-    <div class="footer"><strong>
-        Thank you for shopping with us!
-    </strong></div><br><br><br><br>
+    <br><br><br><br>
 
     <!-- Modal for Order Cancellation -->
     <div id="cancelModal" class="modal">

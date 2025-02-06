@@ -2,10 +2,11 @@ form {
     max-width: 400px;
     width: 100%; /* Ensure form stays within screen size */
     padding: 20px;
+    margin-top: 50px;
+    margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px); /* Apply the blur effect */
-    background-color: rgba(255, 255, 255, 0.8); /* Add a subtle white background with opacity */
+    backdrop-filter: blur(100px); /* Apply the blur effect */
     margin-right: 20px; /* Add space on the right side */
     animation: fadeIn 0.6s ease-in-out;
 }
@@ -62,16 +63,16 @@ input[type="text"], input[type="file"], textarea, .quantity-input, select {
 button {
     width: 100%;
     padding: 10px;
-    background-color: #1f2422;
+    background: linear-gradient(45deg, #050945, #6366f1);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 16px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #373a37;
+    background: linear-gradient(45deg, #6366f1, #050945);
 }
 
 /* Styling for the back link in the upper left corner */

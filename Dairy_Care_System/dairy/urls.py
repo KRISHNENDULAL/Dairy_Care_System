@@ -2,6 +2,7 @@ from django.urls import path, include
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import validate_dairy_image
 
 
 urlpatterns = [
@@ -101,6 +102,7 @@ urlpatterns = [
     path('update_order_status/', views.update_order_status, name='update_order_status'),
     path('get_order_tracking/<int:order_id>/', views.get_order_tracking, name='get_order_tracking'),
 
+    path('validate_dairy_image/', views.validate_dairy_image, name='validate_dairy_image'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

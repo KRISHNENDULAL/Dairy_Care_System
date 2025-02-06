@@ -3,20 +3,27 @@
 <html lang="en">
 <head>
     <title>{{ animal.animal_name }} Health Status</title>
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Add Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Reset some default styles */
         body {
+            margin-left: 250px;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
         }
 
         /* Main container */
         h1 {
             text-align: center;
             margin-top: 20px;
-            color: #4A4A4A;
+            color: #000000;
         }
 
         /* Link styling */
@@ -26,7 +33,7 @@
         }
 
         a:hover {
-            text-decoration: underline;
+            text-decoration: none;
         }
 
         /* Table styling */
@@ -41,7 +48,7 @@
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #dddddd;
+            border-bottom: 1px solid #aaaaaa;
         }
 
         th {
@@ -81,7 +88,7 @@
             position: absolute; /* Use absolute positioning */
             top: 20px; /* Adjust vertical position */
             right: 20px; /* Aligns the button to the right corner */
-            background-color: #007BFF; /* Button color */
+            background: linear-gradient(45deg, #1599ea, #043669);
             color: white; /* Text color */
             padding: 10px 15px; /* Padding */
             border: none; /* No border */
@@ -93,7 +100,7 @@
         }
 
         .add-button:hover {
-            background-color: #0056b3; /* Darker on hover */
+            background: linear-gradient(45deg, #043669, #1599ea);
         }
 
         /* Button styles */
@@ -119,130 +126,390 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
         }
 
         /* Modal content styling */
         .modal-content {
-            position: relative; /* Or 'absolute' if it's contained within a parent */
-            top: -20px; /* Adjust this value as needed */
-            margin: 0 auto;
-            max-width: 500px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: white;
+            margin: 2% auto;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
         }
 
-        /* Close button styling */
-        .close-button {
-            position: absolute;
-            top: 25px;
-            right: 18px;
-            font-size: 24px;
-            color: #333;
-            cursor: pointer;
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
-        .close-button:hover {
-            color: #ff4d4d;
-        }
-
-        /* Form heading */
         .modal-content h1 {
-            font-size: 24px;
             color: #333;
-            margin-bottom: 5px;
             text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
         }
 
-        /* Label styling */
-        label {
+        .modal-content h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #024a12, #0ddf25);
+        }
+
+        .modal .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .modal label {
             display: block;
-            font-size: 14px;
-            color: #555;
-            margin-top: 15px;
+            margin-bottom: 8px;
+            color: #333;
             font-weight: 500;
+            font-size: 0.95em;
         }
 
-        /* Input and select styling */
-        input[type="date"],
-        select {
+        .modal input[type="date"],
+        .modal select {
             width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            background-color: #fff;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 12px 15px 12px 35px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
-        /* Multi-select styling */
-        select[multiple] {
-            height: 80px;
+        .modal select[multiple] {
+            height: auto;
+            min-height: 120px;
+            padding-left: 12px;
         }
 
-        /* Submit button styling */
-        button[type="submit"] {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
+        .modal input:focus,
+        .modal select:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            outline: none;
+        }
+
+        .modal .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal .btn {
+            flex: 1;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
             cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
         }
 
-        button[type="submit"]:hover {
+        .modal .btn-primary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .modal .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        .modal .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal select option {
+            padding: 8px;
+        }
+
+        .modal select option:checked {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .modal .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal .close:hover {
+            color: #333;
+        }
+
+        /* Scrollbar styling */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 10px auto;
+                padding: 15px;
+            }
+
+            .modal .btn-container {
+                flex-direction: column;
+            }
+
+            .modal h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        /* Main container adjustments */
+        .main-content {
+            margin-left: 250px;  /* Match sidenav width */
+            padding: 20px;
+            margin-top: 20px;    /* Adjust based on header height */
+        }
+
+        /* Page title styling */
+        .page-title {
+            color: #333;
+            font-size: 34px;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000000;
+            display: inline-block;
+        }
+
+        /* Table container */
+        .table-container {
+            backdrop-filter: blur(100px);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Button styling */
+        .action-buttons {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .add-button {
+            background-color: #044c98;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            float: right;
+        }
+
+        .add-button:hover {
+            background-color: #0056b3;
+        }
+
+        .update-button {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            font-size: 13px;
+        }
+
+        .update-button:hover {
             background-color: #218838;
+        }
+
+        .addbtn {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #20bf08, #04610e);
+            border: none;
+            color: #ffffff;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .addbtn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(45deg, #04610e, #20bf08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Status colors */
+        .status-healthy {
+            color: #28a745;
+        }
+
+        .status-sick {
+            color: #dc3545;
+        }
+
+        .status-recovering {
+            color: #ffc107;
+        }
+
+        /* Empty state */
+        .no-records {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <h1>{{ animal.animal_name }}'s Health Records</h1>
-    <a href="#" class="add-button" onclick="openModal()">Add another report</a><br><br>
-    
+    <!-- Side Navigation (Always Visible) -->
+    <div id="mySidenav" class="sidenav"><br><br>
+        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i> Products List</a>
+        <a href="{% url 'addproducts' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
+        <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i> Animals List</a>
+        <a href="{% url 'addanimal' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+        <a href="{% url 'diseasedetection' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-heartbeat"></i> Health Checker</a><br>
+        <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i> Order Details</a><br>
+        <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i> Pre-Order Details</a><br>
+        <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i> Milk Details</a><br> -->
+        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i> Stock Details</a><br>
+        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i> Feedback Review</a><br>
+    </div>
 
-    <table>
-        <tr>
-            <th>Checkup Date</th>
-            <th>Health Status</th>
-            <th>Vaccinations</th>
-            <th>Treatment Details</th>
-            <th>Veterinarian Name</th>
-            <th>Next Checkup Date</th>
-            <th>Actions</th>
-        </tr>
-        {% for record in health_records %}
-        <tr>
-            <td>{{ record.checkup_date }}</td>
-            <td>{{ record.health_status }}</td>
-            <td>{{ record.vaccinations }}</td>
-            <td>{{ record.treatment_details }}</td>
-            <td>{{ record.veterinarian_name }}</td>
-            <td>{{ record.next_checkup_date }}</td>
-            <td>
-                <a href="{% url 'update_health_record' record.health_id %}" class="update-button">Update</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7">No health records available.</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="brand-name"><span>Dairy Care System</span></div>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul><br><br><br><br>
 
-    <a class="back-button" href="{% url 'animalslist' %}">Back to Animals List</a>
+    <!-- Main Content -->
+    <div class="main-content">
+        <center><h1 class="page-title">{{ animal.animal_name }}'s Health Records</h1></center>
+        <div class="table-container">
+            <div class="action-buttons">
+                <a href="#" class="add-button" onclick="openModal()">Add another report</a>
+            </div><br><br>
+            <table>
+                <tr>
+                    <th><i class="fas fa-calendar"></i> Checkup Date</th>
+                    <th><i class="fas fa-heartbeat"></i> Health Status</th>
+                    <th><i class="fas fa-syringe"></i> Vaccinations</th>
+                    <th><i class="fas fa-notes-medical"></i> Treatment Details</th>
+                    <th><i class="fas fa-user-md"></i> Veterinarian</th>
+                    <th><i class="fas fa-calendar-plus"></i> Next Checkup Date</th>
+                    <th><i class="fa fa-bars"></i> Actions</th>
+                </tr>
+                {% for record in health_records %}
+                <tr>
+                    <td>{{ record.checkup_date }}</td>
+                    <td class="status-{{ record.health_status|lower }}">{{ record.health_status }}</td>
+                    <td>{{ record.vaccinations }}</td>
+                    <td>{{ record.treatment_details }}</td>
+                    <td>{{ record.veterinarian_name }}</td>
+                    <td>{{ record.next_checkup_date }}</td>
+                    <td>
+                        <a href="{% url 'update_health_record' record.health_id %}" class="update-button">Update</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="no-records">No health records available.</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    </div>
 
     <!-- Modal for adding health record -->
     <div id="addHealthRecordModal" class="modal">
@@ -253,7 +520,7 @@
                 {% csrf_token %}
                 
                 <label for="checkup_date">Checkup Date:</label>
-                <input type="date" name="checkup_date" required>
+                <input type="date" name="checkup_date" required><br><br>
 
                 <label for="health_status">Health Status:</label>
                 <select id="health_status" name="health_status" multiple required>
@@ -264,7 +531,7 @@
                     <option value="Under Observation">Under Observation</option>
                     <option value="Chronic Condition">Chronic Condition</option>
                     <option value="Euthanized">Euthanized</option>
-                </select>
+                </select><br><br>
 
                 <label for="vaccinations">Vaccinations:</label>
                 <select id="vaccinations" name="vaccinations" multiple required>
@@ -276,7 +543,7 @@
                     <option value="Parainfluenza">Parainfluenza</option>
                     <option value="IBR">Infectious Bovine Rhinotracheitis (IBR)</option>
                     <option value="FMD">Foot and Mouth Disease (FMD)</option>
-                </select>
+                </select><br><br>
 
                 <label for="treatment_details">Treatment Details:</label>
                 <select id="treatment_details" name="treatment_details" multiple required>
@@ -288,7 +555,7 @@
                     <option value="Wound Care">Wound Care</option>
                     <option value="Dietary Adjustments">Dietary Adjustments</option>
                     <option value="Topical Treatments">Topical Treatments</option>
-                </select>
+                </select><br><br>
 
                 <label for="veterinarian_name">Veterinarian Name:</label>
                 <select id="veterinarian_name" name="veterinarian_name" required>
@@ -296,20 +563,63 @@
                     <option value="Dr. Ravi Sankar S">Dr. Ravi Sankar S</option>
                     <option value="Dr. Krishna Lakshmi">Dr. Krishna Lakshmi</option>
                     <option value="Dr. Radhamadhav">Dr. Radhamadhav</option>
-                </select>
+                </select><br><br>
 
                 <label for="next_checkup_date">Next Checkup Date:</label>
-                <input type="date" name="next_checkup_date">
+                <input type="date" name="next_checkup_date"><br><br>
 
                 <input type="hidden" name="added_by_id" value="{{ request.user.id }}">
-                <input type="hidden" name="animal_id" value="{{ animal_id }}">
+                <input type="hidden" name="animal_id" value="{{ animal_id }}"><br><br>
                 
-                <button type="submit">Add Record</button>
+                <center><button type="submit" class="addbtn">Add Record</button></center><br>
             </form>
         </div>
     </div>
 
+    <!-- Add SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        // Toggle dropdown on click
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+
+        // Close the dropdown if clicked outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+            // Custom SweetAlert2 logout confirmation
+            function confirmLogout() {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out of Dairy Care System!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, logout',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to logout URL
+                        window.location.href = "{% url 'logout' %}";
+                    }
+                });
+            }
+        
+
         function openModal() {
             document.getElementById("addHealthRecordModal").style.display = "block";
         }
@@ -325,5 +635,6 @@
             }
         };
     </script>
+
 </body>
 </html>

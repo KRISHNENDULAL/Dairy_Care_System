@@ -3,154 +3,262 @@
 <html lang="en">
 <head>
     <title>Add Health Record</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-    /* Reset some default styles */
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        color: #333;
-    }
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #1976D2;
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+        }
 
-    /* Center content and style headings */
-    h1 {
-        text-align: center;
-        margin-top: 20px;
-        color: #4A4A4A;
-    }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
 
-    /* Form styling */
-    form {
-        max-width: 600px;  /* Limit form width */
-        margin: 0 auto;    /* Center form */
-        background: white; /* White background for form */
-        padding: 20px;     /* Add padding */
-        border-radius: 8px; /* Rounded corners */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
 
-    /* Input and select styling */
-    label {
-        display: block;
-        margin: 10px 0 5px; /* Spacing around labels */
-    }
-
-    input[type="date"],
-    select {
-        width: 100%; /* Full width */
-        padding: 10px; /* Padding for inputs */
-        border: 1px solid #ddd; /* Light border */
-        border-radius: 5px; /* Rounded corners */
-        margin-bottom: 15px; /* Space below inputs */
-    }
-
-    input[type="date"]:focus,
-    select:focus {
-        border-color: #007BFF; /* Border color on focus */
-        outline: none; /* Remove default outline */
-    }
-
-    /* Button styling */
-    button {
-        background-color: #007BFF; /* Button color */
-        color: white; /* Text color */
-        padding: 10px 15px; /* Padding */
-        border: none; /* No border */
-        border-radius: 5px; /* Rounded corners */
-        cursor: pointer; /* Pointer cursor on hover */
-        font-size: 16px; /* Font size */
-    }
-
-    button:hover {
-        background-color: #0056b3; /* Darker on hover */
-    }
-
-    /* Back link styling */
-    a {
-        display: block; /* Make it block-level for spacing */
-        text-align: center; /* Center align */
-        margin-top: 20px; /* Space above */
-        text-decoration: none; /* Remove underline */
-        color: #007BFF; /* Link color */
-    }   
-
-    a:hover {
-        text-decoration: underline; /* Underline on hover */
-    }
-
-    /* Additional responsive styling */
-    @media (max-width: 600px) {
         h1 {
-            font-size: 24px; /* Adjust heading size on small screens */
+            color: var(--text-color);
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
         }
 
-        button {
-            width: 100%; /* Full width button on mobile */
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
         }
-    }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px 15px 12px 35px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        select[multiple] {
+            height: auto;
+            min-height: 120px;
+            padding-left: 12px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            outline: none;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        select option {
+            padding: 8px;
+        }
+
+        select option:checked {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
     </style>
 </head>
 <body>
-<center>
-    <h1>Add Health Record</h1>
-    <form method="post">
-        {% csrf_token %}
+    <div class="container">
+        <h1>Add Health Record</h1>
+        <div class="form-container">
+            <form method="post">
+                {% csrf_token %}
 
-        <label for="checkup_date">Checkup Date:</label>
-        <input type="date" name="checkup_date" required>
+                <div class="form-group">
+                    <label for="checkup_date">
+                        <i class="fas fa-calendar"></i> Checkup Date
+                    </label>
+                    <input type="date" name="checkup_date" required>
+                </div>
 
-        <label for="health_status">Health Status:</label>
-        <select id="health_status" name="health_status" multiple required>
-            <option value="Healthy">Healthy</option>
-            <option value="Sick">Sick</option>
-            <option value="Recovering">Recovering</option>
-            <option value="Injured">Injured</option>
-            <option value="Under Observation">Under Observation</option>
-            <option value="Chronic Condition">Chronic Condition</option>
-            <option value="Euthanized">Euthanized</option>
-        </select>
+                <div class="form-group">
+                    <label for="health_status">
+                        <i class="fas fa-heartbeat"></i> Health Status
+                    </label>
+                    <select id="health_status" name="health_status" multiple required>
+                        <option value="Healthy">Healthy</option>
+                        <option value="Sick">Sick</option>
+                        <option value="Recovering">Recovering</option>
+                        <option value="Injured">Injured</option>
+                        <option value="Under Observation">Under Observation</option>
+                        <option value="Chronic Condition">Chronic Condition</option>
+                        <option value="Euthanized">Euthanized</option>
+                    </select>
+                </div>
 
-        <label for="vaccinations">Vaccinations:</label>
-        <select id="vaccinations" name="vaccinations" multiple required>
-            <option value="Rabies">Rabies</option>
-            <option value="Bovine Viral Diarrhea (BVD)">Bovine Viral Diarrhea (BVD)</option>
-            <option value="Clostridium Perfringens (Type C and D)">Clostridium Perfringens (Type C and D)</option>
-            <option value="Brucellosis">Brucellosis</option>
-            <option value="Leptospirosis">Leptospirosis</option>
-            <option value="Parainfluenza">Parainfluenza</option>
-            <option value="Infectious Bovine Rhinotracheitis (IBR)">Infectious Bovine Rhinotracheitis (IBR)</option>
-            <option value="Foot and Mouth Disease (FMD)">Foot and Mouth Disease (FMD)</option>
-        </select>
+                <div class="form-group">
+                    <label for="vaccinations">
+                        <i class="fas fa-syringe"></i> Vaccinations
+                    </label>
+                    <select id="vaccinations" name="vaccinations" multiple required>
+                        <option value="Rabies">Rabies</option>
+                        <option value="BVD">Bovine Viral Diarrhea (BVD)</option>
+                        <option value="Clostridium">Clostridium Perfringens</option>
+                        <option value="Brucellosis">Brucellosis</option>
+                        <option value="Leptospirosis">Leptospirosis</option>
+                        <option value="Parainfluenza">Parainfluenza</option>
+                        <option value="IBR">Infectious Bovine Rhinotracheitis (IBR)</option>
+                        <option value="FMD">Foot and Mouth Disease (FMD)</option>
+                    </select>
+                </div>
 
-        <label for="treatment_details">Treatment Details:</label>
-        <select id="treatment_details" name="treatment_details" multiple required>
-            <option value="Antibiotics">Antibiotics</option>
-            <option value="Anti-inflammatory Medications">Anti-inflammatory Medications</option>
-            <option value="Surgery">Surgery</option>
-            <option value="Fluid Therapy">Fluid Therapy</option>
-            <option value="Vaccination Administration">Vaccination Administration</option>
-            <option value="Wound Care">Wound Care</option>
-            <option value="Dietary Adjustments">Dietary Adjustments</option>
-            <option value="Topical Treatments">Topical Treatments</option>
-        </select>
+                <div class="form-group">
+                    <label for="treatment_details">
+                        <i class="fas fa-notes-medical"></i> Treatment Details
+                    </label>
+                    <select id="treatment_details" name="treatment_details" multiple required>
+                        <option value="Antibiotics">Antibiotics</option>
+                        <option value="Anti-inflammatory">Anti-inflammatory Medications</option>
+                        <option value="Surgery">Surgery</option>
+                        <option value="Fluid Therapy">Fluid Therapy</option>
+                        <option value="Vaccination">Vaccination Administration</option>
+                        <option value="Wound Care">Wound Care</option>
+                        <option value="Dietary Adjustments">Dietary Adjustments</option>
+                        <option value="Topical Treatments">Topical Treatments</option>
+                    </select>
+                </div>
 
-        <label for="veterinarian_name">Veterinarian Name:</label>
-        <select id="veterinarian_name" name="veterinarian_name" required>
-            <option value="">Select Veterinarian who examined</option>
-            <option value="Dr. Ravi Sankar S">Dr. Ravi Sankar S</option>
-            <option value="Dr. Krishna Lakshmi">Dr. Krishna Lakshmi</option>
-            <option value="Dr. Radhamadhav">Dr. Radhamadhav</option>
-        </select>
+                <div class="form-group">
+                    <label for="veterinarian_name">
+                        <i class="fas fa-user-md"></i> Veterinarian Name
+                    </label>
+                    <select id="veterinarian_name" name="veterinarian_name" required>
+                        <option value="">Select Veterinarian</option>
+                        <option value="Dr. Ravi Sankar S">Dr. Ravi Sankar S</option>
+                        <option value="Dr. Krishna Lakshmi">Dr. Krishna Lakshmi</option>
+                        <option value="Dr. Radhamadhav">Dr. Radhamadhav</option>
+                    </select>
+                </div>
 
-        <label for="next_checkup_date">Next Checkup Date:</label>
-        <input type="date" name="next_checkup_date">
+                <div class="form-group">
+                    <label for="next_checkup_date">
+                        <i class="fas fa-calendar-plus"></i> Next Checkup Date
+                    </label>
+                    <input type="date" name="next_checkup_date">
+                </div>
 
-        <input type="hidden" name="added_by_id" value="{{ request.user.id }}">
-        <input type="hidden" name="animal_id" value="{{ animal_id }}">
+                <input type="hidden" name="added_by_id" value="{{ request.user.id }}">
+                <input type="hidden" name="animal_id" value="{{ animal_id }}">
 
-        <button type="submit">Add Record</button>
-    </form>
-</center>
-    <a href="{% url 'animal_health_status' animal_id %}">Back to Health Records</a>
+                <div class="btn-container">
+                    <a href="{% url 'animal_health_status' animal_id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Add Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

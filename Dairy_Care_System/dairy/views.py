@@ -22,7 +22,11 @@ from django.db.models import Q  # Import Q for case-insensitive query
 from google.cloud import dialogflow_v2 as dialogflow
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from google.cloud import vision
+from google.oauth2 import service_account
+from google.cloud.vision_v1 import types
 
+import io
 import razorpay
 import random
 import string
@@ -30,7 +34,33 @@ import logging
 import json
 from datetime import datetime
 
-
+DAIRY_KEYWORDS = {
+    # Basic dairy products with variations
+    'milk', 'dairy', 'milk product', 'dairy product',
+    'milk bottle', 'milk pack', 'milk packet', 'milk container',
+    
+    # Milk varieties and types
+    'whole milk', 'full cream milk', 'toned milk', 'double toned milk',
+    'skimmed milk', 'skim milk', 'low fat milk', 'full fat milk',
+    'cow milk', 'buffalo milk', 'fresh milk', 'pasteurized milk',
+    'homogenized milk', 'raw milk', 'organic milk', 'flavored milk',
+    
+    # Milk packaging terms
+    'milk carton', 'milk jug', 'milk pouch', 'milk packaging',
+    'milk box', 'milk sachet', 'milk bag', 'milk container',
+    
+    # Common milk brands and descriptors
+    'amul milk', 'milma', 'mother dairy', 'dairy fresh',
+    'farm fresh milk', 'pure milk', 'natural milk',
+    
+    # Other dairy products
+    'curd', 'yogurt', 'butter', 'cheese', 'cream',
+    'ghee', 'paneer', 'buttermilk', 'lassi', 'whey',
+    
+    # Milk processing and storage
+    'pasteurized', 'homogenized', 'refrigerated milk',
+    'cold milk', 'fresh dairy', 'dairy farm', 'milk farm'
+}
 
 def home(request):
     return render(request, 'home.html')
@@ -884,7 +914,18 @@ def logout(request):
 
 
 
-def addproducts(request): 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def addproducts(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+    try:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+    except Users_table.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('login')
+
     if request.method == 'POST':
         product_name = request.POST.get('product_name')
         product_description = request.POST.get('product_description')
@@ -892,43 +933,126 @@ def addproducts(request):
         product_quantity = request.POST.get('product_quantity')
         quantity_unit = request.POST.get('quantity_unit')
         product_price = request.POST.get('product_price')  # Get the price from the POST data
-        
-        # Get user_id from the session
-        employee_user_id = request.session.get('user_id')  # Assuming 'user_id' is stored in the session for employees
+        product_photo = request.FILES.get('product_images')
 
-        try:
-            # Fetch the Users_table instance
-            employee = Users_table.objects.get(user_id=employee_user_id)
-        except Users_table.DoesNotExist:
-            messages.error(request, 'Employee not found.')
-            return redirect('productslist')  # Handle user not found
-
-        # Check if a product with the same name exists for the current farmer
-        if Products_table.objects.filter(product_name__iexact=product_name, employee=employee).exists():
+        # Check if a product with the same name exists for the current employee
+        if Products_table.objects.filter(product_name__iexact=product_name, employee=user).exists():
             messages.error(request, 'You already have a product with this name.')
-            return render(request, 'addproducts.html')  # Return to the same form with an error message
+            return render(request, 'addproducts.html', {'username': user.username})
 
         # Create a new product entry
         product = Products_table(
             product_name=product_name,
             product_description=product_description,
-            product_category=product_category,  # Add the category here
+            product_category=product_category,
             product_quantity=product_quantity,
             quantity_unit=quantity_unit,
             product_price=product_price,
-            employee=employee
+            employee=user
         )
         product.save()
 
-        # If a photo was uploaded, create a new ProductImage entry
-        product_photo = request.FILES.get('product_images')
+        # Save product image if uploaded
         if product_photo:
             ProductImage.objects.create(product=product, image=product_photo)
 
-        # messages.success(request, f'Product "{product_name}" added successfully!')
         return redirect('productslist')
 
-    return render(request, 'addproducts.html')
+    return render(request, 'addproducts.html', {'username': user.username})
+
+
+
+@csrf_exempt
+def validate_dairy_image(request):
+    """
+    View function to handle dairy image validation requests
+    """
+    if request.method == 'POST' and request.FILES.get('image'):
+        try:
+            image_file = request.FILES['image']
+            is_valid, message = validate_dairy_image_content(image_file)
+            return JsonResponse({
+                'valid': is_valid,
+                'message': message
+            })
+        except Exception as e:
+            return JsonResponse({
+                'valid': False,
+                'message': f"Error processing image: {str(e)}"
+            })
+    return JsonResponse({
+        'valid': False,
+        'message': "No image file provided"
+    })
+
+def validate_dairy_image_content(image_file):
+    """
+    Helper function to validate if the image contains dairy products using Google Cloud Vision API
+    """
+    try:
+        # Create credentials and client
+        client = vision.ImageAnnotatorClient()
+
+        # Read the image file
+        content = image_file.read()
+        image = vision.Image(content=content)
+
+        # Perform detection with multiple feature types
+        response = client.annotate_image({
+            'image': image,
+            'features': [
+                {'type_': vision.Feature.Type.LABEL_DETECTION},
+                {'type_': vision.Feature.Type.OBJECT_LOCALIZATION},
+                {'type_': vision.Feature.Type.TEXT_DETECTION}
+            ]
+        })
+
+        # Define dairy-related keywords
+        dairy_keywords = {
+            'milk', 'dairy', 'cheese', 'yogurt', 'butter', 'cream', 'curd', 
+            'ghee', 'paneer', 'buttermilk', 'whey', 'dairy product'
+        }
+
+        # Process labels
+        detected_labels = set()
+        high_confidence_matches = set()
+        
+        for label in response.label_annotations:
+            label_text = label.description.lower()
+            detected_labels.add(label_text)
+            
+            # Check for dairy-related terms with confidence threshold
+            if any(keyword in label_text for keyword in dairy_keywords) and label.score >= 0.6:
+                high_confidence_matches.add(f"{label_text} ({label.score:.2%})")
+
+        # Process objects
+        for object_ in response.localized_object_annotations:
+            obj_name = object_.name.lower()
+            detected_labels.add(obj_name)
+            
+            if any(keyword in obj_name for keyword in dairy_keywords) and object_.score >= 0.6:
+                high_confidence_matches.add(f"{obj_name} ({object_.score:.2%})")
+
+        # Process text
+        if response.text_annotations:
+            text = response.text_annotations[0].description.lower()
+            words = text.split()
+            
+            # Look for dairy-related terms in text
+            for word in words:
+                if any(keyword in word for keyword in dairy_keywords):
+                    detected_labels.add(word)
+
+        # Decision logic
+        if high_confidence_matches:
+            return True, f"Validated as dairy product: {', '.join(high_confidence_matches)}"
+        elif any(keyword in label for keyword in dairy_keywords for label in detected_labels):
+            return True, "Validated as dairy-related product"
+        else:
+            return False, "Please upload an image that clearly shows dairy products"
+
+    except Exception as e:
+        return False, f"Error validating image: {str(e)}"
 
 
 
@@ -944,7 +1068,7 @@ def adminproductslist(request):
         selected_category = request.GET.get('product_category', '').strip()
 
         # Start with a base query for active products
-        products = Products_table.objects.all()
+        products = Products_table.objects.all().order_by('product_name')
 
         # Apply search filter if a search query is provided
         if search_query:
@@ -983,7 +1107,7 @@ def productslist(request):
         # Base query: Filter products added by the logged-in user
         products = Products_table.objects.filter(
             employee_id=user_id  # Use employee_id instead of added_by
-        ).select_related('employee')
+        ).select_related('employee').order_by('product_name')
         
         # Apply additional filters based on search query and selected category
         if search_query:
@@ -1025,7 +1149,7 @@ def custproductslist(request):
         selected_category = request.GET.get('product_category', '')  # Selected category
 
         # Fetch all products filtered by status
-        products = Products_table.objects.filter(status=True)
+        products = Products_table.objects.filter(status=True).order_by('product_name')
 
         # Apply search filter if search query is provided
         if search_query:
@@ -1478,45 +1602,40 @@ def animalslist(request):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def addanimal(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+    
+    user = get_object_or_404(Users_table, pk=user_id)  # Fetch the user object using user_id
+    
     if request.method == 'POST':
         # Fetch form data
         animal_name = request.POST.get('animal_name')
         breed = request.POST.get('breed')
-        date_of_birth = request.POST.get('date_of_birth') if request.POST.get('date_of_birth') else None
+        date_of_birth = request.POST.get('date_of_birth') or None
         gender = request.POST.get('gender')
-        milk_capacity = request.POST.get('milk_capacity') if request.POST.get('milk_capacity') else None
+        milk_capacity = request.POST.get('milk_capacity') or None
 
-        # Fetch the currently logged-in user's ID as 'added_by'
-        by_user_id = request.session.get('user_id')  # Get the user_id from session
-        
-        # Get the Users_table instance corresponding to the user_id
-        added_by_user = get_object_or_404(Users_table, pk=by_user_id)
-
-        # Create a new animal record with the user instance in the added_by field
+        # Create a new animal record
         animal = Animals_table.objects.create(
             animal_name=animal_name,
             breed=breed,
             date_of_birth=date_of_birth,
             gender=gender,
             milk_capacity=milk_capacity,
-            added_by=added_by_user  # Assign the user instance, not the raw ID
+            added_by=user  # Assign the user instance
         )
 
         # Handle multiple file uploads
-        if request.FILES.getlist('animal_images'):
-            for img in request.FILES.getlist('animal_images'):
-                animal_image = AnimalImages(
-                    animal=animal,
-                    animal_image=img
-                )
-                animal_image.save()
-
-        # Redirect to the animals list page after successfully adding the animal
-        return redirect('animalslist')
-
-    # If GET request, render the form page
-    return render(request, 'addanimal.html')
+        for img in request.FILES.getlist('animal_images'):
+            AnimalImages.objects.create(animal=animal, animal_image=img)
+        
+        return redirect('animalslist')  # Redirect after successful addition
+    
+    context = {'username': user.username}  # Pass username to template
+    return render(request, 'addanimal.html', context)
 
 
 
@@ -1582,43 +1701,34 @@ def animaldetails(request, animal_id):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def updateanimal(request, animal_id):
-    # Fetch the animal object using the provided ID
-    animal = get_object_or_404(Animals_table, animal_id=animal_id)
+    user_id = request.session.get('user_id')  # Retrieve user_id from session
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
     
-    # Fetch the existing images for the animal
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object
+    animal = get_object_or_404(Animals_table, animal_id=animal_id)
     images = AnimalImages.objects.filter(animal=animal)
-
-    # If the form is submitted, update the animal details
+    
     if request.method == 'POST':
-        # Manually update the animal fields from POST data
         animal.animal_name = request.POST.get('animal_name', animal.animal_name)
         animal.breed = request.POST.get('breed', animal.breed)
-
-        # Ensure the date_of_birth is parsed correctly
         date_of_birth_str = request.POST.get('date_of_birth')
         if date_of_birth_str:
             animal.date_of_birth = parse_date(date_of_birth_str)
-
         animal.gender = request.POST.get('gender', animal.gender)
         animal.milk_capacity = request.POST.get('milk_capacity', animal.milk_capacity)
         
-        # Handle image upload - update images if a new one is uploaded
         if request.FILES.get('animal_image'):
-            # Delete old images
-            images.delete()  # Delete all existing images for the animal
-            
+            images.delete()  # Delete all existing images
             new_image = request.FILES['animal_image']
             AnimalImages.objects.create(animal=animal, animal_image=new_image)
-
-        # Save the updated animal details
+        
         animal.save()
-
-        # Redirect to animal details page after update
         return redirect('animaldetails', animal_id=animal.animal_id)  
-
-    # Render the template with the animal and its current images
-    return render(request, 'updateanimal.html', {'animal': animal, 'images': images})
+    
+    return render(request, 'updateanimal.html', {'animal': animal, 'images': images, 'username': user.username})
 
 
 
@@ -1640,15 +1750,23 @@ def restore_animal(request, animal_id):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def animal_health_status(request, animal_id):
-    animal = get_object_or_404(Animals_table, animal_id=animal_id)
-    health_records = AnimalHealth_table.objects.filter(animal=animal)  # Use the foreign key 'animal'
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object
+    animal = get_object_or_404(Animals_table, animal_id=animal_id)  # Fetch the animal
+    health_records = AnimalHealth_table.objects.filter(animal=animal)  # Fetch health records
 
     context = {
+        'username': user.username,
         'animal': animal,
-        'health_records': health_records,  # This will hold the records fetched from the database
+        'health_records': health_records,
     }
     
     return render(request, 'animal_health_status.html', context)
+
 
 
 def add_health_record(request, animal_id):
@@ -1685,10 +1803,15 @@ def add_health_record(request, animal_id):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_health_record(request, health_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object
     health_record = get_object_or_404(AnimalHealth_table, health_id=health_id)
 
     if request.method == "POST":
-        # Update the health record with new data
+        # Update health record
         health_record.checkup_date = request.POST['checkup_date']
         health_record.health_status = request.POST['health_status']
         health_record.vaccinations = request.POST['vaccinations']
@@ -1700,7 +1823,11 @@ def update_health_record(request, health_id):
         messages.success(request, 'Health record updated successfully!')
         return redirect('animal_health_status', animal_id=health_record.health_id)
 
-    return render(request, 'update_health_record.html', {'health_record': health_record})
+    context = {
+        'health_record': health_record,
+        'username': user.username,  # Pass the username to the template
+    }
+    return render(request, 'update_health_record.html', context)
 
 
 
@@ -2314,7 +2441,7 @@ def assign_delivery(request):
 
         try:
             order = Order_table.objects.get(id=order_id)
-            
+
             if action == "assign":
                 employee = Users_table.objects.get(user_id=employee_id)
                 order.deliveryboy = employee

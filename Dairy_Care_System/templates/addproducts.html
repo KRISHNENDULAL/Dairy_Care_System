@@ -6,11 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Products</title>
     <link rel="stylesheet" href="{% static 'css/addproducts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Add Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            background: url('{% static "images/addproduct.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin-top: 30px;
+            margin-left: 250px;
             font-family: Arial, sans-serif;
             padding: 0;
             display: flex;
@@ -22,7 +29,39 @@
     
 </head>
 <body>
-<a href="{% url 'farmownerpage' %}" class="back-link"><b>&larr; BACK</b></a>
+<!-- <a href="{% url 'farmownerpage' %}" class="back-link"><b>&larr; BACK</b></a> -->
+
+<!-- Side Navigation (Always Visible) -->
+<div id="mySidenav" class="sidenav"><br><br>
+    <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i> Products List</a>
+    <a href="{% url 'addproducts' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
+    <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i> Animals List</a>
+    <a href="{% url 'addanimal' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+    <a href="{% url 'diseasedetection' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-heartbeat"></i> Health Checker</a><br>
+    <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i> Order Details</a><br>
+    <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i> Pre-Order Details</a><br>
+    <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i> Milk Details</a><br> -->
+    <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i> Stock Details</a><br>
+    <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+    <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i> Feedback Review</a><br>
+</div>
+
+<!-- Navigation Bar -->
+<ul>
+    <div class="brand-name"><span>Dairy Care System</span></div>
+    <div class="header">
+        <div class="nav-item">
+            <li>
+                <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                <div class="dropdown-content" id="dropdown-content">
+                    <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </div>
+    </div>
+</ul>
+
 
 <form id="addProductForm" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
@@ -41,7 +80,7 @@
         <option value="" disabled selected>Select a Category</option>
         <option value="milk">Milk</option>
         <option value="spreads">Spreads</option>
-        <option value="non-fermented">Non-Fermented</option>
+        <option value="nonfermented">NonFermented</option>
         <option value="fermented">Fermented</option>
         <option value="powders">Powders</option>
         <option value="desserts">Desserts</option>
@@ -282,8 +321,183 @@
             if (!valid) {
                 event.preventDefault();
             }
+
+            const photoError = document.getElementById('photoError');
+            if (photoError.style.color === 'red') {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Image',
+                    text: 'Please upload a valid dairy product image before submitting.',
+                });
+            }
         });
     });
 </script>
+
+<!-- Add SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Toggle dropdown on click
+    function toggleDropdown() {
+        var dropdown = document.getElementById("dropdown-content");
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        } else {
+            dropdown.style.display = "block";
+        }
+    }
+
+    // Close the dropdown if clicked outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('.username')) {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            }
+        }
+    }
+
+    // Custom SweetAlert2 logout confirmation
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of Dairy Care System!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to logout URL
+                window.location.href = "{% url 'logout' %}";
+            }
+        });
+    }
+
+    // Your Google Cloud API Key
+    const API_KEY = 'AIzaSyBLSAPqtZQ4KhCTNP9zkM2Dke9giqwhENc';
+    
+    // Function to validate the uploaded image using Google Cloud Vision API
+    async function validateImage(file) {
+        const formData = new FormData();
+        formData.append('product_images', file);
+
+        // Show loading indicator
+        Swal.fire({
+            title: 'Validating Image...',
+            text: 'Please wait while we verify the image content',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            // Convert image to base64
+            const base64Image = await getBase64(file);
+            const visionRequest = {
+                requests: [
+                    {
+                        image: {
+                            content: base64Image.split(',')[1]
+                        },
+                        features: [
+                            {
+                                type: 'LABEL_DETECTION',
+                                maxResults: 10
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            // Make API request to Google Cloud Vision
+            const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(visionRequest)
+            });
+
+            const data = await response.json();
+            
+            // Define dairy-related keywords
+            const dairyKeywords = new Set([
+                'milk', 'dairy', 'cheese', 'yogurt', 'butter', 'cream',
+                'dairy product', 'food', 'drink', 'beverage', 'dessert',
+                'ice cream', 'milkshake', 'curd', 'ghee', 'paneer',
+                'dairy food', 'milk product'
+            ]);
+
+            // Process the labels
+            const labels = data.responses[0].labelAnnotations;
+            const detectedLabels = labels.map(label => label.description.toLowerCase());
+            const matchingLabels = detectedLabels.filter(label => dairyKeywords.has(label));
+
+            const photoError = document.getElementById('photoError');
+
+            if (matchingLabels.length > 0) {
+                // Valid dairy-related image
+                Swal.close();
+                photoError.textContent = `✓ Valid dairy product image: ${matchingLabels.join(', ')}`;
+                photoError.style.color = "green";
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Valid Image',
+                    text: `Detected dairy-related content: ${matchingLabels.join(', ')}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                // Invalid image
+                Swal.close();
+                photoError.textContent = "✗ Invalid image: No dairy-related content detected";
+                photoError.style.color = "red";
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Image',
+                    text: 'Please upload an image of a dairy product'
+                });
+            }
+
+        } catch (error) {
+            // Handle errors
+            Swal.close();
+            console.error('Error:', error);
+            const photoError = document.getElementById('photoError');
+            photoError.textContent = "✗ Error validating image. Please try again.";
+            photoError.style.color = "red";
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to validate image. Please try again.'
+            });
+        }
+    }
+
+    // Helper function to convert file to base64
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Event listener for the file input
+    document.querySelector('input[name="product_images"]').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            validateImage(file);
+        }
+    });
+</script>
+
 </body>
 </html>

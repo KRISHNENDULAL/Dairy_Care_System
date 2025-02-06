@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url('{% static "images/feedbackreview.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin-left: 250px;
             padding: 20px;
@@ -22,7 +22,22 @@
             margin-bottom: 30px;
             font-family: Copperplate, Papyrus, fantasy;
             font-size: 3.0em;
+            position: relative; /* Ensure the pseudo-element positions correctly */
         }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 40%;
+            height: 3px;
+            background: linear-gradient(to right, #c3c4c6, #000000);
+            border-radius: 2px;
+            transform: translateX(-50%); /* Center the underline */
+        }
+
+
         .feedback-list {
             max-width: 1200px; /* Increased width */
             margin: auto;
@@ -132,6 +147,11 @@
         {% endif %}
     </div>
 
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <!-- Add SweetAlert2 and Font Awesome JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script>
         // Toggle dropdown on click
         function toggleDropdown() {
