@@ -35,6 +35,7 @@ h1 {
     color: black;
     font-size: 70px;
     margin-top: 60px;
+    animation: slideIn 0.8s ease-out; /* Add login-box animation */
 }
 
 h2 {
@@ -252,3 +253,25 @@ footer {
         gap: 1rem;
     }
 }
+
+/* Add animation keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
