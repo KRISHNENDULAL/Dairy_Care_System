@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: url('{% static "images/updateproduct.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/customerpage.jpg" %}') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             padding: 20px;
@@ -44,6 +44,9 @@
             </select>
             <div id="categoryError" class="error-message"></div><br>
 
+            <label for="product_subcategory">Sub-Category:</label>
+            <input type="text" id="product_subcategory" name="product_subcategory" value="{{ product.product_subcategory }}" required>
+            <span class="error" id="productSubcategoryError"></span>
 
             <label for="quantity">Stock:</label>
             <input type="text" id="quantity" name="product_quantity" value="{{ product.product_quantity }}" required>
@@ -89,6 +92,8 @@
             const form = document.querySelector('form'); // Select the form element
             const productName = document.getElementById('product_name');
             const productDescription = document.getElementById('product_description');
+            const productCategory = document.getElementById('product_category');
+            const productSubcategory = document.getElementById('product_subcategory');
             const productQuantity = document.getElementById('quantity');
             const quantityUnit = document.getElementById('quantityUnit');
             const productPrice = document.getElementById('price');
@@ -117,6 +122,16 @@
             function validateDescription(description) {
                 const wordCount = description.trim().split(/\s+/).length;
                 return wordCount <= 100;
+            }
+
+            // Validate product name (only alphabets)
+            function validateProductCategory(category) {
+                return /^[a-zA-Z\s]+$/.test(category); // Allow alphabets and spaces
+            }
+            
+            // Validate product name (only alphabets)
+            function validateProductSubcategory(subcategory) {
+                return /^[a-zA-Z\s]+$/.test(subcategory); // Allow alphabets and spaces
             }
     
             // Validate quantity (integer or decimal)
@@ -148,6 +163,28 @@
                     showError('Description must not exceed 100 words.', 'productDescriptionError');
                 } else {
                     clearError('productDescriptionError');
+                }
+            });
+
+            // Live validation for product category
+            productCategory.addEventListener('input', function() {
+                if (productCategory.value.trim() === "") {
+                    showError('Product category is required.', 'productCategoryError');
+                } else if (!validateProductCategory(productCategory.value.trim())) {
+                    showError('Product category can only contain alphabets.', 'productCategoryError');
+                } else {
+                    clearError('productCategoryError');
+                }
+            });
+
+            // Live validation for product subcategory
+            productSubcategory.addEventListener('input', function() {
+                if (productSubcategory.value.trim() === "") {
+                    showError('Product subcategory is required.', 'productSubcategoryError');
+                } else if (!validateProductSubcategory(productSubcategory.value.trim())) {
+                    showError('Product subcategory can only contain alphabets.', 'productSubcategorytError');
+                } else {
+                    clearError('productSubcategoryError');
                 }
             });
     
@@ -203,6 +240,18 @@
     
                 if (productDescription.value.trim() === "" || !validateDescription(productDescription.value.trim())) {
                     showError('Description is required and must not exceed 100 words.', 'productDescriptionError');
+                    valid = false;
+                }
+
+                // Final validation checks before submission
+                if (productCategory.value.trim() === "" || !validateProductCategory(productCategory.value.trim())) {
+                    showError('Product Category is required and can only contain alphabets.', 'productCategoryError');
+                    valid = false;
+                }
+
+                // Final validation checks before submission
+                if (productSubcategory.value.trim() === "" || !validateProductSubcategory(productSubcategory.value.trim())) {
+                    showError('Product subcategory is required and can only contain alphabets.', 'productSubcategoryError');
                     valid = false;
                 }
     

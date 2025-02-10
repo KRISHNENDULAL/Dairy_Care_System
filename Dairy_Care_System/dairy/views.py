@@ -25,6 +25,15 @@ from django.views.decorators.csrf import csrf_exempt
 from google.cloud import vision
 from google.oauth2 import service_account
 from google.cloud.vision_v1 import types
+from textblob import TextBlob
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import nltk
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
+from django.http import HttpResponse
+from io import BytesIO
+from datetime import datetime
+
 
 import io
 import razorpay
@@ -32,7 +41,8 @@ import random
 import string
 import logging
 import json
-from datetime import datetime
+import qrcode
+
 
 DAIRY_KEYWORDS = {
     # Basic dairy products with variations
@@ -499,7 +509,6 @@ def restoreuser(request, user_id):
 
 
 def deleteaccount(request, user_id):
-    
     user = get_object_or_404(Users_table, user_id=user_id)
     user.status = False  # Set status to inactive
     user.save()  # Save changes to the database
@@ -785,33 +794,71 @@ def adminfeedbackreview(request):
 
 
 
+def get_sentiment_label(score):
+    if score > 0.05:
+        return 'Positive', 'text-success'
+    elif score < -0.05:
+        return 'Negative', 'text-danger'
+    else:
+        return 'Neutral', 'text-warning'
+
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def feedbackreview(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    user_id = request.session.get('user_id')
     
     if user_id:
         try:
-            # Fetch the user object using user_id
             user = Users_table.objects.get(user_id=user_id)
-            
-            # Filter feedback for products added by the logged-in user
             feedback_list = Feedback_table.objects.filter(
                 product__employee_id=user_id
             ).select_related('user', 'product__employee').order_by('-created_at')
             
-            # Prepare the context for the template
+            # Initialize VADER
+            analyzer = SentimentIntensityAnalyzer()
+            
+            # Process each feedback with sentiment analysis
+            analyzed_feedback = []
+            for feedback in feedback_list:
+                # TextBlob analysis
+                blob = TextBlob(feedback.feedback_text)
+                textblob_score = blob.sentiment.polarity
+                
+                # VADER analysis
+                vader_scores = analyzer.polarity_scores(feedback.feedback_text)
+                vader_compound = vader_scores['compound']
+                
+                # Get sentiment labels
+                textblob_label, textblob_class = get_sentiment_label(textblob_score)
+                vader_label, vader_class = get_sentiment_label(vader_compound)
+                
+                analyzed_feedback.append({
+                    'feedback': feedback,
+                    'textblob': {
+                        'score': round(textblob_score, 2),
+                        'label': textblob_label,
+                        'class': textblob_class
+                    },
+                    'vader': {
+                        'score': round(vader_compound, 2),
+                        'label': vader_label,
+                        'class': vader_class
+                    }
+                })
+            
             context = {
-                'username': user.username,  # Pass the username to the template
-                'feedback_list': feedback_list,  # Pass the feedback list to the template
+                'username': user.username,
+                'feedback_list': analyzed_feedback,
             }
             
             return render(request, 'feedbackreview.html', context)
         
         except Users_table.DoesNotExist:
-            return redirect('login')  # Redirect to login if user does not exist
+            return redirect('login')
     
     else:
-        return redirect('login')  # Redirect to login if no user is logged in
+        return redirect('login')
 
     
 
@@ -930,6 +977,7 @@ def addproducts(request):
         product_name = request.POST.get('product_name')
         product_description = request.POST.get('product_description')
         product_category = request.POST.get('product_category')  # Get the product category
+        product_subcategory = request.POST.get('product_subcategory')  # Get the product category
         product_quantity = request.POST.get('product_quantity')
         quantity_unit = request.POST.get('quantity_unit')
         product_price = request.POST.get('product_price')  # Get the price from the POST data
@@ -945,6 +993,7 @@ def addproducts(request):
             product_name=product_name,
             product_description=product_description,
             product_category=product_category,
+            product_subcategory=product_subcategory,
             product_quantity=product_quantity,
             quantity_unit=quantity_unit,
             product_price=product_price,
@@ -1187,7 +1236,7 @@ def productdetails(request):
         images = product.images.all()  # Get associated images
 
         # Determine product availability status
-        product_status = "Available" if product.product_quantity > 0 else "Out of Stock"
+        product_status = "In Stock" if product.product_quantity > 0 else "Out of Stock"
 
         # Wishlist addition logic
         if 'add_to_wishlist' in request.POST:
@@ -1294,6 +1343,7 @@ def updateproduct(request, product_id):
         product.product_name = request.POST.get('product_name')
         product.product_description = request.POST.get('product_description')
         product.product_category = request.POST.get('product_category')  # Updated for category
+        product.product_subcategory = request.POST.get('product_subcategory')  # Updated for category
         product.product_quantity = request.POST.get('product_quantity')
         product.quantity_unit = request.POST.get('quantity_unit')
         product.product_price = request.POST.get('product_price')
@@ -2517,6 +2567,51 @@ def deliverydetailsall(request):
 
 
 
+def generate_qr_code(request, order_id):
+    """Dynamically generates a QR code for order confirmation."""
+    order = get_object_or_404(Order_table, id=order_id)
+
+    if order.status != "Out":
+        return HttpResponse("QR Code is only available when the order is 'Out for Delivery'.", status=400)
+
+    confirmation_url = f"http://127.0.0.1:8000/confirm-delivery/{order_id}/"  # Replace with production URL
+    qr = qrcode.make(confirmation_url)
+    
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+
+
+def verify_qr(request, order_id):
+    """Verify QR Code and mark order as delivered"""
+    order = get_object_or_404(Order_table, id=order_id)
+
+    if order.status == "out_for_delivery":
+        order.status = "delivered"
+        order.is_verified = True
+        order.save()
+        return JsonResponse({"message": "Order successfully delivered!"})
+    else:
+        return JsonResponse({"error": "Invalid Order Status"}, status=400)
+    
+
+
+def confirm_delivery(request, order_id):
+    """Mark order as delivered when QR code is scanned."""
+    order = get_object_or_404(Order_table, id=order_id)
+
+    if order.status == "Out":
+        order.status = "Delivered"
+        order.save()
+        return HttpResponse("Order has been successfully marked as Delivered!")
+
+    return HttpResponse("Invalid QR Code or Order is not Out for Delivery.")
+
+
+
 @csrf_exempt
 def update_order_status(request):
     if request.method == 'POST':
@@ -2594,6 +2689,20 @@ def diseasedetection(request):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def deliverynotifications(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context = {
+            'username': user.username,  # Pass the username to the template
+        }
+        return render(request, 'deliverynotifications.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in
+
+
+
 """def login(request):
     return render(request, 'login.html')
 
@@ -2605,4 +2714,8 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+
+
+
 

@@ -312,8 +312,8 @@
     <div id="mySidenav" class="sidenav"><br><br><br><br>
         <a href="{% url 'deliveryboyassigns' %}"><i class="fas fa-truck"></i> Your Deliveries</a><br>
         <a href="{% url 'deliverydetailsall' %}"><i class="fas fa-shopping-basket"></i> Delivery History</a><br>
+        <a href="{% url 'deliverynotifications' %}"><i class="fas fa-bell"></i>  Notifications</a><br>
         <a href="#"><i class="fas fa-comments"></i> Feedback Review</a><br>
-        <a href="#"><i class="fas fa-bell"></i>  Notifications</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -373,7 +373,7 @@
                             <td>
                                 <span class="status-badge status-{{ order.status|lower }}">
                                     <i class="fas fa-circle" style="font-size: 8px;"></i>
-                                    {{ order.status }}
+                                    {{ order.get_status_display }}
                                 </span>
                             </td>
                             <td class="price-column">₹{{ order.total_price }}</td>

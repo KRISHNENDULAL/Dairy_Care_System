@@ -59,11 +59,25 @@
             <p>Simply upload an image and let our system do the rest.</p><br>
             <form id="diseaseDetectionForm" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="file" id="imageUpload" name="livestock_image" accept="image/*" required>
-                <br><br>
-                <center><img id="preview" src="#" alt="Image Preview" style="display:none; max-width:300px;"/></center>
-                <br><br>
-                <button type="submit">Detect Disease</button><br><br>
+                <!-- Additional Input Fields -->
+                <label for="animal_breed">Animal Breed:</label>
+                <input type="text" id="animal_breed" name="animal_breed" required><br><br>
+
+                <label for="animal_weight">Weight (kg):</label>
+                <input type="number" id="animal_weight" name="animal_weight" required><br><br>
+
+                <label for="animal_age">Age (years):</label>
+                <input type="number" id="animal_age" name="animal_age" required><br><br>
+
+                <label for="symptoms">Symptoms:</label>
+                <textarea id="symptoms" name="symptoms" placeholder="Enter symptoms here..." required></textarea><br><br>
+
+                <label for="imageUpload">Upload Image:</label>
+                <input type="file" id="imageUpload" name="livestock_image" accept="image/*" required><br>
+                
+                <center><img id="preview" src="#" alt="Image Preview" style="display:none; max-width:300px;"/></center><br>
+
+                <button type="submit">Detect Disease</button><br>
                 <p id="loading">Processing... Please wait.</p>
             </form>
             <div id="results"></div>

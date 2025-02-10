@@ -73,6 +73,32 @@
             color: #ffcc00; /* Gold color for rating stars */
         }
         
+        .text-success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .text-danger {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .text-warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        td.text-success {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        td.text-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        td.text-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -125,19 +151,27 @@
                         <th>Product</th>
                         <th>Rating (/5)</th>
                         <th>Feedback</th>
+                        <th>TextBlob Sentiment</th>
+                        <th>VADER Sentiment</th>
                         <th>Submitted At</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for feedback in feedback_list %}
+                    {% for item in feedback_list %}
                     <tr>
-                        <td>{{ feedback.user.username }}</td>
-                        <td>{{ feedback.product.product_name }}</td>
+                        <td>{{ item.feedback.user.username }}</td>
+                        <td>{{ item.feedback.product.product_name }}</td>
                         <td>
-                            {{ feedback.rating }} <span class="rating"><i class="fas fa-star"></i></span>
+                            {{ item.feedback.rating }} <span class="rating"><i class="fas fa-star"></i></span>
                         </td>
-                        <td>{{ feedback.feedback_text }}</td>
-                        <td>{{ feedback.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ item.feedback.feedback_text }}</td>
+                        <td class="{{ item.textblob.class }}">
+                            {{ item.textblob.label }} ({{ item.textblob.score }})
+                        </td>
+                        <td class="{{ item.vader.class }}">
+                            {{ item.vader.label }} ({{ item.vader.score }})
+                        </td>
+                        <td>{{ item.feedback.created_at|date:"Y-m-d H:i" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -164,10 +164,10 @@
                     <button type="submit" class="remove-button"><i class="fas fa-trash"></i>Remove</button>
                 </form>
             </div>
-        </div><br><br>
-        {% empty %}
-        <p style="font-size: 30px; color:white">Your wishlist is currently empty.</p><br>
-        <a href="{% url 'custproductslist' %}" style="font-size: 25px; color:rgb(12, 204, 191)">Continue Shopping</a></strong>
+        </div>
+        {% empty %}<br><br><br>
+        <strong><p style="font-size: 20px; color:rgb(0, 0, 0)">Your wishlist is currently empty.</p><br></strong>
+        <a href="{% url 'custproductslist' %}" style="font-size: 17px; color:rgb(178, 10, 10)">Continue Shopping</a></strong>
         {% endfor %}
     </center>
 

@@ -75,12 +75,9 @@ urlpatterns = [
     path('custproductslist',views.custproductslist,name='custproductslist'),
     path('productdetails/', views.productdetails, name='productdetails'),
     path('custfeedback',views.custfeedback,name='custfeedback'),
-
     path('wishlist', views.wishlist, name='wishlist'),
-
     path('preorder/', views.preorder, name='preorder'),
     path('preorderlisting', views.preorderlisting, name='preorderlisting'),  # URL for pre-order list
-
     path('add_to_cart/', views.add_to_cart, name='add_to_cart'),
     path('viewcart', views.viewcart, name='viewcart'),
     path('cart/update/<int:cart_id>/', views.update_cart, name='update_cart'),
@@ -94,15 +91,20 @@ urlpatterns = [
 
 
     path('employeepage',views.employeepage,name='employeepage'),
-    
     path('deliverydetailsall', views.deliverydetailsall, name='deliverydetailsall'),
     path('get_employees/', views.get_employees, name='get_employees'),
     path('assign_delivery/', views.assign_delivery, name='assign_delivery'),
     path('deliveryboyassigns', views.deliveryboyassigns, name='deliveryboyassigns'),
     path('update_order_status/', views.update_order_status, name='update_order_status'),
     path('get_order_tracking/<int:order_id>/', views.get_order_tracking, name='get_order_tracking'),
-
     path('validate_dairy_image/', views.validate_dairy_image, name='validate_dairy_image'),
+    path('deliverynotifications', views.deliverynotifications, name='deliverynotifications'),
+
+    path('generate_qr/<int:order_id>/', views.generate_qr_code, name='generate_qr_code'),
+    path('verify_qr/<int:order_id>/', views.verify_qr, name='verify_qr'),
+    path("confirm-delivery/<int:order_id>/", views.confirm_delivery, name="confirm_delivery"),
+
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

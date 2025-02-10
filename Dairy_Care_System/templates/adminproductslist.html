@@ -462,6 +462,7 @@
             <p><strong>Stock:</strong> {{ product.product_quantity }} {{ product.quantity_unit }}</p>
             <p><strong>Price:</strong> Rs. {{ product.product_price }}</p>
             <p><strong>Category:</strong> {{ product.product_category }}</p>
+            <p><strong>Sub-Category:</strong> {{ product.product_subcategory }}</p>
             <p><strong>Status:</strong> {{ product.status|yesno:"Available,Not Available" }}</p>
             <p><strong>Added by:</strong> {{ product.employee.username }}</p>
             <p><strong>Added at:</strong> {{ product.added_at }}</p>

@@ -382,6 +382,7 @@
         <div class="order-card">
             <span>{{ order.order_date|date:"M. d, Y" }}</span>
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
+            <!-- <span><strong>DeliveryAgent:</strong> {{ order.deliveryboy_id }}</span> -->
             <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
             <!-- <a href="#" class="view-summary" onclick="openTrackOrderModal({{ order.id }})"><strong>Track Order</strong></a> -->

@@ -50,6 +50,7 @@ class Products_table(models.Model):
     quantity_unit = models.CharField(max_length=20)   # Unit of measurement
     product_price = models.DecimalField(max_digits=10, decimal_places=2)  # Price field
     product_category = models.CharField(max_length=100, null=True, blank=True)  # Category field
+    product_subcategory = models.CharField(max_length=100, null=True, blank=True)  # Subcategory field
     employee = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)         # 1 if available, else 0
     added_at = models.DateTimeField(auto_now_add=True) # Timestamp for when the product is added
@@ -204,7 +205,7 @@ class Order_table(models.Model):
     delivery_address = models.TextField(null=False, blank=False)  # Delivery address
     total_price = models.DecimalField(max_digits=10, decimal_places=2)  # Total price of the order
     payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)  # Payment method
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')  # Order status
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # Order status
     order_date = models.DateTimeField(auto_now_add=True)  # Automatically set order date
     deliveryboy = models.ForeignKey(Users_table, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_orders')  # Reference to assigned delivery personnel
     
