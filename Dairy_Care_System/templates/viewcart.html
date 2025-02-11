@@ -239,6 +239,7 @@
         <a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Your Pre-Orders</a><br>
         <a href="{% url 'feedbackpage' %}" id="feed"><i class="fas fa-comment"></i> Give Feedback</a><br>
         <a href="{% url 'custfeedback' %}" id="feed"><i class="fas fa-comments"></i> Your Feedbacks</a><br>
+        <a href="{% url 'customerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -300,8 +301,8 @@
                             <button class="btn btn-update" type="submit"><i class="fas fa-undo"></i> Update</button>
                         </form>
                     </td>
-                    <td>₹{{ item.product.product_price }}</td>
-                    <td>₹{{ item.get_total_price }}</td>
+                    <td>₹ {{ item.product.product_price }}</td>
+                    <td>₹ {{ item.get_total_price }}</td>
                     <td>
                         <form method="POST" action="{% url 'delete_from_cart' item.cart_id %}">
                             {% csrf_token %}
@@ -314,7 +315,7 @@
         </table>
 
         <div class="total">
-            Total Price: ₹{{ total_price }}
+            Total Price: <strong>₹ {{ total_price }}</strong>
         </div><br>
 
         <div class="checkout">

@@ -27,9 +27,6 @@ from google.oauth2 import service_account
 from google.cloud.vision_v1 import types
 from textblob import TextBlob
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import nltk
-# nltk.download('punkt')
-# nltk.download('averaged_perceptron_tagger')
 from django.http import HttpResponse
 from io import BytesIO
 from datetime import datetime
@@ -40,8 +37,13 @@ import razorpay
 import random
 import string
 import logging
+import nltk
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
 import json
 import qrcode
+import cv2
+import numpy as np
 
 
 DAIRY_KEYWORDS = {
@@ -83,6 +85,32 @@ def about(request):
 def contactus(request):
     return render(request, 'contactus.html')
 
+
+def productexplore(request):
+
+        search_query = request.GET.get('search', '')  # Get the search query from the GET request
+        selected_category = request.GET.get('product_category', '')  # Selected category
+
+        # Fetch all products filtered by status
+        products = Products_table.objects.order_by('product_name')
+
+        # Apply search filter if search query is provided
+        if search_query:
+            products = products.filter(product_name__icontains=search_query)
+
+        # Apply category filter if a category is selected
+        if selected_category:
+            products = products.filter(product_category=selected_category)
+
+        context = {
+            # 'username': user.username,  # Pass the username to the template
+            'products': products,       # Pass the filtered or all products to the template
+            'search_query': search_query,  # Pass the search query to the template (optional for retaining input value)
+            'selected_category': selected_category,  # Pass the selected category to retain its value
+        }
+        return render(request, 'productexplore.html', context)
+
+    
 
 otp_storage = {}
 
@@ -1221,6 +1249,47 @@ def custproductslist(request):
 
 
 
+def image_search(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        uploaded_image = request.FILES['image']
+        
+        # Convert the uploaded image to an OpenCV format
+        img_array = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
+        uploaded_cv2_img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+        best_match = None
+        best_score = float('inf')
+
+        for product in Products_table.objects.all():
+            for product_image in product.images.all():
+                img = cv2.imread(product_image.image.path)
+
+                if img is None:
+                    continue
+
+                # Resize both images to a fixed size for comparison
+                img = cv2.resize(img, (200, 200))
+                uploaded_cv2_img = cv2.resize(uploaded_cv2_img, (200, 200))
+
+                # Compare using Structural Similarity Index (SSIM)
+                gray1 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                gray2 = cv2.cvtColor(uploaded_cv2_img, cv2.COLOR_BGR2GRAY)
+
+                score = cv2.norm(gray1, gray2, cv2.NORM_L2)
+
+                if score < best_score:
+                    best_score = score
+                    best_match = product.product_name
+
+        if best_match:
+            return JsonResponse({'success': True, 'match': best_match})
+        else:
+            return JsonResponse({'success': False})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def productdetails(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
@@ -1336,6 +1405,11 @@ def editproduct(request):
     
 
 def updateproduct(request, product_id):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if not user_id:
+        return redirect('login')  # Redirect to login if no user is logged in
+    
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
     product = Products_table.objects.get(product_id=product_id)
     images = ProductImage.objects.filter(product=product)
 
@@ -1352,13 +1426,13 @@ def updateproduct(request, product_id):
         # Handle new image upload
         product_photo = request.FILES.get('product_images')  # Ensure this matches your input name
         if product_photo:
-            # Delete existing images
             ProductImage.objects.filter(product=product).delete()  # Delete all old images
             ProductImage.objects.create(product=product, image=product_photo)  # Add new image
 
-        return redirect('productslist')  # Redirect to a detail page after update
+        return redirect('productslist')  # Redirect to product list after update
 
     context = {
+        'username': user.username,
         'product': product,
         'images': images,
     }
@@ -2714,6 +2788,8 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+
 
 
 

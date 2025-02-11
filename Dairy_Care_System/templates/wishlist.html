@@ -108,6 +108,7 @@
         <a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Your Pre-Orders</a><br>
         <a href="{% url 'feedbackpage' %}" id="feed"><i class="fas fa-comment"></i> Give Feedback</a><br>
         <a href="{% url 'custfeedback' %}" id="feed"><i class="fas fa-comments"></i> Your Feedbacks</a><br>
+        <a href="{% url 'customerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -156,7 +157,7 @@
                     {% endif %}
                     <p>{{ item.product.product_description }}</p><br>
                     <!-- <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br> -->
-                    <p><strong>Price:</strong> Rs. {{ item.product.product_price }}</p><br><br>
+                    <p><strong>Price:</strong> ₹ {{ item.product.product_price }}</p><br><br>
                 </div>
                 <form method="POST" action="{% url 'wishlist' %}">
                     {% csrf_token %}

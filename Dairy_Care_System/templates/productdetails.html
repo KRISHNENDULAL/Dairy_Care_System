@@ -295,6 +295,7 @@
         <a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Your Pre-Orders</a><br>
         <a href="{% url 'feedbackpage' %}" id="feed"><i class="fas fa-comment"></i> Give Feedback</a><br>
         <a href="{% url 'custfeedback' %}" id="feed"><i class="fas fa-comments"></i> Your Feedbacks</a><br>
+        <a href="{% url 'customerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -329,7 +330,7 @@
             <div class="product-details">
                 <h1 class="product-title">{{ product.product_name }}</h1>
 
-                <p class="product-price"><i class="fas fa-rupee-sign"></i>. {{ product.product_price }}</p>
+                <p class="product-price">₹ {{ product.product_price }}</p>
 
                 <p class="product-description">{{ product.product_description }}</p>
 
@@ -339,7 +340,7 @@
 
                 <p><strong>Category:</strong> {{ product.product_category }}</p><br>   
                 
-                <p><strong>Sub-Category:</strong> {{ product.product_subcategory }}</p><br>  
+                <p><strong>Variety:</strong> {{ product.product_subcategory }}</p><br>  
 
                 <!-- Quantity and Unit Input (in the same line) -->
                 <div class="quantity-input">

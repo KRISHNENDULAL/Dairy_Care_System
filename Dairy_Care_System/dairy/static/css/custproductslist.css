@@ -32,6 +32,7 @@ h3 {
     font-size: 1.2em; /* Adjust font size */
     margin: 10px 0; /* Margin for spacing */
     text-align: center; /* Centering the product name */
+    text-shadow: 2px 2px 4px rgba(95, 93, 123, 0.5);
 }
 
 p {
@@ -118,7 +119,7 @@ p {
 }
 
 .search-button:hover {
-    background-color: #105314;
+    background-color: #626700;
 }
 
 /* Dropdown styling */
@@ -127,21 +128,14 @@ p {
     padding: 10px;
     font-size: 16px;
     color: #555; /* Text color */
-    background-color: #f9f9f9; /* Light background */
-    border: 2px solid #ccc; /* Border styling */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    transition: all 0.3s ease; /* Smooth transitions */
-    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Rounded corners */
 }
 
 /* Hover and focus effects */
 #productCategory:hover,
 #productCategory:focus {
-    border-color: #5c85d6; /* Highlighted border color */
-    background-color: #fff; /* Brighter background */
-    color: #333; /* Darker text color */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+    border-color: #000000; /* Darker text color */
 }
 
 /* Disabled option styling */

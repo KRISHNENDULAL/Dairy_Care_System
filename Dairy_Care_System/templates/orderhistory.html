@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -351,6 +350,7 @@
         <a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Your Pre-Orders</a><br>
         <a href="{% url 'feedbackpage' %}" id="feed"><i class="fas fa-comment"></i> Give Feedback</a><br>
         <a href="{% url 'custfeedback' %}" id="feed"><i class="fas fa-comments"></i> Your Feedbacks</a><br>
+        <a href="{% url 'customerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -383,7 +383,7 @@
             <span>{{ order.order_date|date:"M. d, Y" }}</span>
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <!-- <span><strong>DeliveryAgent:</strong> {{ order.deliveryboy_id }}</span> -->
-            <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
+            <span><strong>Total:</strong> ₹ {{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
             <!-- <a href="#" class="view-summary" onclick="openTrackOrderModal({{ order.id }})"><strong>Track Order</strong></a> -->
             {% if order.status == 'Pending' or order.status == 'Confirmed' or order.status == 'Shipped' %}

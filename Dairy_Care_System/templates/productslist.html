@@ -312,12 +312,13 @@
 
     <!-- Navigation Bar -->
     <ul>
-        <div class="brand-name"></i><span>Dairy Care System</span></div>
+        <div class="brand-name"><span>Dairy Care System</span></div>
         <div class="header">
             <div class="nav-item">
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Dashboard</a>
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>

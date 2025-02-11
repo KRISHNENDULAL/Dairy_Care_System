@@ -197,7 +197,7 @@
 
             if (userRole === "Customer") {
                 redirectUrl = "{% url 'customerpage' %}";
-            } else if (userRole === "Employee") {
+            } else if (userRole === "DeliveryEmployee") {
                 redirectUrl = "{% url 'employeepage' %}";
             } else if (userRole === "Admin") {
                 redirectUrl = "{% url 'adminpage' %}";

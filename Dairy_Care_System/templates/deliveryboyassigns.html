@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <title>My Deliveries</title>
     <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
     <style>
@@ -324,6 +325,7 @@
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'employeepage' %}"><i class="fas fa-home home-icon"></i> Dashboard</a>
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <!-- Change Logout link to trigger a custom SweetAlert -->
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>

@@ -247,7 +247,7 @@
                     <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}" style="width: 50px; height: 50px; margin-right: 10px;">
                     <span>{{ item.product.product_name }}</span>
                     <span>{{ item.quantity }}</span>
-                    <span>Rs.{{ item.price }}</span>
+                    <span>₹ {{ item.price }}</span>
                 </li>
             {% empty %}
                 <li>No items found for this order.</li>
@@ -255,7 +255,7 @@
         </ul>
         
         <div class="total-price">
-            <strong>Total Price:</strong> Rs.{{ total_price }}
+            Total Price: <strong>₹ {{ total_price }}</strong>
         </div>
 
         <div class="footer"><br><strong>

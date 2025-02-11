@@ -120,6 +120,7 @@
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Dashboard</a>
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
@@ -135,7 +136,7 @@
         <div class="order-card">
             <span>{{ order.order_date|date:"M. d, Y" }}</span>
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
-            <span><strong>Total:</strong> Rs.{{ order.total_price }}</span>
+            <span><strong>Total:</strong> ₹ {{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
             <!-- <a href="#" class="view-summary"><strong>Track Order</strong></a> -->
         </div>

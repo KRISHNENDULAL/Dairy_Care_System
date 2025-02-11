@@ -34,6 +34,7 @@
         <a href="{% url 'preorderlisting' %}"><i class="fas fa-clipboard-list"></i> Your Pre-Orders</a><br>
         <a href="{% url 'feedbackpage' %}" id="feed"><i class="fas fa-comment"></i> Give Feedback</a><br>
         <a href="{% url 'custfeedback' %}" id="feed"><i class="fas fa-comments"></i> Your Feedbacks</a><br>
+        <a href="{% url 'customerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -78,6 +79,11 @@
                 <!-- Search and Voice Buttons -->
                 <button type="button" id="voice-search-button" class="search-button">
                     <i class="fas fa-microphone"></i>
+                </button>
+                <!-- Image Upload Button -->
+                <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                <button type="button" id="image-search-button" class="search-button">
+                    <i class="fas fa-camera"></i>
                 </button>
                 <button type="submit" class="search-button">Search</button>
             </form>
@@ -196,102 +202,47 @@
         });
     </script>
 
+    <script>
+        document.getElementById('image-search-button').addEventListener('click', function () {
+            document.getElementById('image-upload').click();
+        });
+
+        document.getElementById('image-upload').addEventListener('change', function (event) {
+            if (event.target.files.length > 0) {
+                let formData = new FormData();
+                formData.append('image', event.target.files[0]);
+
+                fetch("{% url 'image_search' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "{% url 'custproductslist' %}?search=" + data.match;
+                    } else {
+                        Swal.fire({
+                            title: 'No Match Found',
+                            text: 'No products matched your uploaded image.',
+                            icon: 'warning',
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to search by image. Try again later.',
+                        icon: 'error',
+                    });
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>
 
 
-<!-- // Voice Search functionality
-const voiceSearchButton = document.getElementById('voice-search-button');
-const searchBar = document.getElementById('search-bar');
-
-voiceSearchButton.addEventListener('click', () => {
-    // Check browser support for SpeechRecognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        
-        // Configure recognition settings
-        recognition.continuous = false;
-        recognition.lang = 'en-US';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-
-        // Show listening indicator
-        Swal.fire({
-            title: 'Listening...',
-            html: 'Speak now to search products',
-            icon: 'info',
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        // Start listening
-        recognition.start();
-
-        // Handle results
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            searchBar.value = transcript;
-            
-            // Close the listening indicator
-            Swal.close();
-
-            // Show what was recognized
-            Swal.fire({
-                title: 'You said:',
-                text: transcript,
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                // Submit the search form
-                searchBar.form.submit();
-            });
-        };
-
-        // Handle errors
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            Swal.fire({
-                title: 'Error',
-                text: 'Could not recognize speech. Please try again.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        };
-
-        // Handle end of speech
-        recognition.onend = () => {
-            if (!searchBar.value) {
-                Swal.fire({
-                    title: 'No speech detected',
-                    text: 'Please try again',
-                    icon: 'warning',
-                    confirmButtonText: 'OK'
-                });
-            }
-        };
-
-    } else {
-        // Browser doesn't support speech recognition
-        Swal.fire({
-            title: 'Not Supported',
-            text: 'Your browser does not support voice search. Please use Chrome or Edge.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-});
-
-// Add visual feedback for the voice button
-voiceSearchButton.addEventListener('mousedown', () => {
-    voiceSearchButton.style.transform = 'scale(0.95)';
-});
-
-voiceSearchButton.addEventListener('mouseup', () => {
-    voiceSearchButton.style.transform = 'scale(1)';
-}); -->

@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Explore Our Products</title>
+    <link rel="stylesheet" href="{% static 'css/productexplore.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/customerpage.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+        }
+    </style>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script> -->
+    <!-- Add Font Awesome and SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <ul>
+        <a href="{% url 'home' %}">
+            <i class="fas fa-home home-icon"></i>
+        </a>
+
+        <div class="header">
+            <div class="nav-item">
+                <li><b><a href="{% url 'productexplore' %}"><i class="fas fa-tags"></i> Explore</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'regmailverify' %}"><i class="fas fa-user-plus"></i> Register</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></b></li>
+            </div>
+            <div class="nav-item">
+                <li><b><a href="{% url 'contactus' %}"><i class="fas fa-envelope"></i> Contact Us</a></b></li>
+            </div>
+        </div>
+    </ul><br><br><br><br>
+
+    <h1>Explore Our Products</h1>
+
+    <div class="main-content">
+    <!-- Search Bar -->
+    <!-- <center>
+        <div class="search-bar-container">
+            <form method="GET" action="{% url 'productexplore' %}">
+                <input type="text" name="search" id="search-bar" class="search-bar" placeholder="Search for products..." value="{{ search_query }}">
+                
+                <select id="productCategory" name="product_category">
+                    <option value="" disabled {% if not selected_category %}selected{% endif %}>Category search...</option>
+                    <option value="milk" {% if selected_category == "milk" %}selected{% endif %}>Milk</option>
+                    <option value="spreads" {% if selected_category == "spreads" %}selected{% endif %}>Spreads</option>
+                    <option value="non-fermented" {% if selected_category == "non-fermented" %}selected{% endif %}>Non-Fermented</option>
+                    <option value="fermented" {% if selected_category == "fermented" %}selected{% endif %}>Fermented</option>
+                    <option value="powders" {% if selected_category == "powders" %}selected{% endif %}>Powders</option>
+                    <option value="desserts" {% if selected_category == "desserts" %}selected{% endif %}>Desserts</option>
+                    <option value="beverages" {% if selected_category == "beverages" %}selected{% endif %}>Beverages</option>
+                </select>
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+    </center> -->
+
+    <!-- Main content that shifts when the sidebar opens -->
+    <div class="products-container">
+        {% for product in products %}
+        <div class="product">
+            <form action="{% url 'login' %}" method="POST" style="cursor: pointer;">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                <button type="submit" class="product-card">
+                    <div class="product-image">
+                        {% for image in product.images.all %}
+                            <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
+                        {% endfor %}
+                        <div class="product-overlay">
+                            <span class="view-details">View Details</span>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ product.product_name }}</h3>
+                        <p class="product-description">{{ product.product_description }}</p>
+                        <div class="product-price">₹ {{ product.product_price }}</div>
+                    </div>
+                </button>
+            </form>
+        </div>
+        {% empty %}
+            <div class="no-products"><i class="fas fa-box-open"></i> <p>No products available.</p></div>
+        {% endfor %}
+    </div>
+    </div>
+
+    <footer><center>
+        <p>&copy; 2024 Dairy Care System. All rights reserved.</p>
+    </center></footer><br>
+
+</body>
+</html>
+
+

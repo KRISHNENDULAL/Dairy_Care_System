@@ -1,10 +1,10 @@
 .container {
     max-width: 600px;
-    margin-left: 100px;
-    background: rgba(251, 238, 214, 0.9);
+    margin-left: 270px;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(100px); /* Apply the blur effect */
 }
 
 h1, h2 {
@@ -52,7 +52,7 @@ textarea:focus {
 }
 
 button {
-    background-color: #797f00;
+    background: linear-gradient(45deg, #050945, #6366f1);
     color: white;
     border: none;
     padding: 12px;
@@ -61,13 +61,11 @@ button {
     margin: 10px 0;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s, transform 0.2s;
     width: 100%;
 }
 
 button:hover {
-    background-color: #105314;
-    transform: translateY(-2px);
+    background: linear-gradient(45deg, #6366f1, #050945);
 }
 
 
