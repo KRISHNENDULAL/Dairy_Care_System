@@ -74,10 +74,20 @@
                 <label for="symptoms">Symptoms:</label>
                 <textarea id="symptoms" name="symptoms" placeholder="Enter symptoms here..." required></textarea><br><br>
 
-                <label for="imageUpload">Upload Image:</label>
-                <input type="file" id="imageUpload" name="livestock_image" accept="image/*" required><br>
-                
-                <center><img id="preview" src="#" alt="Image Preview" style="display:none; max-width:300px;"/></center><br>
+                <div class="upload-section">
+                    <label for="imageUpload">Upload Image:</label>
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="imageUpload" name="livestock_image" accept="image/*" required style="display: none;">
+                        <div class="drag-text">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag and drop image here or</p>
+                            <button type="button" class="browse-btn" onclick="document.getElementById('imageUpload').click()">
+                                Browse Files
+                            </button>
+                        </div>
+                    </div>
+                    <center><img id="preview" src="#" alt="Image Preview" style="display:none; max-width:300px;"/></center>
+                </div>
 
                 <button type="submit">Detect Disease</button><br>
                 <p id="loading">Processing... Please wait.</p>
@@ -167,6 +177,75 @@
                     window.location.href = "{% url 'logout' %}";
                 }
             });
+        }
+    </script>
+
+    <!-- Add this script before closing body tag -->
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const imageUpload = document.getElementById('imageUpload');
+        const preview = document.getElementById('preview');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                imageUpload.files = files;
+                handleFiles(files);
+            }
+        }
+
+        // Handle both dropped and selected files
+        imageUpload.addEventListener('change', function(e) {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please upload an image file');
+                }
+            }
         }
     </script>
 

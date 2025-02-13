@@ -209,6 +209,16 @@
 
         document.getElementById('image-upload').addEventListener('change', function (event) {
             if (event.target.files.length > 0) {
+                // Show loading indicator
+                Swal.fire({
+                    title: 'Searching...',
+                    text: 'Analyzing image and finding similar products',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
                 let formData = new FormData();
                 formData.append('image', event.target.files[0]);
 
@@ -221,21 +231,51 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        window.location.href = "{% url 'custproductslist' %}?search=" + data.match;
+                    Swal.close();
+
+                    if (data.success && data.products && data.products.length > 0) {
+                        // Create a modal to display similar products
+                        let productsHtml = data.products.map(product => `
+                            <div class="similar-product">
+                                <img src="${product.images[0]}" alt="${product.name}">
+                                <h4>${product.name}</h4>
+                                <p>${product.description}</p>
+                                <p class="price">₹${product.price}</p>
+                                <form action="{% url 'productdetails' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="${product.id}">
+                                    <button type="submit" class="view-details-btn">View Details</button>
+                                </form>
+                            </div>
+                        `).join('');
+
+                        Swal.fire({
+                            title: 'Similar Products Found',
+                            html: `
+                                <div class="similar-products-container">
+                                    ${productsHtml}
+                                </div>
+                            `,
+                            width: '80%',
+                            showConfirmButton: false,
+                            showCloseButton: true,
+                            customClass: {
+                                container: 'similar-products-modal'
+                            }
+                        });
                     } else {
                         Swal.fire({
-                            title: 'No Match Found',
-                            text: 'No products matched your uploaded image.',
-                            icon: 'warning',
+                            title: 'No Matches Found',
+                            text: 'We couldn\'t find any similar products. Try another image or use text search.',
+                            icon: 'info'
                         });
                     }
                 })
                 .catch(error => {
                     Swal.fire({
                         title: 'Error',
-                        text: 'Failed to search by image. Try again later.',
-                        icon: 'error',
+                        text: 'Failed to process image search. Please try again.',
+                        icon: 'error'
                     });
                 });
             }

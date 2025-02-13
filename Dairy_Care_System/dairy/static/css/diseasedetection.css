@@ -106,3 +106,71 @@ button:hover {
         width: 100%; /* Full width buttons on small screens */
     }
 }
+
+/* Add these new styles while keeping existing ones */
+
+.upload-section {
+    margin: 20px 0;
+}
+
+.upload-area {
+    width: 100%;
+    min-height: 200px;
+    border: 2px dashed #7eaddd;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    position: relative;
+    transition: all 0.3s ease;
+    background: rgba(240, 238, 238, 0.9);
+}
+
+.upload-area.dragover {
+    background: rgba(4, 54, 105, 0.1);
+    border-color: #1599ea;
+}
+
+.drag-text {
+    text-align: center;
+    padding: 20px;
+}
+
+.drag-text i {
+    font-size: 50px;
+    color: #043669;
+    margin-bottom: 15px;
+}
+
+.drag-text p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.browse-btn {
+    background: rgb(51, 111, 208);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.browse-btn:hover {
+    background: rgb(35, 97, 197);
+    transform: translateY(-2px);
+}
+
+#preview {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+}

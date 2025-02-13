@@ -44,6 +44,8 @@ import json
 import qrcode
 import cv2
 import numpy as np
+from .utils.image_search import ImageSearcher
+from .utils.delivery_assignment import DeliveryAssignment
 
 
 DAIRY_KEYWORDS = {
@@ -1249,44 +1251,45 @@ def custproductslist(request):
 
 
 
+@csrf_exempt
 def image_search(request):
     if request.method == 'POST' and request.FILES.get('image'):
-        uploaded_image = request.FILES['image']
-        
-        # Convert the uploaded image to an OpenCV format
-        img_array = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
-        uploaded_cv2_img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-
-        best_match = None
-        best_score = float('inf')
-
-        for product in Products_table.objects.all():
-            for product_image in product.images.all():
-                img = cv2.imread(product_image.image.path)
-
-                if img is None:
-                    continue
-
-                # Resize both images to a fixed size for comparison
-                img = cv2.resize(img, (200, 200))
-                uploaded_cv2_img = cv2.resize(uploaded_cv2_img, (200, 200))
-
-                # Compare using Structural Similarity Index (SSIM)
-                gray1 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                gray2 = cv2.cvtColor(uploaded_cv2_img, cv2.COLOR_BGR2GRAY)
-
-                score = cv2.norm(gray1, gray2, cv2.NORM_L2)
-
-                if score < best_score:
-                    best_score = score
-                    best_match = product.product_name
-
-        if best_match:
-            return JsonResponse({'success': True, 'match': best_match})
-        else:
-            return JsonResponse({'success': False})
-
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
+        try:
+            image_searcher = ImageSearcher()
+            best_match, products = image_searcher.search_products(request.FILES['image'])
+            
+            if products:
+                # Return success with matching products
+                return JsonResponse({
+                    'success': True,
+                    'match': best_match,
+                    'products': [
+                        {
+                            'id': p.product_id,
+                            'name': p.product_name,
+                            'description': p.product_description,
+                            'category': p.product_category,
+                            'price': str(p.product_price),
+                            'images': [img.image.url for img in p.images.all()]
+                        } for p in products[:10]  # Limit to top 10 matches
+                    ]
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'No matching products found'
+                })
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+            
+    return JsonResponse({
+        'success': False,
+        'error': 'Invalid request'
+    })
 
 
 
@@ -2290,7 +2293,7 @@ def checkoutorder(request):
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
 
-        # Check if it's a Razorpay payment
+        # Create order based on payment method
         if payment_method == "online":
             # Process Razorpay payment
             payment_id = request.POST.get('payment_id')
@@ -2312,7 +2315,6 @@ def checkoutorder(request):
                 payment_method="online",
                 total_price=total_price
             )
-
         else:  # For Cash on Delivery
             order = Order_table.objects.create(
                 user=user,
@@ -2342,6 +2344,9 @@ def checkoutorder(request):
                     product=cart_item.product,  # Link to the product
                     farmer=user  # Link to the user who added the product
                 )
+
+        # Auto-assign delivery agent
+        DeliveryAssignment.auto_assign_delivery_agent(order)
 
         user_cart.delete()
 

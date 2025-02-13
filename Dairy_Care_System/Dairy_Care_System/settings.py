@@ -23,6 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 
+API_KEY = os.environ.get('API_KEY')
+
 SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
