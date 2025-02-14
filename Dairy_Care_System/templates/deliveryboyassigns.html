@@ -417,20 +417,29 @@
             </div>
             <div class="modal-body">
                 <div class="status-options">
-                    <button class="status-btn confirmed" onclick="updateStatus('Confirmed')">
+                    <button class="status-btn confirmed" onclick="selectStatus('Confirmed')">
                         <i class="fas fa-check-circle"></i> Confirmed
                     </button>
-                    <button class="status-btn shipped" onclick="updateStatus('Shipped')">
+                    <button class="status-btn shipped" onclick="selectStatus('Shipped')">
                         <i class="fas fa-shipping-fast"></i> Shipped
                     </button>
-                    <button class="status-btn out" onclick="updateStatus('Out')">
-                        <i class="fas fa-box-check"></i> Out for Delivery
+                    <button class="status-btn out" onclick="selectStatus('Out for Delivery')">
+                        <i class="fas fa-truck"></i> Out for Delivery
                     </button>
-                    <button class="status-btn delivered" onclick="updateStatus('Delivered')">
-                        <i class="fas fa-box-check"></i> Delivered
+                    <button class="status-btn delivered" onclick="selectStatus('Delivered')">
+                        <i class="fas fa-box"></i> Delivered
                     </button>
                 </div>
-            </div>
+            
+                <label for="location">Enter Current Location:</label>
+                <input type="text" id="location" class="input-field" placeholder="Enter location">
+                
+                <button onclick="getCurrentLocation()" class="fetch-location-btn">
+                    <i class="fas fa-map-marker-alt"></i> Get Current Location
+                </button>
+                <center><button class="update-status-btn" onclick="submitStatusUpdate()">
+                    <i class="fas fa-save"></i> Update Status
+                </button></center>
         </div>
     </div>
 

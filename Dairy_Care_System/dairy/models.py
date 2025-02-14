@@ -224,6 +224,17 @@ class OrderItem_table(models.Model):
     
 
 
+class DeliveryStatus(models.Model):
+    order = models.ForeignKey(Order_table, on_delete=models.CASCADE)  # Linking to Orders_table
+    status = models.CharField(max_length=50)
+    location = models.CharField(max_length=255)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order {self.order.id}: {self.status} - {self.location} at {self.updated_at}"
+    
+
+
 class Address_table(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)

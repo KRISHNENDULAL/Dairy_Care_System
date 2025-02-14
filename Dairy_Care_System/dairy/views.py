@@ -31,6 +31,9 @@ from django.http import HttpResponse
 from io import BytesIO
 from datetime import datetime
 
+from django.utils.timezone import now
+from datetime import timedelta
+from django.db.models import Count
 
 import io
 import razorpay
@@ -567,14 +570,33 @@ def deleteaccount(request, user_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def customerpage(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    if user_id:
-        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        context = {
-            'username': user.username,  # Pass the username to the template
-        }
-        return render(request, 'customerpage.html', context)
-    else:
+
+    if not user_id:
         return redirect('login')  # Redirect to login if no user is logged in
+
+    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+
+    # Get the date one month ago
+    last_month = now() - timedelta(days=30)
+
+    # Fetch the top-selling products in the last month
+    top_selling_products = (
+        OrderItem_table.objects.filter(order__order_date__gte=last_month)
+        .values('product_id')
+        .annotate(total_sold=Count('product_id'))
+        .order_by('-total_sold')[:4]  # Fetch top 4 products
+    )
+
+    # Get product details from Products_table
+    product_ids = [item['product_id'] for item in top_selling_products]
+    recommended_products = Products_table.objects.filter(product_id__in=product_ids)
+
+    context = {
+        'username': user.username,  # Pass the username to the template
+        'recommended_products': recommended_products,  # Pass recommended products
+    }
+
+    return render(request, 'customerpage.html', context)
     
 
 
@@ -1132,6 +1154,7 @@ def validate_dairy_image_content(image_file):
 
     except Exception as e:
         return False, f"Error validating image: {str(e)}"
+
 
 
 

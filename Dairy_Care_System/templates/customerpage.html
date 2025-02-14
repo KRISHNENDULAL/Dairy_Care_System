@@ -17,85 +17,6 @@
         .sidenav a i, .dropdown-content a i {
             margin-right: 10px; /* Space between icon and text */
         }
-
-        .chat-popup {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 300px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-
-        .chat-header {
-            background: #03652c;
-            color: white;
-            padding: 15px;
-            border-radius: 10px 10px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-body {
-            height: 300px;
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .chat-footer {
-            padding: 10px;
-            display: flex;
-            border-top: 1px solid #eee;
-        }
-
-        .chat-footer input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            margin-right: 10px;
-        }
-
-        .chat-footer button {
-            background: #37100d;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        .user-message, .bot-message {
-            margin: 8px 0;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 80%;
-        }
-
-        .user-message {
-            background: #e3f2fd;
-            margin-left: auto;
-        }
-
-        .bot-message {
-            background: #f5f5f5;
-            margin-right: auto;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
     </style>
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -136,12 +57,31 @@
     <center>
         <!-- Message and Quote -->
         <div class="message">
-            <h1>Welcome, {{ username }}!</h1> <br><br>
+            <h1>Welcome, {{ username }}!</h1> <br>
             We value your trust and aim to deliver the best shopping experience for you.
         </div><br><br>
         <div class="quote">
             A satisfied customer is the best business strategy of all.
-        </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div><br><br><br>
+        
+        <!-- Recommended Products Section -->
+        <div class="recommended-products">
+            <h3>Top Selling Products Recommended for You</h3>
+            <div class="product-list">
+                {% for product in recommended_products %}
+                    <div class="product-card">
+                        {% for image in product.images.all %}
+                            <img src="{{ image.image.url }}" alt="{{ product.product_name }}">
+                        {% endfor %}
+                        <h4>{{ product.product_name }}</h4>
+                        <p>₹{{ product.product_price }}</p>
+                        <a href="{% url 'custproductslist' %}" class="btn">View Products</a>
+                    </div>
+                {% empty %}
+                    <p>No recommendations available.</p>
+                {% endfor %}
+            </div>
+        </div>
 
         <footer>
             <b><p>&copy; 2024 Dairy Care System. All rights reserved.</p></b>
