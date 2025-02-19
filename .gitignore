@@ -1,7 +1,3 @@
 .env
 env/
-.ipynb_checkpoints/
-# cattle_disease_model.h5
-# cattle_disease_model.keras
-# Dataset_training.ipynb
-
+# .ipynb_checkpoints/
