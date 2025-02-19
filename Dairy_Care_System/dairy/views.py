@@ -33,7 +33,7 @@ from datetime import datetime
 
 from django.utils.timezone import now
 from datetime import timedelta
-from django.db.models import Count
+from django.db.models import Count, Q
 
 import io
 import razorpay
@@ -567,37 +567,66 @@ def deleteaccount(request, user_id):
 
 
 
+def get_seasonal_recommendations():
+    from datetime import datetime
+
+    month = datetime.now().month
+
+    if month in [12, 1, 2]:  # Winter
+        return Products_table.objects.filter(product_category="Dairy-based sweets")[:2]
+    elif month in [6, 7, 8]:  # Summer
+        return Products_table.objects.filter(product_category="Cold milk beverages")[:2]
+    return []
+
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def customerpage(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
-
+    user_id = request.session.get('user_id')
     if not user_id:
-        return redirect('login')  # Redirect to login if no user is logged in
+        return redirect('login')
 
-    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+    user = Users_table.objects.get(user_id=user_id)
 
-    # Get the date one month ago
     last_month = now() - timedelta(days=30)
 
-    # Fetch the top-selling products in the last month
+    # Fetch top-selling products in the last month
     top_selling_products = (
         OrderItem_table.objects.filter(order__order_date__gte=last_month)
         .values('product_id')
         .annotate(total_sold=Count('product_id'))
-        .order_by('-total_sold')[:4]  # Fetch top 4 products
+        .order_by('-total_sold')[:4]
     )
 
-    # Get product details from Products_table
-    product_ids = [item['product_id'] for item in top_selling_products]
-    recommended_products = Products_table.objects.filter(product_id__in=product_ids)
+    # Get product details for top-selling items
+    top_products = Products_table.objects.filter(product_id__in=[p['product_id'] for p in top_selling_products])
 
-    context = {
-        'username': user.username,  # Pass the username to the template
-        'recommended_products': recommended_products,  # Pass recommended products
-    }
+    # Fetch user's past purchases
+    user_purchased_products = OrderItem_table.objects.filter(order__user=user).values_list('product_id', flat=True)
 
-    return render(request, 'customerpage.html', context)
-    
+    # Fetch user's wishlisted items
+    wishlisted_products = WishlistItem.objects.filter(user=user).values_list('product_id', flat=True)
+
+    # Identify similar products based on the category of purchased/wishlisted products
+    similar_products = Products_table.objects.filter(
+        Q(product_category__in=Products_table.objects.filter(product_id__in=user_purchased_products).values_list('product_category', flat=True))
+        | Q(product_id__in=wishlisted_products)
+    ).exclude(product_id__in=user_purchased_products).distinct()[:4]
+
+    # Add seasonal products dynamically
+    seasonal_products = get_seasonal_recommendations()
+
+    # Merge all recommendations with AI-based rule adjustments
+    final_recommendations = list(top_products) + list(similar_products) + list(seasonal_products)
+
+    # Remove duplicates and keep top 6 recommendations
+    final_recommendations = list(set(final_recommendations))[:6]
+
+    return render(request, 'customerpage.html', {
+        'username': user.username,
+        'recommended_products': final_recommendations
+    })
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

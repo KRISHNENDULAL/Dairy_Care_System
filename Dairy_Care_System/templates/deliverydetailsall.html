@@ -421,12 +421,12 @@
                 <h3><i class="fas fa-truck"></i> Update Delivery Status</h3>
                 <span class="close">&times;</span>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="statusModal"> 
                 <div class="status-options">
                     <button class="status-btn confirmed" onclick="updateStatus('Confirmed')">
                         <i class="fas fa-check-circle"></i> Confirmed
                     </button>
-                    <button class="status-btn shipped" onclick="updateStatus('Shipped')">
+                    <button class="status-btn shipped" id="shipped" onclick="updateStatus('Shipped')">
                         <i class="fas fa-shipping-fast"></i> Shipped
                     </button>
                     <button class="status-btn out" onclick="updateStatus('Out')">
