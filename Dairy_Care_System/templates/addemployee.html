@@ -44,6 +44,13 @@
                     <label for="phone">Phone:</label>
                     <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
                     <div id="phoneError" class="error-message"></div>
+                </div>
+
+                <!-- Pincode Field -->
+                <div class="form-group">
+                    <label for="pincode">Pincode:</label>
+                    <input type="text" name="pincode" id="pincode" placeholder="Enter your pincode">
+                    <div class="error-message" id="pincodeError"></div>
                 </div><br>
                 
                 <!-- Submit Button -->
@@ -65,6 +72,7 @@
             const username = document.getElementById('username');
             const email = document.getElementById('email');
             const phone = document.getElementById('phone');
+            const pincode = document.getElementById('pincode');
 
             // Function to show error
             function showError(message, elementId) {
@@ -91,6 +99,14 @@
                 return /^[a-zA-Z]+$/.test(username);
             }
 
+            // Function to validate pincode
+            function validatePincode(pincode) {
+                const pincodeRegex = /^[1-9][0-9]{2}\s?[0-9]{3}$/; // Allows 6 digits with optional space after the third digit
+                const sequentialPattern = /012345|123456|234567|345678|456789|567890|678901|789012|890123|901234/; // Checks for sequential patterns
+                const repetitivePattern = /(.)\1{5}/; // Checks for repetitive digits (e.g., 000000)
+                return pincodePattern.test(pincode);
+            }
+
             // General validation for field dependencies
             function validateFieldsBefore(field, dependentField, errorElementId) {
                 field.addEventListener('focus', function() {
@@ -106,6 +122,7 @@
             // Apply validation for each field
             validateFieldsBefore(email, username, 'emailError');
             validateFieldsBefore(phone, email, 'phoneError');
+            validateFieldsBefore(pincode, phone, 'pincodeError');
 
             // Add live validation
             username.addEventListener('input', function() {
@@ -139,6 +156,16 @@
                 }
             });
 
+            pincode.addEventListener('input', function() {
+                if (pincode.value.trim() === "") {
+                    showError('Pincode is required.', 'pincodeError');
+                } else if (!validatePincode(pincode.value.trim())) {
+                    showError('Enter a valid Pincode.', 'pincodeError');
+                } else {
+                    clearError('pincodeError');
+                }
+            });
+
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
                 let valid = true;
@@ -169,6 +196,13 @@
                     valid = false;
                 } else {
                     clearError('phoneError');
+                }
+
+                if (!validatePincode(pincode.value.trim())) {
+                    showError('Enter a valid Pincode.', 'pincodeError');
+                    valid = false;
+                } else {
+                    clearError('pincodeError');
                 }
 
                 // If any validation fails, prevent form submission

@@ -69,6 +69,12 @@
                 <div class="error-message" id="phoneError"></div>
             </div><br>
 
+            <div class="form-group">
+                <label for="pincode">Pincode:</label>
+                <input type="text" id="pincode" name="pincode" value="{{ user.pincode }}" required>
+                <div class="error-message" id="pincodeError"></div>
+            </div><br>
+
             <button type="submit" class="btn">Update</button><br>
 
         </form><br><br>
@@ -87,6 +93,7 @@
             const username = document.getElementById('username');
             const email = document.getElementById('email');
             const phone = document.getElementById('phone');
+            const pincode = document.getElementById('pincode');
             
             // Function to show error
             function showError(message, elementId) {
@@ -103,6 +110,14 @@
             function validatePhoneNumber(phoneNumber) {
                 // Ensure it starts with 6, 7, 8, or 9, is 10 digits, and not repeated digits
                 return /^[6-9]\d{9}$/.test(phoneNumber) && !/^(.)\1{9}$/.test(phoneNumber);
+            }
+
+            // Function to validate pincode
+            function validatePincode(pincode) {
+                const pincodeRegex = /^[1-9][0-9]{2}\s?[0-9]{3}$/; // Allows 6 digits with optional space after the third digit
+                const sequentialPattern = /012345|123456|234567|345678|456789|567890|678901|789012|890123|901234/; // Checks for sequential patterns
+                const repetitivePattern = /(.)\1{5}/; // Checks for repetitive digits (e.g., 000000)
+                return pincodePattern.test(pincode);
             }
     
             // Function to validate username (only alphabets)
@@ -125,6 +140,7 @@
             // Apply validation for each field
             validateFieldsBefore(email, username, 'emailError');
             validateFieldsBefore(phone, email, 'phoneError');
+            validateFieldsBefore(pincode, phone, 'pincodeError');
     
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
@@ -156,6 +172,13 @@
                     valid = false;
                 } else {
                     clearError('phoneError');
+                }
+
+                if (!validatePincode(pincode.value.trim())) {
+                    showError('Enter a valid pincode.', 'pincodeError');
+                    valid = false;
+                } else {
+                    clearError('pincodeError');
                 }
     
                 // If any validation fails, prevent form submission

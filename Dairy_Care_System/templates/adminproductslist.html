@@ -25,12 +25,18 @@
         }
 
         .header {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 5px;
-            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h2 {
+            color: #000000;
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 50px;
+            font-weight: 600;
+            margin: 0;
+            position: relative;
+            display: inline-block;
         }
 
         .nav-item.left {
@@ -429,6 +435,10 @@
 </ul> -->
 
 <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br><br>
+
+<div class="header">
+    <h2> Products List</h2>
+</div>
 <!-- Search Bar -->
 <center>
     <div class="search-bar-container">

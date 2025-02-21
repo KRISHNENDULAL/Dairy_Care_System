@@ -9,6 +9,7 @@ class Users_table(models.Model):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=254, unique=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
+    pincode = models.CharField(max_length=6, null=False, blank=False)  # Pincode
     is_phone_verified = models.BooleanField(default=False)
     password = models.CharField(max_length=128)  # For hashed password storage
     

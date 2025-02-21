@@ -188,6 +188,7 @@ def registration(request):
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
+        pincode = request.POST['pincode']
         role = request.POST['role']  
         password = request.POST['password']
 
@@ -205,7 +206,7 @@ def registration(request):
             return redirect('registration')
 
         # Create the new user with hashed password
-        user = Users_table(username=username, email=email, phone=phone, password=password, role=role)
+        user = Users_table(username=username, email=email, phone=phone, pincode=pincode, password=password, role=role)
         user.save()
 
         # Send email notification
@@ -338,6 +339,7 @@ def addemployee(request):
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
+        pincode = request.POST['pincode']
 
         # Check if the username or email already exists
         if Users_table.objects.filter(username=username).exists():
@@ -352,7 +354,7 @@ def addemployee(request):
         password = generate_random_password()
 
         # Create the new employee with the role set to 'employee'
-        user = Users_table(username=username, email=email, phone=phone, password=password, role='employee')
+        user = Users_table(username=username, email=email, phone=phone, pincode=pincode, password=password, role='employee')
         user.save()
 
         # Print success message only after saving the user
@@ -995,6 +997,7 @@ def updateuserprofile(request):
         user.username = request.POST.get('username')
         user.email = request.POST.get('email')
         user.phone = request.POST.get('phone')
+        user.pincode = request.POST.get('pincode')
         user.save()  # Save changes
 
         messages.success(request, 'Profile updated successfully.')
@@ -2730,16 +2733,34 @@ def verify_qr(request, order_id):
     
 
 
+def scan_qr(request):
+    """Render QR scanner page"""
+    return render(request, 'qr_scanner.html')
+
+
+
+@csrf_exempt  # Add this decorator
 def confirm_delivery(request, order_id):
     """Mark order as delivered when QR code is scanned."""
-    order = get_object_or_404(Order_table, id=order_id)
-
-    if order.status == "Out":
-        order.status = "Delivered"
-        order.save()
-        return HttpResponse("Order has been successfully marked as Delivered!")
-
-    return HttpResponse("Invalid QR Code or Order is not Out for Delivery.")
+    if request.method == 'POST':
+        order = get_object_or_404(Order_table, id=order_id)
+        
+        if order.status == "Out":
+            order.status = "Delivered"
+            order.save()
+            
+            # Create notification for customer
+            Notifications_table.objects.create(
+                message=f"Your order #{order.id} has been delivered successfully!",
+                order=order,
+                user=order.user
+            )
+            
+            return HttpResponse("Order has been successfully marked as Delivered!")
+        
+        return HttpResponse("Invalid QR Code or Order is not Out for Delivery.", status=400)
+    
+    return HttpResponse("Invalid request method.", status=405)
 
 
 
@@ -2845,6 +2866,8 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+
 
 
 

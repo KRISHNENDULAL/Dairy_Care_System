@@ -181,6 +181,7 @@
         <a href="{% url 'deliverydetailsall' %}"><i class="fas fa-shopping-basket"></i> Delivery History</a><br>
         <a href="{% url 'deliverynotifications' %}"><i class="fas fa-bell"></i>  Notifications</a><br>
         <a href="#"><i class="fas fa-comments"></i> Feedback Review</a><br>
+        <a href="{% url 'employeepage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
     
     <!-- Navigation Bar -->
@@ -191,7 +192,6 @@
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'employeepage' %}"><i class="fas fa-home home-icon"></i> Dashboard</a>
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <!-- Change Logout link to trigger a custom SweetAlert -->
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>

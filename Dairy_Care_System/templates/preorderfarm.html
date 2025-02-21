@@ -119,6 +119,7 @@
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
         <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+        <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -133,7 +134,6 @@
                         </a>
                     </b>
                     <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Dashboard</a>
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <!-- Change Logout link to trigger a custom SweetAlert -->
                         <a href="#" onclick="confirmLogout()" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>

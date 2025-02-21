@@ -104,8 +104,9 @@ urlpatterns = [
     path('generate_qr/<int:order_id>/', views.generate_qr_code, name='generate_qr_code'),
     path('verify_qr/<int:order_id>/', views.verify_qr, name='verify_qr'),
     path("confirm-delivery/<int:order_id>/", views.confirm_delivery, name="confirm_delivery"),
+    path('scan-qr/', views.scan_qr, name='scan_qr'),
 
-
+    
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

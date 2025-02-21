@@ -302,6 +302,45 @@
         .update-status-btn:hover {
             background: #434190;
         }
+
+        .qr-scanner-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #060c7e;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .qr-scanner-btn:hover {
+            background: #5752eb;
+        }
+
+        #qrScannerModal .modal-content {
+            max-width: 500px;
+        }
+
+        #reader {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Style for disabled QR scanner button */
+        .qr-scanner-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #cccccc;
+        }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -315,6 +354,7 @@
         <a href="{% url 'deliverydetailsall' %}"><i class="fas fa-shopping-basket"></i> Delivery History</a><br>
         <a href="{% url 'deliverynotifications' %}"><i class="fas fa-bell"></i>  Notifications</a><br>
         <a href="#"><i class="fas fa-comments"></i> Feedback Review</a><br>
+        <a href="{% url 'employeepage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
     <!-- Navigation Bar -->
@@ -325,7 +365,6 @@
                 <li>
                     <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
                     <div class="dropdown-content" id="dropdown-content">
-                        <a href="{% url 'employeepage' %}"><i class="fas fa-home home-icon"></i> Dashboard</a>
                         <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
                         <!-- Change Logout link to trigger a custom SweetAlert -->
                         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -349,6 +388,7 @@
                         <th>Amount</th>
                         <th>Order Date</th>
                         <th>Actions</th>
+                        <th>Scan QR</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -402,6 +442,16 @@
                                     {% endif %}
                                 </button>
                             </td>
+                            <td>
+                                <a href="{% url 'scan_qr' %}?{{ order.id }}" 
+                                   class="qr-scanner-btn" 
+                                   {% if order.status != 'Out' %}
+                                   style="opacity: 0.5; cursor: not-allowed; background-color: #cccccc;"
+                                   onclick="return false;"
+                                   {% endif %}>
+                                    <i class="fas fa-qrcode"></i> Scan QR
+                                </a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -436,6 +486,20 @@
                         <i class="fas fa-box-check"></i> Delivered
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this modal for QR Scanner at the end of the body -->
+    <div id="qrScannerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-qrcode"></i> Scan QR Code</h3>
+                <span class="close" onclick="closeQRScannerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="reader"></div>
+                <div id="result"></div>
             </div>
         </div>
     </div>
@@ -484,6 +548,8 @@
         }
 
         let currentOrderId = null;
+        let html5QrcodeScanner = null;
+        let currentOrderIdForQR = null;
 
         // Function to open modal
         function openStatusModal(orderId) {
@@ -568,6 +634,75 @@
                     text: 'An error occurred while updating the status.'
                 });
             });
+        }
+
+        function openQRScanner(orderId) {
+            currentOrderIdForQR = orderId;
+            document.getElementById('qrScannerModal').style.display = 'block';
+            
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", { fps: 10, qrbox: 250 });
+                
+                html5QrcodeScanner.render(onScanSuccess, onScanError);
+            }
+        }
+
+        function closeQRScannerModal() {
+            document.getElementById('qrScannerModal').style.display = 'none';
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear();
+                html5QrcodeScanner = null;
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Stop scanning
+            html5QrcodeScanner.clear();
+            
+            // Verify if the QR code matches the order
+            const urlPattern = `confirm-delivery/${currentOrderIdForQR}/`;
+            if (decodedText.includes(urlPattern)) {
+                // Make API call to confirm delivery
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                fetch(`/confirm-delivery/${currentOrderIdForQR}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.text())
+                .then(data => {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Delivery confirmed successfully!',
+                        icon: 'success'
+                    }).then(() => {
+                        // Refresh the page to update the status
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to confirm delivery',
+                        icon: 'error'
+                    });
+                });
+            } else {
+                Swal.fire({
+                    title: 'Invalid QR Code',
+                    text: 'This QR code does not match the order',
+                    icon: 'error'
+                });
+            }
+            closeQRScannerModal();
+        }
+
+        function onScanError(error) {
+            console.warn(`QR scan error: ${error}`);
         }
     </script>
 

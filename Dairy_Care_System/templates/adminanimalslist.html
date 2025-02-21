@@ -24,12 +24,18 @@
         }
 
         .header {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 5px;
-            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            color: #000000;
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 50px;
+            font-weight: 600;
+            margin: 0;
+            position: relative;
+            display: inline-block;
         }
 
         .nav-item {
@@ -318,6 +324,10 @@
     </ul> -->
 
     <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br><br>
+
+    <div class="header">
+        <h2> Animals List</h2>
+    </div>
     <!-- Animal Details Section -->
     <div class="animal-container">
         {% for animal in animals %}

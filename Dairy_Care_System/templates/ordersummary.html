@@ -221,10 +221,18 @@
                 {% if order.status == "Out" %}
                     <div class="qr-code-section" style="text-align: center; margin-top: 30px;">
                         <h2>Scan QR Code to Complete Delivery</h2>
+                        <p style="font-size: 15px; color: #0e3cbc; margin: 10px 0;">
+                            <strong>Delivery Agent:
+                            {% if order.deliveryboy %}
+                                {{ order.deliveryboy.username }}
+                            {% else %}
+                                Not assigned yet
+                            {% endif %}</strong> 
+                        </p>
                         <img src="{% url 'generate_qr_code' order.id %}" alt="Order QR Code" style="max-width: 150px; height: auto;">
-                    </div>
+                    </div><br>
                 {% endif %}
-            </div><br>
+            </div>
             <h1>Receipt</h1>
             <h3>Order Confirmation</h3>
         </div>

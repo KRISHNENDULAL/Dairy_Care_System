@@ -19,7 +19,7 @@
     
     <a href="{% url 'home' %}">
         <i class="fas fa-home home-icon"></i>
-    </a><br>
+    </a><br><br><br><br>
 
     <div class="container">
         <div class="login-box">
@@ -44,6 +44,13 @@
                     <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
                     <div class="error-message" id="phoneError"></div>
                 </div>
+
+                <div class="form-group">
+                    <label for="pincode">Pincode:</label>
+                    <input type="text" name="pincode" id="pincode" placeholder="Enter your pincode">
+                    <div class="error-message" id="pincodeError"></div>
+                </div>
+
                 <div class="form-group">
                     <label for="role">Role</label>
                     <select name="role" id="role" required>
@@ -71,7 +78,7 @@
             </form>
             <div class="success-message" id="successMessage"></div>
         </div>
-    </div>
+    </div><br><br><br><br>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -79,6 +86,7 @@
             const username = document.getElementById('username');
             const email = document.getElementById('email');
             const phone = document.getElementById('phone');
+            const pincode = document.getElementById('pincode');
             const password = document.getElementById('password');
             const role = document.getElementById('role');
     
@@ -105,6 +113,14 @@
             // Function to validate role selection
             function validateRole(roleValue) {
                 return roleValue !== ""; // Ensure a role is selected
+            }
+
+            // Function to validate pincode
+            function validatePincode(pincode) {
+                const pincodeRegex = /^[1-9][0-9]{2}\s?[0-9]{3}$/; // Allows 6 digits with optional space after the third digit
+                const sequentialPattern = /012345|123456|234567|345678|456789|567890|678901|789012|890123|901234/; // Checks for sequential patterns
+                const repetitivePattern = /(.)\1{5}/; // Checks for repetitive digits (e.g., 000000)
+                return pincodePattern.test(pincode);
             }
     
             // Function to validate password
@@ -141,6 +157,14 @@
                 }
             });
 
+            pincode.addEventListener('input', function() {
+                if (validatePincode(pincode.value.trim())) {
+                    clearError('pincodeError');
+                } else {
+                    showError('Enter a valid Pincode.', 'pincodeError');
+                }
+            });
+
             role.addEventListener('change', function() {
                 if (validateRole(role.value)) {
                     clearError('roleError');
@@ -171,9 +195,10 @@
     
             // Apply validation for each field
             validateFieldsBefore(username, email, 'emailError');
-            validateFieldsBefore(phone, username, 'phoneError');
-            validateFieldsBefore(role, phone, 'roleError');
-            validateFieldsBefore(password, role, 'passwordError');
+            validateFieldsBefore(phone, username, 'usernameError');
+            validateFieldsBefore(pincode, phone, 'phoneError');
+            validateFieldsBefore(role, pincode, 'pincodeError');
+            validateFieldsBefore(password, role, 'roleError');
 
             // Event listener for form submission
             form.addEventListener('submit', function(event) {
@@ -199,6 +224,13 @@
                     valid = false;
                 } else {
                     clearError('phoneError');
+                }
+
+                if (!validatePincode(pincode.value.trim())) {
+                    showError('Enter a valid Pincode.', 'pincodeError');
+                    valid = false;
+                } else {
+                    clearError('pincodeError');
                 }
 
                 if (!validateRole(role.value)) {
