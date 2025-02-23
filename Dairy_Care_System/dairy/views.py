@@ -1336,6 +1336,7 @@ def image_search(request):
                 })
                 
         except Exception as e:
+            print(f"Error in image search view: {str(e)}")  # Log the error for debugging
             return JsonResponse({
                 'success': False,
                 'error': str(e)
@@ -2540,7 +2541,7 @@ def cancelorder(request, order_id):
         order.save()
 
         # Add a success message
-        messages.success(request, 'Order has been canceled and items have been restocked.')
+        messages.success(request, 'Your Order has been cancelled. The cash have been returned to you and the items have been restocked.')
 
         # Redirect to the order history page
         return redirect('orderhistory')
@@ -2638,6 +2639,42 @@ def assign_delivery(request):
 
             return JsonResponse({"success": True})
         except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+
+@csrf_exempt
+def place_order(request):
+    if request.method == "POST":
+        try:
+            order_data = json.loads(request.body)
+            # Get the user from session
+            user = Users_table.objects.get(user_id=request.session.get('user_id'))
+            
+            order = Order_table.objects.create(
+                user=user,  # Add the user field
+                name=order_data['name'],
+                phone=order_data['phone'],
+                email=order_data['email'],
+                delivery_address=order_data['delivery_address'],
+                pincode=order_data['pincode'],
+                place=order_data['place'],  # Add place field
+                total_price=order_data['total_price'],
+                payment_method=order_data['payment_method'],
+                status='Pending'  # Set initial status
+            )
+
+            # Automatically assign the delivery agent
+            assigned = DeliveryAssignment.auto_assign_delivery_agent(order)
+            
+            if not assigned:
+                return JsonResponse({"success": False, "error": "No delivery agent available."})
+
+            return JsonResponse({"success": True, "order_id": order.id})
+        except Exception as e:
+            print(f"Order placement error: {str(e)}")  # Add logging
             return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
@@ -2746,7 +2783,7 @@ def confirm_delivery(request, order_id):
         order = get_object_or_404(Order_table, id=order_id)
         
         if order.status == "Out":
-            order.status = "Delivered"
+            order.status = "Delivered"  # Change status to Delivered
             order.save()
             
             # Create notification for customer
@@ -2866,6 +2903,10 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+
+
+
 
 
 
