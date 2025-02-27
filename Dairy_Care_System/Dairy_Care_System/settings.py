@@ -211,7 +211,7 @@ LOGIN_URL = '/login/'  # Ensure this points to your custom login URL
 
 # After login, redirect to the user homepage or a relevant page
 LOGIN_REDIRECT_URL = '/customerpage/'  # Adjust this to where users should land after login
-LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
+LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
 
 
 RAZORPAY_KEY_ID = 'rzp_test_K3m91dIeZXVDcE'
@@ -220,5 +220,8 @@ RAZORPAY_SECRET_KEY = '5Pc3YEyRGnv8eASHMCzbs1tp'
 
 # Set GOOGLE_APPLICATION_CREDENTIALS environment variable
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"D:\dairybot-ygjc-759d6cf0768e.json"
+
+# Add this with your other settings
+GOOGLE_API_KEY = 'AIzaSyA5sUGHml3k1TljN0j8ttNhT7mJrPsasdQ'
 
 

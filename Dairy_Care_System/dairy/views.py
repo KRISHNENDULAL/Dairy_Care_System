@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseBadRequest
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -33,7 +33,9 @@ from datetime import datetime
 
 from django.utils.timezone import now
 from datetime import timedelta
-from django.db.models import Count, Q
+from .utils.image_search import ImageSearcher
+from .utils.delivery_assignment import DeliveryAssignment
+from django.db.models import Count, Q, Sum, F
 
 import io
 import razorpay
@@ -47,8 +49,10 @@ import json
 import qrcode
 import cv2
 import numpy as np
-from .utils.image_search import ImageSearcher
-from .utils.delivery_assignment import DeliveryAssignment
+from sklearn.metrics.pairwise import cosine_similarity
+import cv2
+import io
+
 
 
 DAIRY_KEYWORDS = {
@@ -1310,42 +1314,81 @@ def custproductslist(request):
 def image_search(request):
     if request.method == 'POST' and request.FILES.get('image'):
         try:
-            image_searcher = ImageSearcher()
-            best_match, products = image_searcher.search_products(request.FILES['image'])
+            # Read uploaded image
+            image_file = request.FILES['image']
+            image_bytes = image_file.read()
+            nparr = np.frombuffer(image_bytes, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             
-            if products:
-                # Return success with matching products
-                return JsonResponse({
-                    'success': True,
-                    'match': best_match,
-                    'products': [
-                        {
-                            'id': p.product_id,
-                            'name': p.product_name,
-                            'description': p.product_description,
-                            'category': p.product_category,
-                            'price': str(p.product_price),
-                            'images': [img.image.url for img in p.images.all()]
-                        } for p in products[:10]  # Limit to top 10 matches
-                    ]
-                })
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'No matching products found'
-                })
-                
-        except Exception as e:
-            print(f"Error in image search view: {str(e)}")  # Log the error for debugging
+            # Convert to RGB and resize for consistency
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (224, 224))
+            
+            # Extract features (using color histogram as a simple example)
+            features = extract_image_features(img)
+            
+            # Get all products with images
+            all_products = Products_table.objects.all()
+            similar_products = []
+            
+            for product in all_products:
+                product_images = product.images.all()
+                if product_images:
+                    # Get first image of product
+                    product_img_path = product_images[0].image.path
+                    product_img = cv2.imread(product_img_path)
+                    product_img = cv2.cvtColor(product_img, cv2.COLOR_BGR2RGB)
+                    product_img = cv2.resize(product_img, (224, 224))
+                    
+                    # Extract features
+                    product_features = extract_image_features(product_img)
+                    
+                    # Calculate similarity
+                    similarity = calculate_similarity(features, product_features)
+                    
+                    if similarity > 0.5:  # Threshold for similarity
+                        similar_products.append({
+                            'id': product.product_id,
+                            'name': product.product_name,
+                            'description': product.product_description,
+                            'price': float(product.product_price),
+                            'images': [img.image.url for img in product_images],
+                            'similarity': similarity
+                        })
+            
+            # Sort by similarity score
+            similar_products.sort(key=lambda x: x['similarity'], reverse=True)
+            
+            # Take top 5 matches
+            similar_products = similar_products[:5]
+            
             return JsonResponse({
-                'success': False,
-                'error': str(e)
+                'success': True,
+                'products': similar_products
             })
             
+        except Exception as e:
+            print(f"Error in image search: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': 'Failed to process image search'
+            })
+    
     return JsonResponse({
         'success': False,
         'error': 'Invalid request'
     })
+
+def extract_image_features(img):
+    """Extract features from image using color histogram"""
+    hist = cv2.calcHist([img], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+    hist = cv2.normalize(hist, hist).flatten()
+    return hist
+
+def calculate_similarity(features1, features2):
+    """Calculate similarity between two feature vectors"""
+    similarity = cosine_similarity(features1.reshape(1, -1), features2.reshape(1, -1))[0][0]
+    return float(similarity)
 
 
 
@@ -2551,6 +2594,64 @@ def cancelorder(request, order_id):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def orderfullsum(request, order_id):
+    try:
+        order = Order_table.objects.get(id=order_id)
+        order_items = OrderItem_table.objects.filter(order=order)
+        delivery_statuses = DeliveryStatus.objects.filter(order=order).order_by('updated_at')
+        
+        # Map the status to tracking steps
+        status_mapping = {
+            'Placed': 'orderPlaced',
+            'Confirmed': 'orderConfirmed',
+            'Shipped': 'orderShipped',
+            'Out': 'orderOut',
+            'Delivered': 'orderDelivered'
+        }
+        
+        current_status = status_mapping.get(order.status, 'orderPlaced')
+        
+        # Initialize all tracking steps with empty info
+        tracking_info = {
+            'orderPlaced': None,
+            'orderConfirmed': None,
+            'orderShipped': None,
+            'orderOut': None,
+            'orderDelivered': None
+        }
+        
+        # Set initial order placement
+        tracking_info['orderPlaced'] = {
+            'time': order.order_date.strftime("%B %d, %Y %I:%M %p"),
+            'location': ''
+        }
+        
+        # Update tracking info from delivery statuses
+        for status in delivery_statuses:
+            step_id = status_mapping.get(status.status)
+            if step_id:
+                tracking_info[step_id] = {
+                    'time': status.updated_at.strftime("%B %d, %Y %I:%M %p"),
+                    'location': status.location or ''
+                }
+
+        context = {
+            'order': order,
+            'order_items': order_items,
+            'total_price': order.total_price,
+            'payment_method': order.get_payment_method_display(),
+            'current_status': current_status,
+            'tracking_info': tracking_info,
+            'username': request.session.get('username', '')
+        }
+        return render(request, 'orderfullsum.html', context)
+    except Order_table.DoesNotExist:
+        return redirect('orderhistory')
+
+
+
+
 # Check if the user has any pending orders
 def pendingorders(request):
     user_id = request.session.get('user_id')
@@ -2587,6 +2688,71 @@ def orderdetails(request):
         # Redirect to login if no user is logged in
         return redirect('login')
     
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def salegraph(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Get all products of the farmer
+        farmer_products = Products_table.objects.filter(employee=user)
+        
+        # Get sales data for each product
+        sales_data = []
+        for product in farmer_products:
+            # Count total quantity sold for each product
+            total_sold = OrderItem_table.objects.filter(
+                product=product,
+                order__status='Delivered'  # Only count completed orders
+            ).values('product__product_name').annotate(
+                total_quantity=Sum('quantity'),
+                total_revenue=Sum(F('quantity') * F('product__product_price'))
+            ).order_by('product__product_name').first()
+            
+            if total_sold:
+                sales_data.append({
+                    'product_name': product.product_name,
+                    'quantity_sold': total_sold['total_quantity'] or 0,
+                    'revenue': float(total_sold['total_revenue'] or 0)  # Convert Decimal to float
+                })
+            else:
+                # Include products with no sales
+                sales_data.append({
+                    'product_name': product.product_name,
+                    'quantity_sold': 0,
+                    'revenue': 0.0
+                })
+        
+        # Sort by quantity sold
+        sales_data.sort(key=lambda x: x['quantity_sold'], reverse=True)
+        
+        # Calculate totals
+        total_quantity = sum(item['quantity_sold'] for item in sales_data)
+        total_revenue = sum(item['revenue'] for item in sales_data)
+        total_products = len(sales_data)
+
+        # Prepare data for charts
+        products = [item['product_name'] for item in sales_data]
+        quantities = [item['quantity_sold'] for item in sales_data]
+        revenues = [item['revenue'] for item in sales_data]
+        
+        import json
+        context = {
+            'username': user.username,
+            'sales_data': sales_data,
+            'products': json.dumps(products),
+            'quantities': json.dumps(quantities),
+            'revenues': json.dumps(revenues),
+            'total_quantity': total_quantity,
+            'total_revenue': total_revenue,
+            'total_products': total_products
+        }
+        return render(request, 'salegraph.html', context)
+    else:
+        return redirect('login')
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -2807,17 +2973,23 @@ def update_order_status(request):
         try:
             data = json.loads(request.body)
             order_id = data.get('order_id')
-            new_status = data.get('status')
-            
-            # Get the order and update its status
+            status = data.get('status')
+            location = data.get('location')
+
             order = Order_table.objects.get(id=order_id)
-            order.status = new_status
+            order.status = status
             order.save()
-            
+
+            # Create delivery status record
+            DeliveryStatus.objects.create(
+                order=order,
+                status=status,
+                location=location
+            )
+
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-    
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
@@ -2903,6 +3075,43 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+
+
+def get_delivery_status(request, order_id):
+    try:
+        order = Order_table.objects.get(id=order_id)
+        delivery_statuses = DeliveryStatus.objects.filter(order=order).order_by('updated_at')
+        
+        # Initialize with order placement date
+        tracking_info = [{
+            'status': 'Placed',
+            'timestamp': order.order_date.strftime("%B %d, %Y %I:%M %p"),
+            'location': ''
+        }]
+        
+        # Add all status updates from DeliveryStatus
+        for status in delivery_statuses:
+            tracking_info.append({
+                'status': status.status,
+                'timestamp': status.updated_at.strftime("%B %d, %Y %I:%M %p"),
+                'location': status.location or ''
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'tracking_info': tracking_info
+        })
+    except Order_table.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Order not found'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
 
 
 

@@ -17,6 +17,84 @@
         .sidenav a i, .dropdown-content a i {
             margin-right: 10px; /* Space between icon and text */
         }
+
+        /* Add these styles for the similar products display */
+        .similar-products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .similar-product-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            background: white;
+        }
+
+        .similar-product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-details {
+            padding: 15px;
+        }
+
+        .product-details h4 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .similarity {
+            color: #27ae60;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+
+        .view-details-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .view-details-btn:hover {
+            background: #2980b9;
+        }
     </style>
 
     <!-- Add Font Awesome and SweetAlert2 CSS -->
@@ -73,7 +151,7 @@
                     <option value="non-fermented" {% if selected_category == "non-fermented" %}selected{% endif %}>Non-Fermented</option>
                     <option value="fermented" {% if selected_category == "fermented" %}selected{% endif %}>Fermented</option>
                     <option value="powders" {% if selected_category == "powders" %}selected{% endif %}>Powders</option>
-                    <option value="desserts" {% if selected_category == "desserts" %}selected{% endif %}>Desserts</option>
+                    <option value="desserts" {% if selected_category == "desserts" %}selected id="desserts"{% endif %}>Desserts</option>
                     <option value="beverages" {% if selected_category == "beverages" %}selected{% endif %}>Beverages</option>
                 </select>
                 <!-- Search and Voice Buttons -->
@@ -85,7 +163,7 @@
                 <button type="button" id="image-search-button" class="search-button">
                     <i class="fas fa-camera"></i>
                 </button>
-                <button type="submit" class="search-button">Search</button>
+                <button type="submit" id="search" class="search-button">Search</button>
             </form>
         </div>
     </center>
@@ -221,13 +299,11 @@
 
                 let formData = new FormData();
                 formData.append('image', event.target.files[0]);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
                 fetch("{% url 'image_search' %}", {
                     method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-CSRFToken": "{{ csrf_token }}"
-                    }
+                    body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -235,27 +311,31 @@
 
                     if (data.success && data.products && data.products.length > 0) {
                         // Create a modal to display similar products
-                        let productsHtml = data.products.map(product => `
-                            <div class="similar-product">
-                                <img src="${product.images[0]}" alt="${product.name}">
-                                <h4>${product.name}</h4>
-                                <p>${product.description}</p>
-                                <p class="price">₹${product.price}</p>
-                                <form action="{% url 'productdetails' %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product_id" value="${product.id}">
-                                    <button type="submit" class="view-details-btn">View Details</button>
-                                </form>
+                        let productsHtml = `
+                            <div class="similar-products-grid">
+                                ${data.products.map(product => `
+                                    <div class="similar-product-card">
+                                        <div class="product-image">
+                                            <img src="${product.images[0]}" alt="${product.name}">
+                                        </div>
+                                        <div class="product-details">
+                                            <h4>${product.name}</h4>
+                                            <p class="description">${product.description}</p>
+                                            <p class="price">₹${product.price.toFixed(2)}</p>
+                                            <form action="{% url 'productdetails' %}" method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="product_id" value="${product.id}">
+                                                <button type="submit" class="view-details-btn">View Details</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                `).join('')}
                             </div>
-                        `).join('');
+                        `;
 
                         Swal.fire({
                             title: 'Similar Products Found',
-                            html: `
-                                <div class="similar-products-container">
-                                    ${productsHtml}
-                                </div>
-                            `,
+                            html: productsHtml,
                             width: '80%',
                             showConfirmButton: false,
                             showCloseButton: true,
@@ -272,6 +352,7 @@
                     }
                 })
                 .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
                         title: 'Error',
                         text: 'Failed to process image search. Please try again.',

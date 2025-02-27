@@ -175,6 +175,16 @@
             transform: scale(1.02);
         }
 
+        .items-button {
+            background: linear-gradient(135deg, #0588b0, rgb(49, 221, 213));
+            color: white;
+        }
+
+        .items-button:hover {
+            background: linear-gradient(135deg, rgb(49, 221, 213), #0588b0);
+            transform: scale(1.02);
+        }
+
         .btn i {
             font-size: 20px;
         }
@@ -376,6 +386,12 @@
                                 <i class="fas fa-clock"></i> Pre-Order {{ product.product_name }}</button>
                         </form>
                     </div>
+
+                    <div class="product-actions">
+                        <button class="btn items-button" onclick="getRecipeIdeas()">
+                            <i class="fas fa-utensils"></i> What can I make?
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Display success message if it exists -->
@@ -501,5 +517,6 @@
             });
         }
     </script>
+script>
 </body>
 </html>

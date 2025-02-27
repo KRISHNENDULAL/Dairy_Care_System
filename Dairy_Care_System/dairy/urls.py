@@ -56,6 +56,7 @@ urlpatterns = [
     path('orderdetails',views.orderdetails,name='orderdetails'),
     path('stocknotification', views.stocknotification, name='stocknotification'),
     path('farmerproductstock',views.farmerproductstock,name='farmerproductstock'),
+    path('salegraph',views.salegraph,name='salegraph'),
 
     path('addanimal', views.addanimal, name='addanimal'),
     path('animalslist',views.animalslist,name='animalslist'),
@@ -86,6 +87,7 @@ urlpatterns = [
     path('checkoutbilling/', views.checkoutbilling, name='checkoutbilling'),
     path('checkoutorder/', views.checkoutorder, name='checkoutorder'),
     path('ordersummary/<int:order_id>/', views.ordersummary, name='ordersummary'),
+    path('orderfullsum/<int:order_id>/', views.orderfullsum, name='orderfullsum'),
     path('orderhistory/', views.orderhistory, name='orderhistory'),
     path('pendingorders/', views.pendingorders, name='pendingorders'),
     path('cancelorder/<int:order_id>/', views.cancelorder, name='cancelorder'),
@@ -105,6 +107,8 @@ urlpatterns = [
     path('verify_qr/<int:order_id>/', views.verify_qr, name='verify_qr'),
     path("confirm-delivery/<int:order_id>/", views.confirm_delivery, name="confirm_delivery"),
     path('scan-qr/', views.scan_qr, name='scan_qr'),
+
+    path('get_delivery_status/<int:order_id>/', views.get_delivery_status, name='get_delivery_status'),
 
     
 

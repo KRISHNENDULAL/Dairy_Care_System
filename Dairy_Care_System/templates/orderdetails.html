@@ -137,8 +137,8 @@
             <span>{{ order.order_date|date:"M. d, Y" }}</span>
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
             <span><strong>Total:</strong> ₹ {{ order.total_price }}</span>
-            <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
-            <!-- <a href="#" class="view-summary"><strong>Track Order</strong></a> -->
+            <!-- <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a> -->
+            <a href="{% url 'orderfullsum' order.id %}" class="view-summary"><strong>Track Order</strong></a>
         </div>
         {% empty %}
         <div class="order-card">

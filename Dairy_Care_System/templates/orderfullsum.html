@@ -1,0 +1,348 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details & Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0px;
+            padding: 20px;
+            background: url('{% static "images/orderfullsum.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #000000;
+            margin-top: 30px;
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 40px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(14, 4, 153, 0.5);
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1:after {
+            content: '';
+            display: block;
+            width: 90%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #000000, transparent);
+            position: absolute;
+            bottom: -2px;
+            left: 10%;
+        }
+
+        h3 {
+            margin: 20px 0 10px 0;
+            font-style: italic;
+            font-size: 20px;
+            color: #000000;
+        }
+
+        h2 {
+            margin: 20px 0 10px 0;
+            font-style: italic;
+            font-size: 15px;
+            color: #365061;
+            padding-top: 20px;
+        }
+
+        .order-details {
+            margin-bottom: 40px;
+        }
+
+        .tracking-container {
+            margin-top: 40px;
+        }
+
+        .tracking-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        .tracking-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .tracking-step.active .step-icon,
+        .tracking-step.completed .step-icon {
+            background-color: #0aac10;
+        }
+
+        .step-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .step-time {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .order-items {
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            font-size: 18px;
+            padding: 0;
+            margin: 10px 0;
+            font-family: 'Playfair Display';
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0; /* Padding for item rows */
+        }
+
+        li img {
+            width: 50px; /* Set the width of the image */
+            height: 50px; /* Set the height of the image */
+            margin-right: 10px; /* Space between the image and text */
+            border-radius: 5px; /* Optional: rounded corners for images */
+        }
+
+        li:last-child {
+            border-bottom: none; /* Remove border for last item */
+        }
+
+        .total-price {
+            color: #9b0404;
+            font-family: 'Baskerville';
+            font-size: 20px; /* Increased size for total price */
+            margin-top: 10px; /* Spacing above total */
+            margin-left: auto;
+            border-top: 1px solid #ccc; /* Top border for total section */
+            padding-top: 10px; /* Padding above total */
+            display: flex;
+            justify-content: space-between; /* Pushes total price to the right */
+            align-items: center; /* Aligns items vertically */
+        }
+
+        .item-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #000000;
+            padding-top: 30px; /* Padding above footer */
+            padding-bottom: 20px;
+        }
+
+        /* Back to products */
+        .back-link {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 25px;
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .location-text {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- <a href="{% url 'orderhistory' %}" class="back-link">&larr; BACK</a> -->
+    <center><h1>Order Details & Tracking</h1></center><br><br>
+    <div class="container">
+        
+        <div class="order-details">
+            <h3>Invoice Number: {{ order.id }}</h3>
+            <p><strong>Total Amount:</strong> {{ order.name }}</p>
+            <p><strong>Order Date:</strong> {{ order.order_date|date:"F d, Y" }}</p>
+            <p><strong>Total Amount:</strong> ₹{{ order.total_price }}</p>
+            <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+            <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
+            <p><strong>Pincode:</strong> {{ order.pincode }}</p>
+            <p><strong>Delivery Agent:</strong> 
+                {% if order.deliveryboy %}
+                    {{ order.deliveryboy.username }}
+                {% else %}
+                    Not assigned yet
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="tracking-container">
+            <h2>Order Tracking</h2>
+            <div class="tracking-steps">
+                <div class="step-line"></div>
+                {% for status, info in tracking_info.items %}
+                <div class="tracking-step {% if status == current_status %}active{% elif info and not forloop.last %}completed{% endif %}" id="{{ status }}">
+                    <div class="step-icon">
+                        {% if status == 'orderPlaced' %}
+                            <i class="fas fa-shopping-cart"></i>
+                        {% elif status == 'orderConfirmed' %}
+                            <i class="fas fa-user-check"></i>
+                        {% elif status == 'orderShipped' %}
+                            <i class="fas fa-clipboard-check"></i>
+                        {% elif status == 'orderOut' %}
+                            <i class="fas fa-truck"></i>
+                        {% elif status == 'orderDelivered' %}
+                            <i class="fas fa-home"></i>
+                        {% endif %}
+                    </div>
+                    <div class="step-title">{{ status|slice:"5:"|title }}</div>
+                    {% if info %}
+                        <div class="step-time">
+                            {{ info.time }}
+                            {% if info.location %}
+                                <br><small class="location-text">📍 {{ info.location }}</small>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="order-items">
+            <h2>Order Items</h2>
+            <ul>
+                {% for item in order_items %}
+                    <li>
+                        <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.product_name }}" style="width: 70px; height: 60px; margin-right: 10px;">
+                        <span>{{ item.product.product_name }}</span>
+                        <span>{{ item.quantity }}</span>
+                        <span>₹ {{ item.price }}</span>
+                    </li>
+                {% empty %}
+                    <li>No items found for this order.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>&copy; 2024 Dairy Care System. All rights reserved.</strong>
+    </div>
+
+    <script>
+        // Add dropdown and logout functionality
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function confirmLogout() {
+            if(confirm("Are you sure you want to logout?")) {
+                window.location.href = "{% url 'logout' %}";
+            }
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+        // Add this function to update tracking details
+        function updateTrackingDetails() {
+            const orderId = '{{ order.id }}';
+            
+            fetch(`/get_delivery_status/${orderId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.tracking_info.forEach(info => {
+                            const statusMap = {
+                                'Placed': 'orderPlaced',
+                                'Confirmed': 'orderConfirmed',
+                                'Shipped': 'orderShipped',
+                                'Out': 'orderOut',
+                                'Delivered': 'orderDelivered'
+                            };
+
+                            const stepId = statusMap[info.status];
+                            if (stepId) {
+                                const stepElement = document.getElementById(stepId);
+                                if (stepElement) {
+                                    const timeElement = stepElement.querySelector('.step-time');
+                                    if (timeElement) {
+                                        let displayText = info.timestamp;
+                                        if (info.location) {
+                                            displayText += `<br><small class="location-text">📍 ${info.location}</small>`;
+                                        }
+                                        timeElement.innerHTML = displayText;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', updateTrackingDetails);
+    </script>
+</body>
+</html>
