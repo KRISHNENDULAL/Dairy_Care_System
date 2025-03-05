@@ -197,18 +197,18 @@ class Order_table(models.Model):
         ('Cancelled', 'Cancelled'),
     )
 
-    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)  # Reference to user
-    name = models.CharField(max_length=255, null=False, blank=False)  # Customer name
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
     email = models.EmailField(null=False, blank=False)  # Email address
     phone = models.CharField(max_length=20, null=False, blank=False)  # Contact number
     place = models.CharField(max_length=255, null=False, blank=False)  # Place
     pincode = models.CharField(max_length=6, null=False, blank=False)  # Pincode
     delivery_address = models.TextField(null=False, blank=False)  # Delivery address
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)  # Total price of the order
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)  # Payment method
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # Order status
-    order_date = models.DateTimeField(auto_now_add=True)  # Automatically set order date
-    deliveryboy = models.ForeignKey(Users_table, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_orders')  # Reference to assigned delivery personnel
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    order_date = models.DateTimeField(auto_now_add=True)
+    deliveryboy = models.ForeignKey(Users_table, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_orders')
     
     def __str__(self):
         return f"Order {self.id} - {self.user.username}"
@@ -236,6 +236,21 @@ class DeliveryStatus(models.Model):
     
 
 
+class DiseaseImage(models.Model):
+    image = models.ImageField(upload_to='disease_images/')
+    uploaded_by = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    upload_time = models.DateTimeField(auto_now_add=True)
+    diagnosis = models.TextField(null=True, blank=True)
+    
+    def __str__(self):
+        return f"Disease Image uploaded by {self.uploaded_by.username} at {self.upload_time}"
+
+    
+    def full_address(self):
+        return f"{self.street_address}, {self.town_city}, {self.district}, {self.postcode_zip}"
+    
+    
+
 class Address_table(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
@@ -251,5 +266,9 @@ class Address_table(models.Model):
     
     def full_address(self):
         return f"{self.street_address}, {self.town_city}, {self.district}, {self.postcode_zip}"
+    
+
+
+
     
 

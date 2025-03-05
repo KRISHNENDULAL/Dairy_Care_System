@@ -54,113 +54,158 @@
         </div>
     </ul>
 
-
-    <div class="container">
-        <h2>Livestock Disease Detection</h2><br>
-        <div class="upload-box">
-            <p>Simply upload an image and let our system do the rest.</p><br>
-            <form id="diseaseDetectionForm" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <!-- Additional Input Fields -->
-                <label for="animal_breed">Animal Breed:</label>
-                <input type="text" id="animal_breed" name="animal_breed" required><br><br>
-
-                <label for="animal_weight">Weight (kg):</label>
-                <input type="number" id="animal_weight" name="animal_weight" required><br><br>
-
-                <label for="animal_age">Age (years):</label>
-                <input type="number" id="animal_age" name="animal_age" required><br><br>
-
-                <label for="symptoms">Symptoms:</label>
-                <textarea id="symptoms" name="symptoms" placeholder="Enter symptoms here..." required></textarea><br><br>
-
-                <div class="upload-section">
-                    <label for="imageUpload">Upload Image:</label>
-                    <div class="upload-area" id="uploadArea">
-                        <input type="file" id="imageUpload" name="livestock_image" accept="image/*" required style="display: none;">
-                        <div class="drag-text">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Drag and drop image here or</p>
-                            <button type="button" class="browse-btn" onclick="document.getElementById('imageUpload').click()">
-                                Browse Files
-                            </button>
-                        </div>
-                    </div>
-                    <center><img id="preview" src="#" alt="Image Preview" style="display:none; max-width:300px;"/></center>
-                </div>
-
-                <button type="submit">Detect Disease</button><br>
-                <p id="loading">Processing... Please wait.</p>
-            </form>
-            <div id="results"></div>
+    <br><br>
+    <div class="content-container">
+        <h1><i class="fas fa-heartbeat"></i> Disease Detection System</h1>
+        
+        <div class="welcome-text">
+            Welcome to the Disease Detection System. Here you can monitor and detect potential health issues in your cattle using advanced analysis tools.
         </div>
 
-        <div id="history">
-            <h3>Detection History</h3>
-            <ul id="historyList"></ul>
-        </div>
-
-    </div>
-
-    <script>
-        document.getElementById('imageUpload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('preview');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById('diseaseDetectionForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results').style.display = 'none';
+        <div class="upload-section">
+            <h2><i class="fas fa-upload"></i> Upload Image for Analysis</h2>
             
-            setTimeout(() => {
-                const disease = "Foot-and-Mouth Disease"; // Simulated result
-                const confidence = "95%";
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('results').innerHTML = `Detected Disease: ${disease} <br> Confidence: ${confidence}`;
-                document.getElementById('results').style.display = 'block';
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                {% csrf_token %}
+                <div class="file-input-container">
+                    <input type="file" name="disease_image" id="disease_image" accept="image/*" required>
+                    <label for="disease_image" class="custom-file-label">
+                        <i class="fas fa-cloud-upload-alt"></i> Choose Image
+                    </label>
+                </div>
+                <div id="image-preview-container" style="display: none;">
+                    <img id="image-preview" src="" alt="Preview">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-search"></i> Analyze Image
+                </button>
+            </form>
+
+            <!-- Add this after the upload form -->
+            <div class="model-status" style="display: none;">
+                <p><strong>Model Status:</strong> <span id="modelStatus">Checking...</span></p>
+            </div>
+
+            {% if uploaded_image %}
+            <div class="result-section">
+                <h3>Analysis Results</h3>
+                <!-- <div class="image-display">
+                    <img src="{{ uploaded_image }}" alt="Analyzed image">
+                </div> -->
                 
-                const historyList = document.getElementById('historyList');
-                const listItem = document.createElement('li');
-                listItem.textContent = `${disease} - Confidence: ${confidence}`;
-                historyList.appendChild(listItem);
-            }, 2000);
-        });
-    </script>
+                {% if prediction %}
+                <div class="prediction-results">
+                    <h3><i class="fas fa-microscope"></i> Disease Detection Results</h3>
+                    <div class="result-card">
+                        <div class="prediction-main">
+                            <p><strong>Detected Disease:</strong> <span class="disease-name">{{ prediction }}</span></p>
+                            <p><strong>Confidence Level:</strong> <span class="confidence-score">{{ confidence }}</span></p>
+                        </div>
+                        
+                <!-- Debug information -->
+                {% if debug %}
+                <div class="debug-info" style="margin-top: 20px; padding: 10px; background: #f8f9fa;">
+                    <h4>Debug Information:</h4>
+                    <pre>{{ all_probabilities|pprint }}</pre>
+                </div>
+                {% endif %}
+                
+                <!-- Disease information section -->
+                <div class="disease-info">
+                    <!-- <h4><i class="fas fa-info-circle"></i> Disease Information</h4> -->
+                    <div class="info-content">
+                        {% if prediction == 'Foot and Mouth Disease' %}
+                            <p>Foot-and-mouth disease (FMD) is a highly contagious viral disease affecting cattle.</p>
+                            <h5>Common Symptoms:</h5>
+                            <ul>
+                                <li>Fever and blisters in the mouth and on feet</li>
+                                <li>Reduced appetite and milk production</li>
+                                <li>Lameness and difficulty walking</li>
+                                <li>Excessive salivation</li>
+                            </ul>
+                            <h5>Recommended Actions:</h5>
+                            <ul>
+                                <li>Isolate affected animals immediately</li>
+                                <li>Contact veterinarian for treatment</li>
+                                <li>Implement strict biosecurity measures</li>
+                            </ul>
+                        {% elif prediction == 'Mastitis' %}
+                            <p>Mastitis is an inflammation of the udder tissue, usually caused by bacterial infection.</p>
+                            <h5>Common Symptoms:</h5>
+                            <ul>
+                                <li>Swollen, hard, or warm udder</li>
+                                <li>Changes in milk appearance (clumpy, watery, or bloody)</li>
+                                <li>Reduced milk production</li>
+                                <li>Visible discomfort during milking</li>
+                            </ul>
+                            <h5>Recommended Actions:</h5>
+                            <ul>
+                                <li>Begin appropriate antibiotic treatment</li>
+                                <li>Frequent milking of affected quarters</li>
+                                <li>Apply warm compresses to reduce swelling</li>
+                            </ul>
+                        {% elif prediction == 'Pneumonia' %}
+                            <p>Bovine respiratory disease (Pneumonia) affects the lungs and respiratory tract.</p>
+                            <h5>Common Symptoms:</h5>
+                            <ul>
+                                <li>Difficulty breathing and coughing</li>
+                                <li>Nasal discharge</li>
+                                <li>Fever and reduced appetite</li>
+                                <li>Depression and lethargy</li>
+                            </ul>
+                            <h5>Recommended Actions:</h5>
+                            <ul>
+                                <li>Administer prescribed antibiotics</li>
+                                <li>Provide clean, well-ventilated environment</li>
+                                <li>Monitor temperature regularly</li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <p>Could not detect any disease in the image. Please try with a different image.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+
+        <!-- <ul class="features-list">
+            <li><i class="fas fa-camera"></i> Upload images for visual analysis</li>
+            <li><i class="fas fa-clipboard-list"></i> Input symptoms for diagnosis</li>
+            <li><i class="fas fa-history"></i> Track health history</li>
+            <li><i class="fas fa-bell"></i> Get early warning alerts</li>
+        </ul> -->
+
+        <div class="coming-soon">
+            <p><i class="fas fa-tools"></i> Advanced features coming soon!</p>
+        </div>
+    </div>
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
-        // Toggle dropdown on click
-    function toggleDropdown() {
-        var dropdown = document.getElementById("dropdown-content");
-        if (dropdown.style.display === "block") {
-            dropdown.style.display = "none";
-        } else {
-            dropdown.style.display = "block";
-        }
-    }
-
-    // Close the dropdown if clicked outside of it
-    window.onclick = function(event) {
-        if (!event.target.matches('.username')) {
+        // Your existing JavaScript for dropdown and logout
+        function toggleDropdown() {
             var dropdown = document.getElementById("dropdown-content");
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
             }
         }
-    }
 
-        // Custom SweetAlert2 logout confirmation
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
         function confirmLogout() {
             Swal.fire({
                 title: 'Are you sure?',
@@ -173,81 +218,49 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redirect to logout URL
                     window.location.href = "{% url 'logout' %}";
                 }
             });
         }
-    </script>
 
-    <!-- Add this script before closing body tag -->
-    <script>
-        const uploadArea = document.getElementById('uploadArea');
-        const imageUpload = document.getElementById('imageUpload');
-        const preview = document.getElementById('preview');
-
-        // Prevent default drag behaviors
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
-
-        // Highlight drop zone when item is dragged over it
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, unhighlight, false);
-        });
-
-        // Handle dropped files
-        uploadArea.addEventListener('drop', handleDrop, false);
-
-        function preventDefaults (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        function highlight(e) {
-            uploadArea.classList.add('dragover');
-        }
-
-        function unhighlight(e) {
-            uploadArea.classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-
-            if (files.length > 0) {
-                imageUpload.files = files;
-                handleFiles(files);
-            }
-        }
-
-        // Handle both dropped and selected files
-        imageUpload.addEventListener('change', function(e) {
-            handleFiles(this.files);
-        });
-
-        function handleFiles(files) {
-            if (files.length > 0) {
-                const file = files[0];
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-                    reader.readAsDataURL(file);
-                } else {
-                    alert('Please upload an image file');
+        document.getElementById('disease_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').style.display = 'block';
                 }
+                reader.readAsDataURL(file);
             }
-        }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verify model is loaded
+            fetch("{% url 'verify_model' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const statusDiv = document.querySelector('.model-status');
+                    const statusSpan = document.getElementById('modelStatus');
+                    statusDiv.style.display = 'block';
+                    
+                    if (data.success) {
+                        statusSpan.textContent = 'Model loaded successfully';
+                        statusSpan.style.color = '#27ae60';
+                    } else {
+                        statusSpan.textContent = 'Error: Model not loaded';
+                        statusSpan.style.color = '#e74c3c';
+                        // Disable the analyze button
+                        document.querySelector('.submit-btn').disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying model:', error);
+                });
+        });
     </script>
 
 </body>
 </html>
+
+

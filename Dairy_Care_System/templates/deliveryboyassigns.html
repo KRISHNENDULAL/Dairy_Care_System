@@ -189,57 +189,78 @@
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1000;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
         }
 
         .modal-content {
-            position: relative;
-            background: white;
-            margin: 15% auto;
-            padding: 0;
-            width: 90%;
+            background-color: #fefefe;
+            margin: 5% auto; /* Reduced from 15% to 5% to move it higher */
+            padding: 25px;
+            border: 1px solid #888;
+            width: 50%;
             max-width: 500px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            color: #2d3748;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .close {
-            font-size: 28px;
-            font-weight: bold;
-            color: #a0aec0;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            max-height: 80vh; /* Maximum height of 80% of viewport height */
+            overflow-y: auto; /* Allow scrolling if content is too long */
         }
 
         .status-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Two buttons per row */
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .location-section {
+            margin: 20px 0;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .update-confirm-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .update-confirm-btn:hover {
+            background-color: #45a049;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.5em;
         }
 
         .status-btn {
@@ -341,6 +362,65 @@
             cursor: not-allowed;
             background-color: #cccccc;
         }
+
+        /* Add this to your existing styles */
+        .status-btn.selected {
+            background-color: #4CAF50;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .status-btn {
+            transition: all 0.3s ease;
+        }
+
+        #location {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .fetch-location-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .fetch-location-btn:hover {
+            background-color: #1976D2;
+        }
+
+        .status-btn {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-btn:not([disabled]):hover {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .status-btn.selected {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .status-btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #cccccc;
+        }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -427,7 +507,7 @@
                             </td>
                             <td>
                                 <button class="update-status-btn" 
-                                        onclick="openStatusModal('{{ order.id }}')"
+                                        onclick="updateOrderStatus('{{ order.id }}', '{{ order.status }}')"
                                         {% if order.status == 'Cancelled' or order.status == 'Delivered' %} disabled style="opacity: 0.5; cursor: not-allowed; background-color: #cccccc;" {% endif %}>
                                     <i class="fas fa-edit"></i>
                                     {% if order.status == 'Cancelled' %} Order Cancelled
@@ -461,35 +541,36 @@
     <!-- Add this modal HTML before closing body tag -->
     <div id="statusModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-truck"></i> Update Delivery Status</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="status-options">
-                    <button class="status-btn confirmed" onclick="selectStatus('Confirmed')">
-                        <i class="fas fa-check-circle"></i> Confirmed
-                    </button>
-                    <button class="status-btn shipped" onclick="selectStatus('Shipped')">
-                        <i class="fas fa-shipping-fast"></i> Shipped
-                    </button>
-                    <button class="status-btn out" onclick="selectStatus('Out for Delivery')">
-                        <i class="fas fa-truck"></i> Out for Delivery
-                    </button>
-                    <button class="status-btn delivered" onclick="selectStatus('Delivered')">
-                        <i class="fas fa-box"></i> Delivered
-                    </button>
-                </div>
+            <span class="close">&times;</span>
+            <h3 class="modal-title">Update Delivery Status</h3>
             
-                <label for="location">Enter Current Location:</label>
-                <input type="text" id="location" class="input-field" placeholder="Enter location">
-                
-                <button onclick="getCurrentLocation()" class="fetch-location-btn">
+            <div class="status-options">
+                <button class="status-btn confirmed" onclick="selectStatus('Confirmed')">
+                    <i class="fas fa-check"></i> Confirmed
+                </button>
+                <button class="status-btn shipped" onclick="selectStatus('Shipped')">
+                    <i class="fas fa-box"></i> Shipped
+                </button>
+                <button class="status-btn out" onclick="selectStatus('Out')">
+                    <i class="fas fa-truck"></i> Out for Delivery
+                </button>
+                <button class="status-btn delivered" onclick="selectStatus('Delivered')">
+                    <i class="fas fa-home"></i> Delivered
+                </button>
+            </div>
+
+            <div class="location-section">
+                <input type="text" id="location" placeholder="Enter delivery location" class="location-input">
+                <button class="fetch-location-btn" onclick="getCurrentLocation()">
                     <i class="fas fa-map-marker-alt"></i> Get Current Location
                 </button>
-                <center><button class="update-status-btn" onclick="submitStatusUpdate()">
-                    <i class="fas fa-save"></i> Update Status
-                </button></center>
+            </div>
+
+            <div class="modal-footer">
+                <button class="update-confirm-btn" onclick="submitStatusUpdate()">
+                    <i class="fas fa-check"></i> Update Status
+                </button>
+            </div>
         </div>
     </div>
 
@@ -554,6 +635,7 @@
         }
 
         let currentOrderId = null;
+        let selectedStatus = null;
         let html5QrcodeScanner = null;
         let currentOrderIdForQR = null;
 
@@ -581,9 +663,74 @@
             }
         }
 
-        // Function to update status
-        function updateStatus(status) {
-            if (!currentOrderId) return;
+        function submitStatusUpdate(orderId, status, location) {
+            if (!status) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Status Required',
+                    text: 'Please select a delivery status'
+                });
+                return;
+            }
+            
+            if (!location) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Location Required',
+                    text: 'Please enter or fetch current location'
+                });
+                return;
+            }
+
+            updateStatus(orderId, status, location);
+        }
+
+        function selectStatus(button) {
+            if (button.disabled) return;
+            
+            // Remove selected class from all buttons
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked button
+            button.classList.add('selected');
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById('location').value = data.display_name;
+                            })
+                            .catch(error => {
+                                console.error('Error fetching address:', error);
+                                document.getElementById('location').value = 
+                                    `${position.coords.latitude}, ${position.coords.longitude}`;
+                            });
+                    },
+                    function(error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Location Error',
+                            text: 'Unable to fetch location. Please enter manually.'
+                        });
+                    }
+                );
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Geolocation Not Supported',
+                    text: 'Your browser does not support geolocation. Please enter location manually.'
+                });
+            }
+        }
+
+        function updateStatus(orderId, status, location) {
+            if (!orderId) return;
 
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -594,28 +741,26 @@
                     'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({
-                    order_id: currentOrderId,
-                    status: status
+                    order_id: orderId,
+                    status: status,
+                    location: location
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Update the status badge in the table
-                    const row = document.querySelector(`tr[data-order-id="${currentOrderId}"]`);
+                    const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
                     const statusCell = row.querySelector('.status-badge');
                     
-                    // Update status badge class and text
                     statusCell.className = `status-badge status-${status.toLowerCase()}`;
                     statusCell.innerHTML = `
                         <i class="fas fa-circle" style="font-size: 8px;"></i>
                         ${status}
                     `;
 
-                    // Close modal
                     closeStatusModal();
 
-                    // Show success message
                     Swal.fire({
                         icon: 'success',
                         title: 'Status Updated!',
@@ -624,7 +769,6 @@
                         showConfirmButton: false
                     });
                 } else {
-                    // Show error message
                     Swal.fire({
                         icon: 'error',
                         title: 'Update Failed',
@@ -724,6 +868,83 @@
 
         function onScanError(error) {
             console.warn(`QR scan error: ${error}`);
+        }
+
+        function updateOrderStatus(orderId, currentStatus) {
+            // Define the status progression
+            const statusOrder = [
+                { value: 'Pending', label: 'Pending' },
+                { value: 'Confirmed', label: 'Confirmed' },
+                { value: 'Shipped', label: 'Shipped' },
+                { value: 'Out', label: 'Out for Delivery' },
+                { value: 'Delivered', label: 'Delivered' }
+            ];
+            
+            // Get the current status index
+            const currentStatusIndex = statusOrder.findIndex(s => s.value === currentStatus);
+            
+            // Show status selection modal with all statuses
+            Swal.fire({
+                title: 'Update Delivery Status',
+                html: `
+                    <div class="status-buttons">
+                        ${statusOrder.map((status, index) => `
+                            <button type="button" 
+                                class="status-btn ${index === currentStatusIndex ? 'selected' : ''}" 
+                                data-value="${status.value}"
+                                onclick="selectStatus(this)"
+                                ${index <= currentStatusIndex || index > currentStatusIndex + 1 ? 'disabled' : ''}
+                                style="${index <= currentStatusIndex || index > currentStatusIndex + 1 ? 'opacity: 0.5; cursor: not-allowed; background-color: #cccccc;' : ''}">
+                                ${getStatusIcon(status.label)} ${status.label}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="location-input">
+                        <input type="text" id="delivery-location" class="swal2-input" placeholder="Enter delivery location">
+                        <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                            <i class="fas fa-map-marker-alt"></i> Get Current Location
+                        </button>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Update',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    const selectedBtn = document.querySelector('.status-btn:not([disabled]).selected');
+                    const locationInput = document.getElementById('delivery-location');
+
+                    if (!selectedBtn) {
+                        Swal.showValidationMessage('Please select a valid status');
+                        return false;
+                    }
+
+                    if (!locationInput.value.trim()) {
+                        Swal.showValidationMessage('Please enter a location');
+                        return false;
+                    }
+
+                    return {
+                        status: selectedBtn.getAttribute('data-value'),
+                        location: locationInput.value.trim()
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    submitStatusUpdate(orderId, result.value.status, result.value.location);
+                }
+            });
+        }
+
+        // Helper function to get status icon
+        function getStatusIcon(status) {
+            const icons = {
+                'Pending': '<i class="fas fa-clock"></i>',
+                'Confirmed': '<i class="fas fa-check"></i>',
+                'Shipped': '<i class="fas fa-box"></i>',
+                'Out for Delivery': '<i class="fas fa-truck"></i>',
+                'Delivered': '<i class="fas fa-home"></i>'
+            };
+            return icons[status] || '<i class="fas fa-circle"></i>';
         }
     </script>
 

@@ -1,4 +1,223 @@
+{% extends 'base.html' %}
 {% load static %}
+
+{% block title %}{{ animal.animal_name }} Details{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/animaldetails.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Main container styling */
+        .animal-details-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        /* Text section */
+        .text-section {
+            flex: 1;
+        }
+
+        /* Title */
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #0c0687;
+            text-align: left;
+        }
+
+        /* Image Styles */
+        .animal-image {
+            max-width: 300px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Paragraph Styles */
+        p {
+            font-size: 1.1em;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        /* Strong Text */
+        strong {
+            color: #000000;
+        }
+
+        .health-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #053c60;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .health-link:hover {
+            background-color: #034096;
+        }
+
+        .edit-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #9e840f;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .edit-link:hover {
+            background-color: #a9a604;
+        }
+
+        /* Success message */
+        .success-message {
+            margin-top: 20px;
+            color: rgb(0, 128, 0);
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        /* Button Group Styles */
+        .button-group {
+            margin-top: 20px;
+        }
+
+        .view-btn, .delete-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            color: white;
+        }
+
+        .view-btn {
+            background-color: green;
+            border-radius: 5px;
+        }
+
+        .delete-btn {
+            background-color: red;
+            border-radius: 5px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            font-size: 18px;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background-color: green;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: red;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: rgb(14, 189, 14);
+        }
+
+        .btn-cancel:hover {
+            background-color: rgb(218, 14, 14);
+        }
+
+        /* Back to products */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -261,16 +480,20 @@
             <p><strong>Added at:</strong> {{ animal.created_at }}</p>
             <p><strong>Updated at:</strong> {{ animal.updated_at }}</p>
             <div class="button-group">
-                    <a href="animalhealthstatus" class="health-link">
-                        <i class="fas fa-heartbeat"></i> Health Status
-                    </a>
-                    <a href="{% url 'updateanimal' animal_id=animal.animal_id %}" class="edit-link">
-                        <i class="fas fa-edit"></i> Edit Details
-                    </a>
+                <a href="{% url 'animal_health_status' animal.animal_id %}" class="health-link" onclick="maskHealthStatusUrl(event, this.href)">
+                    <i class="fas fa-heartbeat"></i> Health Status
+                </a>
+                <a href="{% url 'updateanimal' animal_id=animal.animal_id %}" class="edit-link">
+                    <i class="fas fa-edit"></i> Edit Details
+                </a>
                 {% if animal.status %}
-                    <a href="#" class="delete-btn" onclick="openModal('delete', '{{ animal.animal_name }}', '{% url 'delete_animal' animal.animal_id %}');"><i class="fas fa-trash"></i> <b>Deactivate</b></a>
+                    <a href="#" class="delete-btn" onclick="openModal('delete', '{{ animal.animal_name }}', '{% url 'delete_animal' animal.animal_id %}');">
+                        <i class="fas fa-trash"></i> <b>Deactivate</b>
+                    </a>
                 {% else %}
-                    <a href="#" class="view-btn" onclick="openModal('restore', '{{ animal.animal_name }}', '{% url 'restore_animal' animal.animal_id %}');"><i class="fas fa-undo"></i> <b>Reactivate</b></a>
+                    <a href="#" class="view-btn" onclick="openModal('restore', '{{ animal.animal_name }}', '{% url 'restore_animal' animal.animal_id %}');">
+                        <i class="fas fa-undo"></i> <b>Reactivate</b>
+                    </a>
                 {% endif %}
             </div>
         </div>
@@ -383,5 +606,54 @@
         }
     </script>
 
+    <script>
+    function maskUrl(event, url) {
+        event.preventDefault();
+        // First navigate to numeric URL which will redirect to masked URL
+        window.location.href = url;
+    }
+    </script>
+
+    <script>
+    // Store animal ID in session storage when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        sessionStorage.setItem('lastAnimalId', '{{ animal.animal_id }}');
+        
+        // Mask the URL after storing the ID
+        const path = window.location.pathname;
+        if (path.match(/\/animal\/\d+\//)) {
+            const maskedPath = path.replace(/\/animal\/\d+\//, '/animal/YK/');
+            window.history.replaceState({id: '{{ animal.animal_id }}'}, '', maskedPath);
+        }
+    });
+
+    function maskHealthStatusUrl(event, url) {
+        event.preventDefault();
+        // Store the current animal ID in session storage
+        sessionStorage.setItem('lastAnimalId', '{{ animal.animal_id }}');
+        // Navigate to the URL which will be masked
+        window.location.href = url;
+    }
+
+    // Handle back navigation
+    window.addEventListener('popstate', function(event) {
+        const lastAnimalId = sessionStorage.getItem('lastAnimalId');
+        if (window.location.pathname === '/animal/YK/') {
+            if (lastAnimalId) {
+                window.location.replace('/animal/' + lastAnimalId + '/');
+            } else {
+                window.location.replace('/animalslist/');
+            }
+        }
+    });
+    </script>
+
 </body>
 </html>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Your existing scripts here -->
+{% endblock %}

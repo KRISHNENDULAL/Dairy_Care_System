@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    {% block extra_head %}{% endblock %}
+    <style>
+        /* Hide content until URL is updated */
+        .content-wrapper {
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        .content-wrapper.visible {
+            opacity: 1;
+        }
+    </style>
+    <script>
+        // Execute immediately before any content is shown
+        (function() {
+            let url = window.location.href;
+            // Add all ID patterns to mask
+            const patterns = [
+                { regex: /\/animal\/(\d+)\//g, replace: '/animal/DCS/' },
+                { regex: /\/updateanimal\/(\d+)\//g, replace: '/updateanimal/DCS/' },
+                { regex: /\/updateproduct\/(\d+)\//g, replace: '/updateproduct/DCS/' },
+                { regex: /\/deleteproduct\/(\d+)\//g, replace: '/deleteproduct/DCS/' },
+                { regex: /\/restoreproduct\/(\d+)\//g, replace: '/restoreproduct/DCS/' },
+                { regex: /\/regdeleteuser\/(\d+)\//g, replace: '/regdeleteuser/DCS/' },
+                { regex: /\/restoreuser\/(\d+)\//g, replace: '/restoreuser/DCS/' },
+                { regex: /\/deleteaccount\/(\d+)\//g, replace: '/deleteaccount/DCS/' },
+                
+                { regex: /\/deleteanimal\/(\d+)\//g, replace: '/deleteanimal/DCS/' },
+                { regex: /\/restoreanimal\/(\d+)\//g, replace: '/restoreanimal/DCS/' },
+                
+                { regex: /\/ordersummary\/(\d+)\//g, replace: '/ordersummary/DCS/' },
+                { regex: /\/orderfullsum\/(\d+)\//g, replace: '/orderfullsum/DCS/' },
+                { regex: /\/cart\/update\/(\d+)\//g, replace: '/cart/update/DCS/' },
+                { regex: /\/cart\/delete\/(\d+)\//g, replace: '/cart/delete/DCS/' },
+                { regex: /\/cancelorder\/(\d+)\//g, replace: '/cancelorder/DCS/' },
+                { regex: /\/get_order_tracking\/(\d+)\//g, replace: '/get_order_tracking/DCS/' },
+                { regex: /\/generate_qr\/(\d+)\//g, replace: '/generate_qr/DCS/' },
+                { regex: /\/verify_qr\/(\d+)\//g, replace: '/verify_qr/DCS/' },
+                { regex: /\/confirm-delivery\/(\d+)\//g, replace: '/confirm-delivery/DCS/' },
+                { regex: /\/get_delivery_status\/(\d+)\//g, replace: '/get_delivery_status/DCS/' },
+                { regex: /\/scan-qr\/\?(\d+)/g, replace: '/scan-qr/DCS/' },
+                { regex: /\/animal\/(\d+)\/animalhealthstatus/g, replace: '/animal/DCS/animalhealthstatus' },
+            ];
+
+            // Store original URL in state before masking
+            let originalUrl = url;
+            let newUrl = url;
+
+            // Apply all masking patterns
+            for (const pattern of patterns) {
+                if (pattern.regex.test(url)) {
+                    newUrl = url.replace(pattern.regex, pattern.replace);
+                    break;
+                }
+            }
+
+            if (newUrl !== url) {
+                window.history.replaceState({originalUrl: originalUrl}, "", newUrl);
+            }
+        })();
+
+        // Handle back/forward navigation
+        window.addEventListener('popstate', function(event) {
+            const ykPatterns = [
+                '/animal/DCS/',
+                '/updateanimal/DCS/',
+                '/updateproduct/DCS/',
+                '/deleteproduct/DCS/',
+                '/restoreproduct/DCS/',
+                '/regdeleteuser/DCS/',
+                '/restoreuser/DCS/',
+
+                '/deleteanimal/DCS/',
+                '/restoreanimal/DCS/',
+                
+                '/deleteaccount/DCS/',
+                '/ordersummary/DCS/',
+                '/orderfullsum/DCS/',
+                '/cart/update/DCS/',
+                '/cart/delete/DCS/',
+                '/cancelorder/DCS/',
+                '/get_order_tracking/DCS/',
+                '/generate_qr/DCS/',
+                '/verify_qr/DCS/',
+                '/confirm-delivery/DCS/',
+                '/get_delivery_status/DCS/',
+                '/scan-qr/DCS/',
+            ];
+
+            const currentPath = window.location.pathname;
+            if (ykPatterns.includes(currentPath)) {
+                if (event.state && event.state.originalUrl) {
+                    window.location.replace(event.state.originalUrl);
+                } else {
+                    // Redirect to appropriate list page based on current path
+                    if (currentPath.includes('animal')) {
+                        window.location.replace('/animalslist');
+                    } else if (currentPath.includes('product')) {
+                        window.location.replace('/productslist');
+                    } else if (currentPath.includes('user')) {
+                        window.location.replace('/reguserlist/all');
+                    } else if (currentPath.includes('order') || currentPath.includes('cart')) {
+                        window.location.replace('/orderhistory');
+                    }
+                }
+            }
+        });
+
+        // Show content after URL is updated
+        window.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.content-wrapper').classList.add('visible');
+        });
+
+        // Only mask the URL, don't change any functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            let url = window.location.href;
+            if (url.includes('/scan-qr/') && /\/scan-qr\/\d+/.test(url)) {
+                history.replaceState(null, '', '/scan-qr/DCS/');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let url = window.location.href;
+            if (url.includes('/animal/') && /\/animal\/\d+\/animalhealthstatus/.test(url)) {
+                history.replaceState(null, '', url.replace(/\/animal\/\d+\/animalhealthstatus/, '/animal/DCS/animalhealthstatus'));
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html> 

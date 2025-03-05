@@ -13,6 +13,35 @@
             background-size: cover;
             font-family: Arial, sans-serif;
         }
+        
+        /* New styles for mobile optimization */
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px; /* Adjust font size for better readability */
+            }
+            .login-box {
+                width: 90%; /* Make the login box responsive */
+                margin: auto; /* Center the login box */
+            }
+            .header {
+                display: flex; /* Use flexbox for navigation */
+                flex-direction: row; /* Align items horizontally */
+                justify-content: center; /* Center items horizontally */
+                flex-wrap: wrap; /* Allow items to wrap if necessary */
+                padding: 10px 0; /* Add padding for better spacing */
+            }
+            .nav-item {
+                margin: 5px; /* Add spacing between nav items */
+                text-align: center; /* Center text for nav items */
+            }
+            .nav-item a {
+                display: block; /* Make links block elements for better touch targets */
+                padding: 10px; /* Add padding for clickable area */
+            }
+            .container {
+                padding: 10px; /* Add padding for mobile */
+            }
+        }
     </style>
 </head>
 <body>

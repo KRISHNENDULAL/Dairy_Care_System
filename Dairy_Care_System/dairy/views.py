@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseBadRequest
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus, DiseaseImage
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -33,7 +33,9 @@ from datetime import datetime
 
 from django.utils.timezone import now
 from datetime import timedelta
-from django.db.models import Count, Q
+from .utils.image_search import ImageSearcher
+from .utils.delivery_assignment import DeliveryAssignment
+from django.db.models import Count, Q, Sum, F
 
 import io
 import razorpay
@@ -47,8 +49,14 @@ import json
 import qrcode
 import cv2
 import numpy as np
-from .utils.image_search import ImageSearcher
-from .utils.delivery_assignment import DeliveryAssignment
+from sklearn.metrics.pairwise import cosine_similarity
+import cv2
+import io
+import socket
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+import os
+
 
 
 DAIRY_KEYWORDS = {
@@ -1310,42 +1318,81 @@ def custproductslist(request):
 def image_search(request):
     if request.method == 'POST' and request.FILES.get('image'):
         try:
-            image_searcher = ImageSearcher()
-            best_match, products = image_searcher.search_products(request.FILES['image'])
+            # Read uploaded image
+            image_file = request.FILES['image']
+            image_bytes = image_file.read()
+            nparr = np.frombuffer(image_bytes, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             
-            if products:
-                # Return success with matching products
-                return JsonResponse({
-                    'success': True,
-                    'match': best_match,
-                    'products': [
-                        {
-                            'id': p.product_id,
-                            'name': p.product_name,
-                            'description': p.product_description,
-                            'category': p.product_category,
-                            'price': str(p.product_price),
-                            'images': [img.image.url for img in p.images.all()]
-                        } for p in products[:10]  # Limit to top 10 matches
-                    ]
-                })
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'No matching products found'
-                })
-                
-        except Exception as e:
-            print(f"Error in image search view: {str(e)}")  # Log the error for debugging
+            # Convert to RGB and resize for consistency
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (224, 224))
+            
+            # Extract features (using color histogram as a simple example)
+            features = extract_image_features(img)
+            
+            # Get all products with images
+            all_products = Products_table.objects.all()
+            similar_products = []
+            
+            for product in all_products:
+                product_images = product.images.all()
+                if product_images:
+                    # Get first image of product
+                    product_img_path = product_images[0].image.path
+                    product_img = cv2.imread(product_img_path)
+                    product_img = cv2.cvtColor(product_img, cv2.COLOR_BGR2RGB)
+                    product_img = cv2.resize(product_img, (224, 224))
+                    
+                    # Extract features
+                    product_features = extract_image_features(product_img)
+                    
+                    # Calculate similarity
+                    similarity = calculate_similarity(features, product_features)
+                    
+                    if similarity > 0.5:  # Threshold for similarity
+                        similar_products.append({
+                            'id': product.product_id,
+                            'name': product.product_name,
+                            'description': product.product_description,
+                            'price': float(product.product_price),
+                            'images': [img.image.url for img in product_images],
+                            'similarity': similarity
+                        })
+            
+            # Sort by similarity score
+            similar_products.sort(key=lambda x: x['similarity'], reverse=True)
+            
+            # Take top 5 matches
+            similar_products = similar_products[:5]
+            
             return JsonResponse({
-                'success': False,
-                'error': str(e)
+                'success': True,
+                'products': similar_products
             })
             
+        except Exception as e:
+            print(f"Error in image search: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': 'Failed to process image search'
+            })
+    
     return JsonResponse({
         'success': False,
         'error': 'Invalid request'
     })
+
+def extract_image_features(img):
+    """Extract features from image using color histogram"""
+    hist = cv2.calcHist([img], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+    hist = cv2.normalize(hist, hist).flatten()
+    return hist
+
+def calculate_similarity(features1, features2):
+    """Calculate similarity between two feature vectors"""
+    similarity = cosine_similarity(features1.reshape(1, -1), features2.reshape(1, -1))[0][0]
+    return float(similarity)
 
 
 
@@ -1854,33 +1901,41 @@ def adminanimaldetails(request, animal_id):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def animaldetails(request, animal_id): 
-    # Retrieve user_id from the session
-    user_id = request.session.get('user_id')
-    
-    # Initialize context dictionary
-    context = {}
+def animaldetails(request, animal_id=None):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
 
-    if user_id:
-        # Fetch the user object using user_id
-        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        context['username'] = user.username  # Pass the username to the template
-    else:
-        return redirect('login')  # Redirect to login if no user is logged in
+        # If it's the masked URL, get the real ID from session
+        if animal_id == 'DCS':  # Changed from 'YK' to 'DCS'
+            animal_id = request.session.get('last_animal_id')
+            if not animal_id:
+                return redirect('animalslist')
 
-    # Fetch the specific animal with related images
-    animal = get_object_or_404(Animals_table.objects.prefetch_related('images'), animal_id=animal_id)
+        # Get the animal details
+        animal = get_object_or_404(Animals_table.objects.prefetch_related('images'), animal_id=animal_id)
 
-    # Calculate the age of the animal
-    if animal.date_of_birth:
-        current_date = timezone.now().date()  # Get the current date
-        animal_age_years = (current_date - animal.date_of_birth).days // 365  # Calculate age in years
-        animal.age_in_years = animal_age_years  # Add a custom attribute to hold the age
+        # Calculate age if date_of_birth exists
+        if animal.date_of_birth:
+            current_date = timezone.now().date()
+            animal_age_years = (current_date - animal.date_of_birth).days // 365
+            animal.age_in_years = animal_age_years
 
-    # Pass the animal details to the context
-    context['animal'] = animal
+        # Store the current animal ID in session
+        request.session['last_animal_id'] = animal.animal_id
 
-    return render(request, 'animaldetails.html', context)
+        context = {
+            'animal': animal,
+            'username': Users_table.objects.get(user_id=user_id).username
+        }
+        
+        return render(request, 'animaldetails.html', context)
+
+    except Exception as e:
+        print(f"Error in animaldetails: {str(e)}")
+        messages.error(request, "An error occurred while accessing animal details.")
+        return redirect('animalslist')
 
 
 
@@ -1932,23 +1987,35 @@ def restore_animal(request, animal_id):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def animal_health_status(request, animal_id):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    
-    if not user_id:
-        return redirect('login')  # Redirect to login if no user is logged in
+def animal_health_status(request, animal_id=None):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
 
-    user = Users_table.objects.get(user_id=user_id)  # Fetch the user object
-    animal = get_object_or_404(Animals_table, animal_id=animal_id)  # Fetch the animal
-    health_records = AnimalHealth_table.objects.filter(animal=animal)  # Fetch health records
+        # Store the original URL in session for proper back navigation
+        if isinstance(animal_id, int):
+            request.session['last_animal_id'] = animal_id
+        elif animal_id == 'YK':
+            animal_id = request.session.get('last_animal_id')
+            if not animal_id:
+                return redirect('animalslist')
 
-    context = {
-        'username': user.username,
-        'animal': animal,
-        'health_records': health_records,
-    }
-    
-    return render(request, 'animal_health_status.html', context)
+        animal = get_object_or_404(Animals_table, animal_id=animal_id)
+        health_records = AnimalHealth_table.objects.filter(animal=animal).order_by('-checkup_date')
+        
+        context = {
+            'animal': animal,
+            'health_records': health_records,
+            'username': Users_table.objects.get(user_id=user_id).username
+        }
+        
+        return render(request, 'animal_health_status.html', context)
+        
+    except Exception as e:
+        print(f"Error in animal_health_status: {str(e)}")
+        messages.error(request, "An error occurred while accessing health records.")
+        return redirect('animalslist')
 
 
 
@@ -2551,6 +2618,64 @@ def cancelorder(request, order_id):
 
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def orderfullsum(request, order_id):
+    try:
+        order = Order_table.objects.get(id=order_id)
+        order_items = OrderItem_table.objects.filter(order=order)
+        delivery_statuses = DeliveryStatus.objects.filter(order=order).order_by('updated_at')
+        
+        # Map the status to tracking steps
+        status_mapping = {
+            'Placed': 'orderPlaced',
+            'Confirmed': 'orderConfirmed',
+            'Shipped': 'orderShipped',
+            'Out': 'orderOut',
+            'Delivered': 'orderDelivered'
+        }
+        
+        current_status = status_mapping.get(order.status, 'orderPlaced')
+        
+        # Initialize all tracking steps with empty info
+        tracking_info = {
+            'orderPlaced': None,
+            'orderConfirmed': None,
+            'orderShipped': None,
+            'orderOut': None,
+            'orderDelivered': None
+        }
+        
+        # Set initial order placement
+        tracking_info['orderPlaced'] = {
+            'time': order.order_date.strftime("%B %d, %Y %I:%M %p"),
+            'location': ''
+        }
+        
+        # Update tracking info from delivery statuses
+        for status in delivery_statuses:
+            step_id = status_mapping.get(status.status)
+            if step_id:
+                tracking_info[step_id] = {
+                    'time': status.updated_at.strftime("%B %d, %Y %I:%M %p"),
+                    'location': status.location or ''
+                }
+
+        context = {
+            'order': order,
+            'order_items': order_items,
+            'total_price': order.total_price,
+            'payment_method': order.get_payment_method_display(),
+            'current_status': current_status,
+            'tracking_info': tracking_info,
+            'username': request.session.get('username', '')
+        }
+        return render(request, 'orderfullsum.html', context)
+    except Order_table.DoesNotExist:
+        return redirect('orderhistory')
+
+
+
+
 # Check if the user has any pending orders
 def pendingorders(request):
     user_id = request.session.get('user_id')
@@ -2590,58 +2715,125 @@ def orderdetails(request):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def deliveryassigns(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+def salegraph(request):
+    user_id = request.session.get('user_id')
     if user_id:
-        try:
-            user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-            orders = Order_table.objects.all().order_by('-order_date')  # Fetch all orders
-            context = {
-                'username': user.username,  # Pass the username to the template
-                'orders': orders,  # Pass the orders to the template
-            }
-            return render(request, 'deliveryassigns.html', context)
-        except Users_table.DoesNotExist:
-            return redirect('login')  # Redirect to login if user doesn't exist
+        user = Users_table.objects.get(user_id=user_id)
+        
+        # Get all products of the farmer
+        farmer_products = Products_table.objects.filter(employee=user)
+        
+        # Get sales data for each product
+        sales_data = []
+        for product in farmer_products:
+            # Count total quantity sold for each product
+            total_sold = OrderItem_table.objects.filter(
+                product=product,
+                order__status='Delivered'  # Only count completed orders
+            ).values('product__product_name').annotate(
+                total_quantity=Sum('quantity'),
+                total_revenue=Sum(F('quantity') * F('product__product_price'))
+            ).order_by('product__product_name').first()
+            
+            if total_sold:
+                sales_data.append({
+                    'product_name': product.product_name,
+                    'quantity_sold': total_sold['total_quantity'] or 0,
+                    'revenue': float(total_sold['total_revenue'] or 0)  # Convert Decimal to float
+                })
+            else:
+                # Include products with no sales
+                sales_data.append({
+                    'product_name': product.product_name,
+                    'quantity_sold': 0,
+                    'revenue': 0.0
+                })
+        
+        # Sort by quantity sold
+        sales_data.sort(key=lambda x: x['quantity_sold'], reverse=True)
+        
+        # Calculate totals
+        total_quantity = sum(item['quantity_sold'] for item in sales_data)
+        total_revenue = sum(item['revenue'] for item in sales_data)
+        total_products = len(sales_data)
+
+        # Prepare data for charts
+        products = [item['product_name'] for item in sales_data]
+        quantities = [item['quantity_sold'] for item in sales_data]
+        revenues = [item['revenue'] for item in sales_data]
+        
+        import json
+        context = {
+            'username': user.username,
+            'sales_data': sales_data,
+            'products': json.dumps(products),
+            'quantities': json.dumps(quantities),
+            'revenues': json.dumps(revenues),
+            'total_quantity': total_quantity,
+            'total_revenue': total_revenue,
+            'total_products': total_products
+        }
+        return render(request, 'salegraph.html', context)
     else:
-        return redirect('login')  # Redirect to login if no user is logged in
+        return redirect('login')
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def deliveryassigns(request):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
+            
+        # Get all orders that need delivery assignment
+        orders = Order_table.objects.select_related('user', 'deliveryboy').all().order_by('-order_date')
+        
+        context = {
+            'orders': orders,
+            'username': Users_table.objects.get(user_id=user_id).username
+        }
+        
+        return render(request, 'deliveryassigns.html', context)
+        
+    except Exception as e:
+        print(f"Error in deliveryassigns: {str(e)}")
+        messages.error(request, "An error occurred while accessing delivery assignments.")
+        return redirect('adminpage')
 
 
 
 def get_employees(request):
-    if request.method == "GET":
-        # Fetch users with role='employee' including phone number
-        employees = Users_table.objects.filter(role='employee').values('user_id', 'username', 'phone')
-        return JsonResponse({"employees": list(employees)})
-    return JsonResponse({"employees": []})
-
+    try:
+        # Get all delivery employees
+        employees = Users_table.objects.filter(role='employee', status=True).values('user_id', 'username', 'phone')
+        return JsonResponse({'employees': list(employees)})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def assign_delivery(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        order_id = data.get("id")
-        employee_id = data.get("deliveryboy")
-        action = data.get("action", "assign")
-
+    if request.method == 'POST':
         try:
-            order = Order_table.objects.get(id=order_id)
+            data = json.loads(request.body)
+            order_id = data.get('id')
+            deliveryboy_id = data.get('deliveryboy')
+            action = data.get('action')
 
-            if action == "assign":
-                employee = Users_table.objects.get(user_id=employee_id)
-                order.deliveryboy = employee
-                order.status = "Confirmed"
+            order = Order_table.objects.get(id=order_id)
+            
+            if action == 'assign':
+                deliveryboy = Users_table.objects.get(user_id=deliveryboy_id)
+                order.deliveryboy = deliveryboy
             else:  # unassign
                 order.deliveryboy = None
-                order.status = "Pending"  # or whatever your initial status is
-            
+                
             order.save()
-
-            return JsonResponse({"success": True})
+            
+            return JsonResponse({'success': True})
         except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-
-    return JsonResponse({"success": False, "error": "Invalid request method"})
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
 
@@ -2807,17 +2999,23 @@ def update_order_status(request):
         try:
             data = json.loads(request.body)
             order_id = data.get('order_id')
-            new_status = data.get('status')
-            
-            # Get the order and update its status
+            status = data.get('status')
+            location = data.get('location')
+
             order = Order_table.objects.get(id=order_id)
-            order.status = new_status
+            order.status = status
             order.save()
-            
+
+            # Create delivery status record
+            DeliveryStatus.objects.create(
+                order=order,
+                status=status,
+                location=location
+            )
+
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-    
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
@@ -2864,6 +3062,63 @@ def get_order_tracking(request, order_id):
 
 
 
+# Update the model paths to match exactly where train_disease_model.py saves them
+MODEL_PATH = os.path.join(settings.BASE_DIR, 'dairy', 'ml_models', 'cow_disease_model.h5')
+CLASS_MAP_PATH = os.path.join(settings.BASE_DIR, 'dairy', 'ml_models', 'class_mapping.json')
+
+# Load the model and class mapping
+try:
+    disease_model = load_model(MODEL_PATH)
+    with open(CLASS_MAP_PATH, 'r') as f:
+        DISEASE_CLASSES = json.load(f)
+    print("Model and class mapping loaded successfully")
+except Exception as e:
+    print(f"Error loading model or class mapping: {str(e)}")
+
+def predict_disease(image_path):
+    try:
+        print(f"Starting prediction for image: {image_path}")
+        
+        if not os.path.exists(MODEL_PATH):
+            raise Exception(f"Model file not found at {MODEL_PATH}")
+            
+        # Load and preprocess the image
+        img = image.load_img(image_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = img_array / 255.0
+
+        print("Making prediction...")
+        # Make prediction
+        predictions = disease_model.predict(img_array)
+        predicted_class = np.argmax(predictions[0])
+        confidence = float(predictions[0][predicted_class])
+
+        print(f"Raw predictions: {predictions}")
+        print(f"Predicted class: {predicted_class}")
+        print(f"Available classes: {DISEASE_CLASSES}")
+
+        # Get disease name from class mapping
+        disease_name = DISEASE_CLASSES.get(str(predicted_class))
+        if not disease_name:
+            raise Exception(f"Disease class {predicted_class} not found in mapping")
+
+        result = {
+            'disease': disease_name,
+            'confidence': confidence * 100,
+            'all_probabilities': {
+                DISEASE_CLASSES[str(i)]: float(prob) * 100 
+                for i, prob in enumerate(predictions[0])
+            }
+        }
+        print(f"Prediction result: {result}")
+        return result
+        
+    except Exception as e:
+        print(f"Error in prediction: {str(e)}")
+
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def diseasedetection(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
@@ -2872,10 +3127,80 @@ def diseasedetection(request):
         context = {
             'username': user.username,  # Pass the username to the template
         }
+
+        if request.method == 'POST' and request.FILES.get('disease_image'):
+            try:
+                image_file = request.FILES['disease_image']
+                
+                # Save the uploaded image temporarily
+                fs = FileSystemStorage()
+                filename = fs.save(f'temp_disease_images/{image_file.name}', image_file)
+                image_path = fs.path(filename)
+                
+                # Get disease prediction
+                prediction_result = predict_disease(image_path)
+                
+                if prediction_result:
+                    context.update({
+                        'uploaded_image': fs.url(filename),
+                        'upload_time': timezone.now(),
+                        'prediction': prediction_result['disease'],
+                        'confidence': f"{prediction_result['confidence']:.2f}%",
+                        'all_probabilities': prediction_result['all_probabilities']
+                    })
+                    messages.success(request, "Image analyzed successfully!")
+                else:
+                    messages.error(request, "Failed to analyze image. Please try again.")
+                    context.update({
+                        'uploaded_image': fs.url(filename),
+                        'upload_time': timezone.now()
+                    })
+                
+                # Clean up temporary file
+                fs.delete(filename)
+                
+            except Exception as e:
+                print(f"Error in diseasedetection: {str(e)}")
+                messages.error(request, "An error occurred. Please try again.")
+                return redirect('farmownerpage')
+        
         return render(request, 'diseasedetection.html', context)
     else:
         return redirect('login')  # Redirect to login if no user is logged in 
 
+
+
+@csrf_exempt
+def verify_model(request):
+    try:
+        # Check if model and class mapping exist
+        if not os.path.exists(MODEL_PATH):
+            return JsonResponse({
+                'success': False,
+                'error': 'Model file not found'
+            })
+            
+        if not os.path.exists(CLASS_MAP_PATH):
+            return JsonResponse({
+                'success': False,
+                'error': 'Class mapping file not found'
+            })
+            
+        # Verify model can make predictions
+        test_shape = (1, 224, 224, 3)
+        test_input = np.zeros(test_shape)
+        _ = disease_model.predict(test_input)
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Model verified successfully'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+    
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -2903,6 +3228,106 @@ def addproducts(request):
 
 def productslist(request):
     return render(request, 'login.html')  """
+
+
+
+def get_delivery_status(request, order_id):
+    try:
+        order = Order_table.objects.get(id=order_id)
+        delivery_statuses = DeliveryStatus.objects.filter(order=order).order_by('updated_at')
+        
+        # Initialize with order placement date
+        tracking_info = [{
+            'status': 'Placed',
+            'timestamp': order.order_date.strftime("%B %d, %Y %I:%M %p"),
+            'location': ''
+        }]
+        
+        # Add all status updates from DeliveryStatus
+        for status in delivery_statuses:
+            tracking_info.append({
+                'status': status.status,
+                'timestamp': status.updated_at.strftime("%B %d, %Y %I:%M %p"),
+                'location': status.location or ''
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'tracking_info': tracking_info
+        })
+    except Order_table.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Order not found'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+def get_server_ip(request):
+    """
+    Returns the server's IP address for QR code generation
+    """
+    try:
+        # Get the hostname
+        hostname = socket.gethostname()
+        # Get the IP address
+        ip_address = socket.gethostbyname(hostname)
+        
+        return JsonResponse({
+            'success': True,
+            'ip_address': ip_address
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def admin_disease_detection(request):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
+            
+        user = Users_table.objects.get(user_id=user_id)
+        if user.role != 'admin':
+            messages.error(request, "Access denied. Admin privileges required.")
+            return redirect('login')
+            
+        context = {
+            'username': user.username,
+        }
+        
+        if request.method == 'POST' and request.FILES.get('disease_image'):
+            try:
+                image = request.FILES['disease_image']
+                disease_image = DiseaseImage.objects.create(
+                    image=image,
+                    uploaded_by=user,
+                    upload_time=timezone.now()
+                )
+                context.update({
+                    'uploaded_image': disease_image.image.url,
+                    'upload_time': disease_image.upload_time
+                })
+                messages.success(request, "Image uploaded successfully!")
+            except Exception as e:
+                print(f"Error uploading image: {str(e)}")
+                messages.error(request, "Failed to upload image. Please try again.")
+        
+        return render(request, 'admin_disease_detection.html', context)
+        
+    except Users_table.DoesNotExist:
+        messages.error(request, "User not found.")
+        return redirect('login')
+    except Exception as e:
+        print(f"Error in admin_disease_detection: {str(e)}")
+        messages.error(request, "An error occurred. Please try again.")
+        return redirect('adminpage')
 
 
 

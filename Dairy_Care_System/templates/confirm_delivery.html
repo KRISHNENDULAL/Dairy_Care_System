@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Delivery{% endblock %}
+
+{% block extra_head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .order-details {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-confirm {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #dc3545;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+                width: auto;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 15px;
+                font-size: 18px;
+            }
+        }
+
+        #success-message {
+            padding: 40px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div id="delivery-form" style="display: block;">
+            <h1>Confirm Delivery</h1>
+            
+            <div class="order-details">
+                <h3>Order #{{ order.id }}</h3>
+                <p><strong>Customer:</strong> {{ order.name }}</p>
+                <p><strong>Address:</strong> {{ order.delivery_address }}</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+            </div>
+
+            <div class="location-section" style="margin: 20px 0;">
+                <input type="text" id="location" placeholder="Enter delivery location" class="form-control">
+                <button onclick="getCurrentLocation()" class="btn btn-secondary" style="margin-top: 10px;">
+                    <i class="fas fa-map-marker-alt"></i> Get Current Location
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button onclick="confirmDelivery()" class="btn btn-confirm">
+                    <i class="fas fa-check"></i> Confirm Delivery
+                </button>
+                <button onclick="window.close()" class="btn btn-cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Message (Hidden by default) -->
+        <div id="success-message" style="display: none; text-align: center;">
+            <i class="fas fa-check-circle" style="font-size: 64px; color: #28a745; margin-bottom: 20px;"></i>
+            <h2 style="color: #28a745; margin-bottom: 20px;">Thank You for Shopping with Us!</h2>
+            <p style="font-size: 18px; margin-bottom: 30px;">Your order has been successfully delivered.</p>
+            <p style="font-size: 16px; color: #666;">Please continue shopping with us!</p>
+            <div style="margin-top: 30px;">
+                <a href="/customerpage" class="btn btn-primary" style="text-decoration: none;">
+                    <i class="fas fa-shopping-cart"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('location').value = `${position.coords.latitude}, ${position.coords.longitude}`;
+                    },
+                    function(error) {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function confirmDelivery() {
+            const location = document.getElementById('location').value;
+            const orderId = '{{ order.id }}';
+            
+            if (!location) {
+                alert('Please enter or fetch the delivery location');
+                return;
+            }
+
+            // Hide the delivery form immediately
+            document.getElementById('delivery-form').style.display = 'none';
+            // Show the success message
+            document.getElementById('success-message').style.display = 'block';
+            
+            // Send the update request in the background
+            fetch(`/confirm-delivery/${orderId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    location: location,
+                    status: 'Delivered'
+                })
+            })
+            .then(response => {
+                // Ignore any response/errors - we've already shown success
+                if (window.opener) {
+                    setTimeout(() => {
+                        window.opener.location.reload();
+                        window.close();
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                // Ignore any errors - we've already shown success
+                console.log('Background update error:', error);
+            });
+        }
+    </script>
+{% endblock %} 

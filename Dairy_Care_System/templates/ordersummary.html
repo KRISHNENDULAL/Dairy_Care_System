@@ -1,10 +1,9 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing Receipt</title>
+
+{% block title %}Billing Receipt{% endblock %}
+
+{% block extra_head %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -205,9 +204,10 @@
             }
         }
     </style>
-</head>
-<body>
-    <a href="{% url 'customerpage' %}" class="back-link">&larr; BACK</a>
+{% endblock %}
+
+{% block content %}
+    <a href="{% url 'orderhistory' %}" class="back-link">&larr; BACK</a>
     <button class="download-btn" onclick="window.print()">
         <i class="fas fa-print"></i> Print Receipt
     </button>
@@ -271,7 +271,9 @@
             ..... &copy;Dairy Care System .....
         </div>
     </div>
-    
+{% endblock %}
+
+{% block extra_scripts %}
     <script>
         async function downloadReceiptPDF() {
             // Create wrapper div with background
@@ -344,5 +346,4 @@
             });
         }
     </script>
-</body>
-</html>
+{% endblock %}

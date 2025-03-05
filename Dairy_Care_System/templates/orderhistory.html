@@ -189,116 +189,6 @@
             font-weight: bold;
             padding: 10px;
         }
-        
-        /* Track Order Modal Styles */
-        .track-order-modal {
-            width: 60%;
-            max-width: 400px;
-            padding: 30px;
-        }
-
-        .modal-header h3 {
-            color: #000000;
-            font-size: 24px;
-            margin: 0;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .tracking-container {
-            padding: 20px 0px;
-        }
-
-        .tracking-progress {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        .tracking-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        /* Progress Line */
-        .tracking-step::before {
-            content: '';
-            position: absolute;
-            left: 25px;
-            top: 40px;
-            width: 2px;
-            height: calc(100% + 30px);
-            background-color: #e2e8f0;
-            z-index: 1;
-            transition: background-color 0.5s ease;
-        }
-
-        .tracking-step:last-child::before {
-            display: none;
-        }
-
-        .step-icon {
-            width: 50px;
-            height: 50px;
-            background-color: #e2e8f0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #718096;
-            position: relative;
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-
-        .step-text {
-            flex: 1;
-        }
-
-        .step-text h4 {
-            margin: 0;
-            color: #2d3748;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .step-time {
-            color: #718096;
-            font-size: 14px;
-            margin: 5px 0 0;
-        }
-
-        /* Active Step Styles */
-        .tracking-step.active .step-icon {
-            background-color: #4299e1;
-            color: white;
-        }
-
-        .tracking-step.active::before {
-            background-color: #4299e1;
-        }
-
-        /* Completed Step Styles */
-        .tracking-step.completed .step-icon {
-            background-color: #48bb78;
-            color: white;
-        }
-
-        .tracking-step.completed::before {
-            background-color: #48bb78;
-        }
-
-        /* Animation for steps */
-        .tracking-step {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.5s ease forwards;
-        }
 
         @keyframes fadeInUp {
             to {
@@ -306,33 +196,6 @@
                 transform: translateY(0);
             }
         }
-
-        .tracking-step:nth-child(1) { animation-delay: 0.1s; }
-        .tracking-step:nth-child(2) { animation-delay: 0.2s; }
-        .tracking-step:nth-child(3) { animation-delay: 0.3s; }
-        .tracking-step:nth-child(4) { animation-delay: 0.4s; }
-
-        /* Update the tracking step styles */
-        .tracking-step.active .step-icon,
-        .tracking-step.completed .step-icon {
-            background-color: #48bb78;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .tracking-step.completed::before {
-            background-color: #48bb78;
-        }
-
-        .tracking-step.active::before {
-            background-color: #48bb78;
-        }
-
-        .tracking-step.active .step-text h4,
-        .tracking-step.completed .step-text h4 {
-            color: #48bb78;
-        }
-
     </style>
     <!-- Add Font Awesome and SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -385,7 +248,7 @@
             <!-- <span><strong>DeliveryAgent:</strong> {{ order.deliveryboy_id }}</span> -->
             <span><strong>Total:</strong> ₹ {{ order.total_price }}</span>
             <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a>
-            <a href="#" class="view-summary" onclick="openTrackOrderModal({{ order.id }})"><strong>Track Order</strong></a>
+            <a href="{% url 'orderfullsum' order.id %}" class="view-summary"><strong>Track Order</strong></a>
             {% if order.status == 'Pending' or order.status == 'Confirmed' or order.status == 'Shipped' %}
                 <button class="cancel-order-btn" data-order-id="{{ order.id }}">Cancel Order</button>
             {% elif order.status == 'Cancelled' %}

@@ -1,0 +1,305 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Disease Detection</title>
+    <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: url('{% static "images/employeepages.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            margin-left: 250px;
+        }
+
+        .content-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .welcome-text {
+            text-align: center;
+            font-size: 1.2em;
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            margin: 20px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .features-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .features-list li i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+
+        .coming-soon {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-radius: 8px;
+            color: #2980b9;
+            font-style: italic;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .upload-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .file-input-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-label {
+            display: block;
+            padding: 15px 20px;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .custom-file-label:hover {
+            background: #2980b9;
+        }
+
+        .submit-btn {
+            padding: 12px 25px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #219a52;
+        }
+
+        #image-preview-container {
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        #image-preview {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .image-display {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .image-display img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .upload-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Side Navigation (Always Visible) -->
+    <div id="mySidenav" class="sidenav"><br><br><br><br>
+        <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
+        <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
+        <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
+        <a href="{% url 'deliveryassigns' %}"><i class="fas fa-truck"></i>  Assign Deliveries</a><br>
+        <a href="{% url 'adminanimalslist' %}"><i class="fas fa-paw"></i>  Manage Animals</a><br>
+        <a href="{% url 'admin_disease_detection' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-heartbeat"></i> Disease Detection</a><br>
+        <a href="{% url 'adminproductstock' %}"><i class="fas fa-boxes"></i>  Manage Stock</a><br>
+        <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
+        <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+    </div>
+
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul>
+
+    <div class="content-container">
+        <h1><i class="fas fa-heartbeat"></i> Disease Detection System</h1>
+        
+        <div class="welcome-text">
+            Welcome to the Disease Detection System. Here you can monitor and detect potential health issues in your cattle using advanced analysis tools.
+        </div>
+
+        <div class="upload-section">
+            <h2><i class="fas fa-upload"></i> Upload Image for Analysis</h2>
+            
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                {% csrf_token %}
+                <div class="file-input-container">
+                    <input type="file" name="disease_image" id="disease_image" accept="image/*" required>
+                    <label for="disease_image" class="custom-file-label">
+                        <i class="fas fa-cloud-upload-alt"></i> Choose Image
+                    </label>
+                </div>
+                <div id="image-preview-container" style="display: none;">
+                    <img id="image-preview" src="" alt="Preview">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-search"></i> Analyze Image
+                </button>
+            </form>
+
+            {% if uploaded_image %}
+            <div class="result-section">
+                <h3>Uploaded Image</h3>
+                <div class="image-display">
+                    <img src="{{ uploaded_image.url }}" alt="Uploaded cow image">
+                </div>
+                <div class="upload-info">
+                    <p><strong>Uploaded at:</strong> {{ upload_time }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <ul class="features-list">
+            <li><i class="fas fa-camera"></i> Upload images for visual analysis</li>
+            <li><i class="fas fa-clipboard-list"></i> Input symptoms for diagnosis</li>
+            <li><i class="fas fa-history"></i> Track health history</li>
+            <li><i class="fas fa-bell"></i> Get early warning alerts</li>
+        </ul>
+
+        <div class="coming-soon">
+            <p><i class="fas fa-tools"></i> Advanced features coming soon!</p>
+        </div>
+    </div>
+
+    <!-- Add SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Your existing JavaScript for dropdown and logout
+        function toggleDropdown() {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.username')) {
+                var dropdown = document.getElementById("dropdown-content");
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                }
+            }
+        }
+
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+
+        document.getElementById('disease_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html> 

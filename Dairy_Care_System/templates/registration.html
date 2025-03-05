@@ -13,13 +13,41 @@
             background-size: cover;
             font-family: Arial, sans-serif;
         }
+
+        /* New styles for mobile optimization */
+        @media (max-width: 600px) {
+            .header {
+                display: flex; /* Use flexbox for navigation */
+                flex-direction: row; /* Align items horizontally */
+                justify-content: space-around; /* Space items evenly */
+                flex-wrap: wrap; /* Allow items to wrap if necessary */
+                padding: 10px 0; /* Add padding for better spacing */
+            }
+            .nav-item {
+                margin: 5px; /* Add spacing between nav items */
+                text-align: center; /* Center text for nav items */
+                flex: 1; /* Allow items to grow and fill space */
+                min-width: 80px; /* Set a minimum width to prevent overlap */
+            }
+            .nav-item a {
+                display: block; /* Make links block elements for better touch targets */
+                padding: 10px; /* Add padding for clickable area */
+            }
+        }
     </style>
 </head>
 <body>
-    
-    <a href="{% url 'home' %}">
-        <i class="fas fa-home home-icon"></i>
-    </a><br><br><br><br>
+    <div class="header">
+        <div class="nav-item">
+            <a href="{% url 'home' %}">
+                <i class="fas fa-home home-icon"></i>
+            </a>
+        </div>
+        <div class="nav-item">
+            <b><a href="{% url 'productexplore' %}"><i class="fas fa-tags"></i> Explore</a></b>
+        </div>
+        <!-- Add other nav items here -->
+    </div>
 
     <div class="container">
         <div class="login-box">

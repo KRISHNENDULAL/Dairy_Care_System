@@ -1,4 +1,9 @@
+{% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Update Animal Details{% endblock %}
+
+{% block extra_head %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -204,6 +209,9 @@
         } */
     </style>
 </head>
+{% endblock %}
+
+{% block content %}
 <body>
     <!-- <a href="{% url 'animaldetails' animal_id=animal.animal_id %}" class="back-link"><b>&larr; BACK</b></a><br> -->
 
@@ -333,3 +341,4 @@
 
 </body>
 </html>
+{% endblock %}

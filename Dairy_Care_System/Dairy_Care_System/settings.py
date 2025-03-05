@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import socket
 
 load_dotenv()
 
@@ -37,7 +38,16 @@ SECRET_KEY = 'django-insecure-$2zp)w#_b4(3!^bn)5r^c+yutwpawq044@4)8fou_l3^yqv-h3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+def get_local_ip_addresses():
+    hostname = socket.gethostname()
+    ip_addresses = socket.gethostbyname_ex(hostname)[2]
+    return ['localhost', '127.0.0.1'] + ip_addresses
+
+# Update ALLOWED_HOSTS to include both IPs
 ALLOWED_HOSTS = ['*']
+
+# Also update CSRF_TRUSTED_ORIGINS to include both IPs
+CSRF_TRUSTED_ORIGINS = ['http://*']
 
 
 # Application definition
@@ -211,7 +221,7 @@ LOGIN_URL = '/login/'  # Ensure this points to your custom login URL
 
 # After login, redirect to the user homepage or a relevant page
 LOGIN_REDIRECT_URL = '/customerpage/'  # Adjust this to where users should land after login
-LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
+LOGOUT_REDIRECT_URL = '/home/'  # Where users go after logout
 
 
 RAZORPAY_KEY_ID = 'rzp_test_K3m91dIeZXVDcE'

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let url = window.location.href;
+            let idPattern = /\/(\d+)\//;  // Detects numeric ID in the URL
+
+            if (idPattern.test(url)) {
+                let newUrl = url.replace(idPattern, "/YK/");  // Replace ID with "YK"
+                // Update the browser URL instantly without reload or redirect
+                window.history.replaceState(null, "", newUrl);
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html> 
