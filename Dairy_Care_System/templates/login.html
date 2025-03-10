@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <style>
         body {
             background: url('{% static "images/login.jpg" %}') no-repeat center center fixed;
@@ -14,32 +14,32 @@
             font-family: Arial, sans-serif;
         }
         
-        /* New styles for mobile optimization */
+        
         @media (max-width: 600px) {
             body {
-                font-size: 14px; /* Adjust font size for better readability */
+                font-size: 14px; 
             }
             .login-box {
-                width: 90%; /* Make the login box responsive */
-                margin: auto; /* Center the login box */
+                width: 90%; 
+                margin: auto; 
             }
             .header {
-                display: flex; /* Use flexbox for navigation */
-                flex-direction: row; /* Align items horizontally */
-                justify-content: center; /* Center items horizontally */
-                flex-wrap: wrap; /* Allow items to wrap if necessary */
-                padding: 10px 0; /* Add padding for better spacing */
+                display: flex; 
+                flex-direction: row; 
+                justify-content: center; 
+                flex-wrap: wrap; 
+                padding: 10px 0; 
             }
             .nav-item {
-                margin: 5px; /* Add spacing between nav items */
-                text-align: center; /* Center text for nav items */
+                margin: 5px; 
+                text-align: center; 
             }
             .nav-item a {
-                display: block; /* Make links block elements for better touch targets */
-                padding: 10px; /* Add padding for clickable area */
+                display: block; 
+                padding: 10px; 
             }
             .container {
-                padding: 10px; /* Add padding for mobile */
+                padding: 10px; 
             }
         }
     </style>
@@ -103,7 +103,6 @@
                 <div class="google-signin">
                     <img src='{% static "images/google.png" %}' alt="Google Logo">
                     <a href="{% url 'social:begin' 'google-oauth2' %}">  Sign in with Google</a>
-                    <!-- <span>sign in with Google</span> -->
                 </div>
             </form>
         </div>

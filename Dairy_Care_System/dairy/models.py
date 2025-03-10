@@ -244,10 +244,6 @@ class DiseaseImage(models.Model):
     
     def __str__(self):
         return f"Disease Image uploaded by {self.uploaded_by.username} at {self.upload_time}"
-
-    
-    def full_address(self):
-        return f"{self.street_address}, {self.town_city}, {self.district}, {self.postcode_zip}"
     
     
 

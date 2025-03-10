@@ -4,12 +4,56 @@
 <head>
     <title>{{ product.product_name }} - Product Details</title>
     <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
         /* General reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+            background: #ffffff;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .goog-te-banner-frame {
+            display: none;
+        }
+
+        .goog-te-combo {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #333;
+            background-color: #fff;
+            cursor: pointer;
+            outline: none;
+            min-width: 150px;
+        }
+
+        .goog-te-combo:hover {
+            border-color: #4a90e2;
+        }
+
+        .goog-te-combo:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
+        }
+
+        .translated-content {
+            transition: all 0.3s ease;
         }
 
         body {
@@ -81,6 +125,15 @@
             flex: 2;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
         .product-title {
@@ -88,7 +141,7 @@
             color: #000000;
             text-shadow: 2px 2px 4px rgba(95, 93, 123, 0.5);
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-right: 160px;
         }
 
         .product-price {
@@ -338,7 +391,14 @@
 
             <!-- Right section: Product details -->
             <div class="product-details">
-                <h1 class="product-title">{{ product.product_name }}</h1>
+                <div class="product-header">
+                    <h1 class="product-title">{{ product.product_name }}</h1>
+
+                    <div class="language-selector">
+                        <div id="google_translate_element"></div>
+                    </div>
+
+                </div>
 
                 <p class="product-price">₹ {{ product.product_price }}</p>
 
@@ -441,9 +501,8 @@
                     </div>
                 {% endif %}
             </div>
-
         </div>
-    </div>
+    </div><br>
 
     <!-- Font Awesome for icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
@@ -451,6 +510,124 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
+    <script>
+        // Initialize Google Translate
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,mr,gu,bn,ta,te,kn,ml,pa,ar,es,fr,de,it,ja,ko,ru,zh-CN', // Add more language codes as needed
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        // Handle translation events
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add class to translatable content
+            const translatableElements = [
+                '.product-title',
+                '.product-description',
+                '.product-status',
+                '.product-actions',
+                '.comment-card'
+            ];
+
+            translatableElements.forEach(selector => {
+                document.querySelectorAll(selector).forEach(element => {
+                    element.classList.add('translated-content');
+                });
+            });
+
+            // Track translation changes
+            let observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.classList.contains('translated-content')) {
+                        // Add any post-translation adjustments here if needed
+                        mutation.target.style.minHeight = 'auto';
+                    }
+                });
+            });
+
+            // Observe translatable content
+            document.querySelectorAll('.translated-content').forEach(element => {
+                observer.observe(element, {
+                    childList: true,
+                    characterData: true,
+                    subtree: true
+                });
+            });
+        });
+
+        // Handle translation completion
+        function handleTranslationComplete() {
+            console.log('Translation completed');
+            // Add any post-translation actions here
+        }
+
+        // Monitor for translation changes
+        let lastLanguage = '';
+        setInterval(function() {
+            const currentLanguage = document.querySelector('.goog-te-combo').value;
+            if (currentLanguage !== lastLanguage) {
+                lastLanguage = currentLanguage;
+                setTimeout(handleTranslationComplete, 1000);
+            }
+        }, 500);
+
+        // Add translation error handling
+        window.addEventListener('error', function(e) {
+            if (e.filename.indexOf('translate') !== -1) {
+                console.error('Translation error:', e);
+                // Handle translation errors gracefully
+            }
+        });
+
+        // Optimize translation performance
+        let translationTimeout;
+        function debounceTranslation(func, wait) {
+            clearTimeout(translationTimeout);
+            translationTimeout = setTimeout(func, wait);
+        }
+
+        // Add custom translation controls
+        function translatePage(language) {
+            const combo = document.querySelector('.goog-te-combo');
+            if (combo) {
+                combo.value = language;
+                combo.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // Add translation progress indicator
+        function showTranslationProgress() {
+            const progressDiv = document.createElement('div');
+            progressDiv.id = 'translationProgress';
+            progressDiv.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                background: #3498db;
+                color: white;
+                padding: 10px;
+                border-radius: 4px;
+                display: none;
+                z-index: 1000;
+            `;
+            progressDiv.textContent = 'Translating...';
+            document.body.appendChild(progressDiv);
+        }
+
+        // Show/hide translation progress
+        function toggleTranslationProgress(show) {
+            const progress = document.getElementById('translationProgress');
+            if (progress) {
+                progress.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        // Initialize translation progress indicator
+        document.addEventListener('DOMContentLoaded', showTranslationProgress);
+    </script>
 
     <!-- JavaScript to update hidden fields with entered quantity and selected unit -->
     <script>

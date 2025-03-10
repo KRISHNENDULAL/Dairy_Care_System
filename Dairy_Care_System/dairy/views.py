@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus, DiseaseImage
@@ -30,14 +30,18 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from django.http import HttpResponse
 from io import BytesIO
 from datetime import datetime
+from django.utils.decorators import method_decorator
 
 from django.utils.timezone import now
 from datetime import timedelta
 from .utils.image_search import ImageSearcher
 from .utils.delivery_assignment import DeliveryAssignment
 from django.db.models import Count, Q, Sum, F
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
 
 import io
+import os
 import razorpay
 import random
 import string
@@ -53,9 +57,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import cv2
 import io
 import socket
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-import os
+import joblib
 
 
 
@@ -2837,7 +2839,7 @@ def assign_delivery(request):
 
 
 
-@csrf_exempt
+@csrf_exempt  # Add this decorator
 def place_order(request):
     if request.method == "POST":
         try:
@@ -3124,40 +3126,43 @@ def diseasedetection(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        context = {
-            'username': user.username,  # Pass the username to the template
-        }
+        context = {'username': user.username}  # Pass the username to the template
 
         if request.method == 'POST' and request.FILES.get('disease_image'):
             try:
                 image_file = request.FILES['disease_image']
                 
-                # Save the uploaded image temporarily
-                fs = FileSystemStorage()
-                filename = fs.save(f'temp_disease_images/{image_file.name}', image_file)
-                image_path = fs.path(filename)
+                # Save image to the DiseaseImage model
+                disease_image = DiseaseImage.objects.create(
+                    image=image_file,
+                    uploaded_by=user,
+                    upload_time=timezone.now()
+                )
+                
+                # Get the saved image path
+                image_path = disease_image.image.path
                 
                 # Get disease prediction
                 prediction_result = predict_disease(image_path)
                 
                 if prediction_result:
+                    disease_image.diagnosis = prediction_result['disease']
+                    disease_image.save()
+                    
                     context.update({
-                        'uploaded_image': fs.url(filename),
-                        'upload_time': timezone.now(),
+                        'uploaded_image': disease_image.image.url,
+                        'upload_time': disease_image.upload_time,
                         'prediction': prediction_result['disease'],
                         'confidence': f"{prediction_result['confidence']:.2f}%",
                         'all_probabilities': prediction_result['all_probabilities']
                     })
-                    messages.success(request, "Image analyzed successfully!")
+                    # messages.success(request, "Image analyzed successfully!")
                 else:
                     messages.error(request, "Failed to analyze image. Please try again.")
                     context.update({
-                        'uploaded_image': fs.url(filename),
-                        'upload_time': timezone.now()
+                        'uploaded_image': disease_image.image.url,
+                        'upload_time': disease_image.upload_time
                     })
-                
-                # Clean up temporary file
-                fs.delete(filename)
                 
             except Exception as e:
                 print(f"Error in diseasedetection: {str(e)}")
@@ -3166,7 +3171,7 @@ def diseasedetection(request):
         
         return render(request, 'diseasedetection.html', context)
     else:
-        return redirect('login')  # Redirect to login if no user is logged in 
+        return redirect('login')  # Redirect to login if no user is logged in
 
 
 
@@ -3217,20 +3222,6 @@ def deliverynotifications(request):
 
 
 
-"""def login(request):
-    return render(request, 'login.html')
-
-def registration(request):
-    return render(request, 'registration.html')
-
-def addproducts(request): 
-    return render(request, 'addproducts.html') 
-
-def productslist(request):
-    return render(request, 'login.html')  """
-
-
-
 def get_delivery_status(request, order_id):
     try:
         order = Order_table.objects.get(id=order_id)
@@ -3266,6 +3257,8 @@ def get_delivery_status(request, order_id):
             'error': str(e)
         })
 
+
+
 def get_server_ip(request):
     """
     Returns the server's IP address for QR code generation
@@ -3285,6 +3278,70 @@ def get_server_ip(request):
             'success': False,
             'error': str(e)
         })
+
+
+
+def load_model():
+    model_path = os.path.join(settings.BASE_DIR, 'ml_models', 'milk_quality_model.pkl')
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found at {model_path}")
+    return joblib.load(model_path)
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@csrf_exempt  # Allow POST requests without CSRF for testing (replace with CSRF token handling in production)
+def milkqualityanalysis(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    user = Users_table.objects.get(user_id=user_id)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))  # Parse JSON request
+            ph_level = float(data.get('phLevel'))
+            fat_content = float(data.get('fatContent'))
+            density = float(data.get('density'))
+            temperature = float(data.get('temperature'))
+
+            model = load_model()
+            input_data = np.array([[ph_level, fat_content, density, temperature]])
+
+            scaler_path = os.path.join(os.path.dirname(__file__), 'ml_model', 'scaler.pkl')
+            if os.path.exists(scaler_path):
+                scaler = joblib.load(scaler_path)
+                input_data = scaler.transform(input_data)
+
+            prediction = model.predict(input_data)[0]
+            quality_mapping = {0: 'Poor', 1: 'Good', 2: 'Very Good'}
+            quality_result = quality_mapping.get(prediction, 'Unknown')
+
+            return JsonResponse({'quality': quality_result})
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return render(request, 'milkqualityanalysis.html', {'username': user.username})
+
+
+
+
+
+"""def login(request):
+    return render(request, 'login.html')
+
+def registration(request):
+    return render(request, 'registration.html')
+
+def addproducts(request): 
+    return render(request, 'addproducts.html') 
+
+def productslist(request):
+    return render(request, 'login.html')  """
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_disease_detection(request):

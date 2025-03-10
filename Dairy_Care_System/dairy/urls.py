@@ -65,6 +65,7 @@ urlpatterns = [
     path('stocknotification', views.stocknotification, name='stocknotification'),
     path('farmerproductstock',views.farmerproductstock,name='farmerproductstock'),
     path('salegraph',views.salegraph,name='salegraph'),
+    path('milkqualityanalysis' ,views.milkqualityanalysis,name='milkqualityanalysis'),
 
     path('addanimal', views.addanimal, name='addanimal'),
     path('animalslist',views.animalslist,name='animalslist'),

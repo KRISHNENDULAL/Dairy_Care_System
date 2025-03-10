@@ -33,8 +33,10 @@
         <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>Pre-Order Details</a><br>
         <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>Milk Details</a><br> -->
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>Stock Details</a><br>
+        <a href="{% url 'milkqualityanalysis' %}"><i class="fas fa-microscope"></i> Quality Analysis</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i>Notifications</a><br>
         <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>Feedback Review</a><br>
+        <a href="{% url 'salegraph' %}"><i class="fas fa-chart-bar"></i> Sale</a><br>
         <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
@@ -54,10 +56,9 @@
         </div>
     </ul>
 
-    <br><br>
+    <br><br><br>
+    <h1><i class="fas fa-heartbeat"></i> Disease Detection System</h1>
     <div class="content-container">
-        <h1><i class="fas fa-heartbeat"></i> Disease Detection System</h1>
-        
         <div class="welcome-text">
             Welcome to the Disease Detection System. Here you can monitor and detect potential health issues in your cattle using advanced analysis tools.
         </div>
@@ -89,9 +90,9 @@
             {% if uploaded_image %}
             <div class="result-section">
                 <h3>Analysis Results</h3>
-                <!-- <div class="image-display">
+                <div class="image-display">
                     <img src="{{ uploaded_image }}" alt="Analyzed image">
-                </div> -->
+                </div>
                 
                 {% if prediction %}
                 <div class="prediction-results">
@@ -112,7 +113,7 @@
                 
                 <!-- Disease information section -->
                 <div class="disease-info">
-                    <!-- <h4><i class="fas fa-info-circle"></i> Disease Information</h4> -->
+                    <h4><i class="fas fa-info-circle"></i> Disease Information</h4>
                     <div class="info-content">
                         {% if prediction == 'Foot and Mouth Disease' %}
                             <p>Foot-and-mouth disease (FMD) is a highly contagious viral disease affecting cattle.</p>
