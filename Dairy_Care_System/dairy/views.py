@@ -31,6 +31,9 @@ from django.http import HttpResponse
 from io import BytesIO
 from datetime import datetime
 from django.utils.decorators import method_decorator
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 from django.utils.timezone import now
 from datetime import timedelta
@@ -2410,25 +2413,29 @@ def checkoutbilling(request):
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
 
 def checkoutorder(request):
-    user = Users_table.objects.get(user_id=request.session['user_id'])
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    user = get_object_or_404(Users_table, user_id=user_id)
     user_cart = Cart.objects.filter(user=user)
     total_price = sum([item.get_total_price() for item in user_cart])
     billing_details = request.session.get('billing_details')
 
+    if not billing_details:
+        return redirect('checkoutbilling')
+
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
 
-        # Create order based on payment method
         if payment_method == "online":
-            # Process Razorpay payment
             payment_id = request.POST.get('payment_id')
             try:
-                # Verify the payment
                 razorpay_client.payment.fetch(payment_id)
-            except razorpay.errors.RazorpayError:  # Catch all Razorpay errors
-                return JsonResponse({"error": "Payment verification failed"})
+            except razorpay.errors.RazorpayError:
+                messages.error(request, "Payment verification failed. Please try again.")
+                return redirect('checkoutorder')
 
-            # If payment is successful, create the order
             order = Order_table.objects.create(
                 user=user,
                 name=billing_details['name'],
@@ -2440,7 +2447,7 @@ def checkoutorder(request):
                 payment_method="online",
                 total_price=total_price
             )
-        else:  # For Cash on Delivery
+        else:  
             order = Order_table.objects.create(
                 user=user,
                 name=billing_details['name'],
@@ -2466,18 +2473,17 @@ def checkoutorder(request):
             if cart_item.product.product_quantity < 2:
                 Notifications_table.objects.create(
                     message=f"Alert: Stock for '{cart_item.product.product_name}' is critically low (below 2 units). Immediate restocking is required.",
-                    product=cart_item.product,  # Link to the product
-                    farmer=user  # Link to the user who added the product
+                    product=cart_item.product,
+                    farmer=user
                 )
 
         # Auto-assign delivery agent
         DeliveryAssignment.auto_assign_delivery_agent(order)
 
-        user_cart.delete()
+        # Send Order Summary Email
+        send_order_email(order, request)
 
-        # Redirect for Razorpay
-        if payment_method == "online":
-            return redirect('ordersummary', order_id=order.id)
+        user_cart.delete()
 
         return redirect('ordersummary', order_id=order.id)
 
@@ -2487,6 +2493,144 @@ def checkoutorder(request):
         'billing_details': billing_details,
         'RAZORPAY_KEY_ID': settings.RAZORPAY_KEY_ID
     })
+
+
+
+def send_order_email(order, request):
+    order_items = OrderItem_table.objects.filter(order=order)
+    
+    # Create HTML email content that matches the receipt format
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .receipt-container {{ 
+                max-width: 600px; 
+                margin: 20px auto; 
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }}
+            .receipt-title {{ 
+                color: blue; 
+                text-align: center;
+                font-size: 24px;
+                font-family: 'Courier New', monospace;
+            }}
+            .order-confirmation {{
+                text-align: center;
+                font-style: italic;
+                margin-bottom: 20px;
+            }}
+            .divider {{
+                border-top: 1px solid #ddd;
+                margin: 15px 0;
+            }}
+            .item-row {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 10px 0;
+                padding: 5px;
+            }}
+            .item-details {{
+                margin: 5px 0;
+            }}
+            .total-price {{
+                color: #d63031;
+                font-weight: bold;
+                font-size: 18px;
+                margin-top: 15px;
+            }}
+            .footer {{
+                text-align: center;
+                color: green;
+                margin-top: 20px;
+                font-style: italic;
+            }}
+            .copyright {{
+                text-align: center;
+                color: #666;
+                font-size: 14px;
+                margin-top: 10px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="receipt-container">
+            <h1 class="receipt-title">Receipt</h1>
+            <div class="order-confirmation">Order Confirmation</div>
+            <div class="divider"></div>
+            
+            <p><strong>Invoice Number:</strong> {order.id}</p>
+            <p><strong>Name:</strong> {order.name}</p>
+            <p><strong>Contact:</strong> {order.phone}</p>
+            <p><strong>Email:</strong> {order.email}</p>
+            <p><strong>Delivery Address:</strong> {order.delivery_address}</p>
+            <p><strong>Pincode:</strong> {order.pincode}</p>
+            <p><strong>Payment Method:</strong> {order.payment_method}</p>
+            <p><strong>Order Date:</strong> {order.order_date.strftime('%B %d, %Y, %I:%M %p')}</p>
+            
+            <div class="divider"></div>
+            <h3>Items Ordered:</h3>
+            
+            <div style="margin: 15px 0;">
+                {''.join(f"""
+                <div class="item-row">
+                    <div>
+                        <img src="{request.build_absolute_uri(item.product.product_image.url)}" 
+                             alt="{item.product.product_name}" 
+                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                        <span style="margin-left: 10px;">{item.product.product_name}</span>
+                    </div>
+                    <div>{item.quantity}</div>
+                    <div>₹ {item.price}</div>
+                </div>
+                """ for item in order_items)}
+            </div>
+            
+            <div class="divider"></div>
+            <p class="total-price">Total Price: ₹ {order.total_price}</p>
+            
+            <div class="footer">Thank you for your order!</div>
+            <div class="copyright">.... © Dairy Care System ....</div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Convert HTML to plain text for non-HTML email clients
+    plain_message = f"""
+    Receipt - Order Confirmation
+    
+    Invoice Number: {order.id}
+    Name: {order.name}
+    Contact: {order.phone}
+    Email: {order.email}
+    Delivery Address: {order.delivery_address}
+    Pincode: {order.pincode}
+    Payment Method: {order.payment_method}
+    Order Date: {order.order_date.strftime('%B %d, %Y, %I:%M %p')}
+    
+    Items Ordered:
+    {''.join(f"- {item.product.product_name} x {item.quantity}: ₹{item.price}\\n" for item in order_items)}
+    
+    Total Price: ₹{order.total_price}
+    
+    Thank you for your order!
+    .... © Dairy Care System ....
+    """
+    
+    send_mail(
+        subject=f"🎉 Your Order has been confirmed : Invoice Number - {order.id}",
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[order.email],
+        html_message=html_message,
+        fail_silently=False
+    )
 
 
 
@@ -3126,8 +3270,14 @@ def diseasedetection(request):
     user_id = request.session.get('user_id')  # Retrieve user_id from the session
     if user_id:
         user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        context = {'username': user.username}  # Pass the username to the template
-
+        # Get disease detection history for the current user
+        disease_history = DiseaseImage.objects.filter(uploaded_by=user).order_by('-upload_time')
+        
+        context = {
+            'username': user.username,
+            'disease_history': disease_history
+        }
+        
         if request.method == 'POST' and request.FILES.get('disease_image'):
             try:
                 image_file = request.FILES['disease_image']

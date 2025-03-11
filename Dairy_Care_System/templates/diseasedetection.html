@@ -64,7 +64,7 @@
         </div>
 
         <div class="upload-section">
-            <h2><i class="fas fa-upload"></i> Upload Image for Analysis</h2>
+            <h2><i class="fas fa-upload"></i> Upload Image for Analysis</h2><br>
             
             <form method="post" enctype="multipart/form-data" class="upload-form">
                 {% csrf_token %}
@@ -80,7 +80,7 @@
                 <button type="submit" class="submit-btn">
                     <i class="fas fa-search"></i> Analyze Image
                 </button>
-            </form>
+            </form><br>
 
             <!-- Add this after the upload form -->
             <div class="model-status" style="display: none;">
@@ -184,6 +184,73 @@
             <p><i class="fas fa-tools"></i> Advanced features coming soon!</p>
         </div>
     </div>
+    </div>
+    </div><br><br>
+
+    <div class="history-container">
+        <h2><i class="fas fa-history"></i> Analysis History</h2>
+        {% if disease_history %}
+            <div class="table-responsive">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Image</th>
+                            <th>Diagnosis</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in disease_history %}
+                            <tr>
+                                <td>{{ record.upload_time|date:"d M Y, h:i A" }}</td>
+                                <td>
+                                    <img src="{{ record.image.url }}" alt="Disease Image" class="history-thumbnail">
+                                </td>
+                                <td>
+                                    {% if record.diagnosis %}
+                                        <span class="diagnosis-badge">{{ record.diagnosis }}</span>
+                                    {% else %}
+                                        <span class="no-diagnosis">No diagnosis available</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="view-details-btn" onclick="viewDetails('{{ record.image.url }}', '{{ record.diagnosis }}', '{{ record.upload_time|date:"d M Y, h:i A" }}')">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-history">
+                <i class="fas fa-info-circle"></i>
+                <p>No disease detection history available yet.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Modal for viewing details -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <center>
+                <u><h3 style="font-size: 1.9em; font-family: 'Copperplate', 'Papyrus', fantasy;">Disease Detection Details</h3></u>
+            </center>
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modalImage" src="" alt="Disease Image">
+                </div>
+                <div class="modal-info">
+                    <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                    <p><strong>Diagnosis:</strong> <span id="modalDiagnosis"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -259,6 +326,29 @@
                     console.error('Error verifying model:', error);
                 });
         });
+
+        // Get the modal
+        var modal = document.getElementById("detailsModal");
+        var span = document.getElementsByClassName("close-modal")[0];
+
+        function viewDetails(imageUrl, diagnosis, dateTime) {
+            document.getElementById("modalImage").src = imageUrl;
+            document.getElementById("modalDiagnosis").textContent = diagnosis || "No diagnosis available";
+            document.getElementById("modalDateTime").textContent = dateTime;
+            modal.style.display = "block";
+        }
+
+        // Close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Click outside modal to close
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 
 </body>

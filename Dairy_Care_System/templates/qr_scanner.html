@@ -1,13 +1,13 @@
-{% extends 'base.html' %}
 {% load static %}
-
-{% block title %}Order QR Code{% endblock %}
-
-{% block extra_head %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
     <style>
         body {
             margin: 0;
@@ -210,9 +210,8 @@
             100% { transform: translateY(0); }
         }
     </style>
-{% endblock %}
-
-{% block content %}
+</head>
+<body><br><br>
     <!-- <a href="{% url 'deliveryboyassigns' %}" class="back-button">
         <i class="fas fa-arrow-left"></i> Back
     </a> -->
@@ -225,89 +224,88 @@
             <div id="reader"></div>
         </div>
     </div>
-{% endblock %}
 
-{% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    const orderId = window.location.search.split('?')[1]; // Gets the order ID directly
-    
-    function onScanSuccess(decodedText, decodedResult) {
-        console.log("Decoded text:", decodedText); // For debugging
-        console.log("Order ID:", orderId); // For debugging
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const orderId = window.location.search.split('?')[1]; // Gets the order ID directly
         
-        // Verify if the QR code matches the order
-        const urlPattern = `confirm-delivery/${orderId}`;
-        if (decodedText.includes(urlPattern)) {
-            // Show confirmation popup first
-            Swal.fire({
-                title: 'Confirm Delivery',
-                text: 'Are you sure you want to mark this order as delivered?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#2563eb',
-                cancelButtonColor: '#dc2626',
-                confirmButtonText: 'Yes, confirm delivery',
-                cancelButtonText: 'No, cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Make API call to confirm delivery
-                    const csrfToken = '{{ csrf_token }}';
-                    
-                    fetch(`/confirm-delivery/${orderId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        }
-                    })
-                    .then(response => response.text())
-                    .then(data => {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Delivery confirmed successfully!',
-                            icon: 'success'
-                        }).then(() => {
-                            // Redirect back to delivery assignments page
-                            window.location.href = "{% url 'deliveryboyassigns' %}";
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log("Decoded text:", decodedText); // For debugging
+            console.log("Order ID:", orderId); // For debugging
+            
+            // Verify if the QR code matches the order
+            const urlPattern = `confirm-delivery/${orderId}`;
+            if (decodedText.includes(urlPattern)) {
+                // Show confirmation popup first
+                Swal.fire({
+                    title: 'Confirm Delivery',
+                    text: 'Are you sure you want to mark this order as delivered?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#dc2626',
+                    confirmButtonText: 'Yes, confirm delivery',
+                    cancelButtonText: 'No, cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Make API call to confirm delivery
+                        const csrfToken = '{{ csrf_token }}';
+                        
+                        fetch(`/confirm-delivery/${orderId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            }
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Delivery confirmed successfully!',
+                                icon: 'success'
+                            }).then(() => {
+                                // Redirect back to delivery assignments page
+                                window.location.href = "{% url 'deliveryboyassigns' %}";
+                            });
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Failed to confirm delivery',
+                                icon: 'error'
+                            });
                         });
-                    })
-                    .catch(error => {
+                    } else {
+                        // If user cancels, show cancelled message
                         Swal.fire({
-                            title: 'Error!',
-                            text: 'Failed to confirm delivery',
-                            icon: 'error'
+                            title: 'Cancelled',
+                            text: 'Delivery confirmation was cancelled',
+                            icon: 'info',
+                            timer: 2000,
+                            showConfirmButton: false
                         });
-                    });
-                } else {
-                    // If user cancels, show cancelled message
-                    Swal.fire({
-                        title: 'Cancelled',
-                        text: 'Delivery confirmation was cancelled',
-                        icon: 'info',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Invalid QR Code',
-                text: 'This QR code does not match the order',
-                icon: 'error'
-            });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Invalid QR Code',
+                    text: 'This QR code does not match the order',
+                    icon: 'error'
+                });
+            }
         }
-    }
 
-    function onScanFailure(error) {
-        // console.warn(`Code scan error = ${error}`);
-    }
+        function onScanFailure(error) {
+            // console.warn(`Code scan error = ${error}`);
+        }
 
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        /* verbose= */ false
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-</script>
-{% endblock %} 
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            /* verbose= */ false
+        );
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    </script>
+</body>
+</html> 

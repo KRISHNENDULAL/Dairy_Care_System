@@ -397,29 +397,23 @@
             background-color: #1976D2;
         }
 
-        .status-btn {
-            margin: 5px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .status-btn:not([disabled]):hover {
-            background-color: #4a90e2;
-            color: white;
-        }
-
-        .status-btn.selected {
-            background-color: #2ecc71;
-            color: white;
-        }
-
-        .status-btn[disabled] {
+        /* Add these styles to your existing style section */
+        .status-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            background-color: #cccccc;
+            background-color: #cccccc !important;
+            color: #666666 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .status-btn:disabled:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .status-btn:disabled i {
+            opacity: 0.5;
         }
     </style>
     <!-- Add SweetAlert2 CSS -->
@@ -507,7 +501,7 @@
                             </td>
                             <td>
                                 <button class="update-status-btn" 
-                                        onclick="updateOrderStatus('{{ order.id }}', '{{ order.status }}')"
+                                        onclick="openStatusModal('{{ order.id }}')"
                                         {% if order.status == 'Cancelled' or order.status == 'Delivered' %} disabled style="opacity: 0.5; cursor: not-allowed; background-color: #cccccc;" {% endif %}>
                                     <i class="fas fa-edit"></i>
                                     {% if order.status == 'Cancelled' %} Order Cancelled
@@ -642,7 +636,23 @@
         // Function to open modal
         function openStatusModal(orderId) {
             currentOrderId = orderId;
+            
+            // Get the current status from the table row
+            const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+            const statusBadge = row.querySelector('.status-badge');
+            const currentStatus = statusBadge.textContent.trim();
+            
+            // Show the modal
             document.getElementById('statusModal').style.display = 'block';
+            
+            // Reset previously selected status
+            selectedStatus = null;
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Update status buttons based on current status
+            updateStatusButtons(currentStatus);
         }
 
         // Function to close modal
@@ -663,8 +673,10 @@
             }
         }
 
-        function submitStatusUpdate(orderId, status, location) {
-            if (!status) {
+        function submitStatusUpdate() {
+            const locationInput = document.getElementById('location').value;
+            
+            if (!selectedStatus) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Status Required',
@@ -673,7 +685,7 @@
                 return;
             }
             
-            if (!location) {
+            if (!locationInput) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Location Required',
@@ -682,19 +694,25 @@
                 return;
             }
 
-            updateStatus(orderId, status, location);
+            updateStatus(selectedStatus, locationInput);
         }
 
-        function selectStatus(button) {
-            if (button.disabled) return;
-            
-            // Remove selected class from all buttons
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked button
-            button.classList.add('selected');
+        // Modify the selectStatus function to handle button selection properly
+        function selectStatus(status) {
+            const button = event.target.closest('.status-btn');
+            if (!button.disabled) {
+                selectedStatus = status;
+                document.querySelectorAll('.status-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                button.classList.add('selected');
+
+                // If Delivered status is selected, redirect to QR scanner page
+                if (status === 'Delivered') {
+                    window.location.href = "{% url 'scan_qr' %}" + "?" + currentOrderId;
+                    return;
+                }
+            }
         }
 
         function getCurrentLocation() {
@@ -729,8 +747,8 @@
             }
         }
 
-        function updateStatus(orderId, status, location) {
-            if (!orderId) return;
+        function updateStatus(status, location) {
+            if (!currentOrderId) return;
 
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -741,7 +759,7 @@
                     'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({
-                    order_id: orderId,
+                    order_id: currentOrderId,
                     status: status,
                     location: location
                 })
@@ -750,7 +768,7 @@
             .then(data => {
                 if (data.success) {
                     // Update the status badge in the table
-                    const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                    const row = document.querySelector(`tr[data-order-id="${currentOrderId}"]`);
                     const statusCell = row.querySelector('.status-badge');
                     
                     statusCell.className = `status-badge status-${status.toLowerCase()}`;
@@ -870,81 +888,57 @@
             console.warn(`QR scan error: ${error}`);
         }
 
-        function updateOrderStatus(orderId, currentStatus) {
-            // Define the status progression
-            const statusOrder = [
-                { value: 'Pending', label: 'Pending' },
-                { value: 'Confirmed', label: 'Confirmed' },
-                { value: 'Shipped', label: 'Shipped' },
-                { value: 'Out', label: 'Out for Delivery' },
-                { value: 'Delivered', label: 'Delivered' }
-            ];
+        // Add this function to handle progressive status disabling
+        function updateStatusButtons(currentStatus) {
+            // Normalize the current status
+            if (currentStatus.includes('Out for Delivery')) {
+                currentStatus = 'Out';
+            }
             
-            // Get the current status index
-            const currentStatusIndex = statusOrder.findIndex(s => s.value === currentStatus);
+            const statusOrder = {
+                'Confirmed': 1,
+                'Shipped': 2,
+                'Out': 3,
+                'Delivered': 4
+            };
+
+            const currentIndex = statusOrder[currentStatus] || 0;
+            const statusButtons = document.querySelectorAll('.status-btn');
             
-            // Show status selection modal with all statuses
-            Swal.fire({
-                title: 'Update Delivery Status',
-                html: `
-                    <div class="status-buttons">
-                        ${statusOrder.map((status, index) => `
-                            <button type="button" 
-                                class="status-btn ${index === currentStatusIndex ? 'selected' : ''}" 
-                                data-value="${status.value}"
-                                onclick="selectStatus(this)"
-                                ${index <= currentStatusIndex || index > currentStatusIndex + 1 ? 'disabled' : ''}
-                                style="${index <= currentStatusIndex || index > currentStatusIndex + 1 ? 'opacity: 0.5; cursor: not-allowed; background-color: #cccccc;' : ''}">
-                                ${getStatusIcon(status.label)} ${status.label}
-                            </button>
-                        `).join('')}
-                    </div>
-                    <div class="location-input">
-                        <input type="text" id="delivery-location" class="swal2-input" placeholder="Enter delivery location">
-                        <button type="button" class="location-btn" onclick="getCurrentLocation()">
-                            <i class="fas fa-map-marker-alt"></i> Get Current Location
-                        </button>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Update',
-                showLoaderOnConfirm: true,
-                preConfirm: () => {
-                    const selectedBtn = document.querySelector('.status-btn:not([disabled]).selected');
-                    const locationInput = document.getElementById('delivery-location');
+            statusButtons.forEach(button => {
+                const buttonText = button.textContent.trim();
+                let buttonStatus;
+                
+                // Extract the status from button text
+                if (buttonText.includes('Confirmed')) buttonStatus = 'Confirmed';
+                else if (buttonText.includes('Shipped')) buttonStatus = 'Shipped';
+                else if (buttonText.includes('Out')) buttonStatus = 'Out';
+                else if (buttonText.includes('Delivered')) buttonStatus = 'Delivered';
 
-                    if (!selectedBtn) {
-                        Swal.showValidationMessage('Please select a valid status');
-                        return false;
-                    }
-
-                    if (!locationInput.value.trim()) {
-                        Swal.showValidationMessage('Please enter a location');
-                        return false;
-                    }
-
-                    return {
-                        status: selectedBtn.getAttribute('data-value'),
-                        location: locationInput.value.trim()
-                    };
-                }
-            }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    submitStatusUpdate(orderId, result.value.status, result.value.location);
+                // Enable/disable based on current status
+                if (statusOrder[buttonStatus] <= currentIndex) {
+                    // Disable button and apply disabled styles
+                    button.disabled = true;
+                    button.style.opacity = '0.5';
+                    button.style.cursor = 'not-allowed';
+                    button.style.backgroundColor = '#cccccc';
+                    button.style.color = '#666666';
+                    button.classList.remove('selected');
+                } else {
+                    // Enable button and restore original styles
+                    button.disabled = false;
+                    button.style.removeProperty('opacity');
+                    button.style.removeProperty('cursor');
+                    button.style.removeProperty('background-color');
+                    button.style.removeProperty('color');
+                    
+                    // Restore original button colors
+                    if (buttonStatus === 'Confirmed') button.className = 'status-btn confirmed';
+                    else if (buttonStatus === 'Shipped') button.className = 'status-btn shipped';
+                    else if (buttonStatus === 'Out') button.className = 'status-btn out';
+                    else if (buttonStatus === 'Delivered') button.className = 'status-btn delivered';
                 }
             });
-        }
-
-        // Helper function to get status icon
-        function getStatusIcon(status) {
-            const icons = {
-                'Pending': '<i class="fas fa-clock"></i>',
-                'Confirmed': '<i class="fas fa-check"></i>',
-                'Shipped': '<i class="fas fa-box"></i>',
-                'Out for Delivery': '<i class="fas fa-truck"></i>',
-                'Delivered': '<i class="fas fa-home"></i>'
-            };
-            return icons[status] || '<i class="fas fa-circle"></i>';
         }
     </script>
 
