@@ -11,7 +11,64 @@
         background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
         background-size: cover;
         margin: 0;
-        margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
+        margin-left: 250px; /* Keep this for sidebar space */
+        padding-top: 0; /* Remove any top padding */
+    }
+
+    /* Remove any unwanted top margins/padding from header elements */
+    .brand-name {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    ul {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    /* Remove the <br> tags after sidenav */
+    #mySidenav {
+        padding-top: 60px; /* Adjust this value as needed */
+    }
+
+    /* Adjust the main content container */
+    .content-container {
+        margin-top: 20px; /* Reduce this value */
+    }
+
+    h1 {
+        margin-top: 20px; /* Reduce this value */
+    }
+
+    .disease-info {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .info-section {
+        margin-bottom: 20px;
+    }
+
+    .section-heading {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        border-bottom: 2px solid;
+        padding-bottom: 5px;
+    }
+
+    .section-content {
+        line-height: 1.6;
+        color: #333;
+        text-align: justify;
+    }
+
+    .description-text {
+        line-height: 1.6;
+        color: #333;
+        text-align: justify;
+        margin-bottom: 20px;
     }
     </style>
     <!-- Add SweetAlert2 CSS -->
@@ -77,7 +134,7 @@
                 <div id="image-preview-container" style="display: none;">
                     <img id="image-preview" src="" alt="Preview">
                 </div>
-                <button type="submit" class="submit-btn">
+                <button type="submit" class="submit-btn" id="analyze_result">
                     <i class="fas fa-search"></i> Analyze Image
                 </button>
             </form><br>
@@ -114,63 +171,68 @@
                 <!-- Disease information section -->
                 <div class="disease-info">
                     <h4><i class="fas fa-info-circle"></i> Disease Information</h4>
-                    <div class="info-content">
-                        {% if prediction == 'Foot and Mouth Disease' %}
-                            <p>Foot-and-mouth disease (FMD) is a highly contagious viral disease affecting cattle.</p>
-                            <h5>Common Symptoms:</h5>
-                            <ul>
-                                <li>Fever and blisters in the mouth and on feet</li>
-                                <li>Reduced appetite and milk production</li>
-                                <li>Lameness and difficulty walking</li>
-                                <li>Excessive salivation</li>
-                            </ul>
-                            <h5>Recommended Actions:</h5>
-                            <ul>
-                                <li>Isolate affected animals immediately</li>
-                                <li>Contact veterinarian for treatment</li>
-                                <li>Implement strict biosecurity measures</li>
-                            </ul>
-                        {% elif prediction == 'Mastitis' %}
-                            <p>Mastitis is an inflammation of the udder tissue, usually caused by bacterial infection.</p>
-                            <h5>Common Symptoms:</h5>
-                            <ul>
-                                <li>Swollen, hard, or warm udder</li>
-                                <li>Changes in milk appearance (clumpy, watery, or bloody)</li>
-                                <li>Reduced milk production</li>
-                                <li>Visible discomfort during milking</li>
-                            </ul>
-                            <h5>Recommended Actions:</h5>
-                            <ul>
-                                <li>Begin appropriate antibiotic treatment</li>
-                                <li>Frequent milking of affected quarters</li>
-                                <li>Apply warm compresses to reduce swelling</li>
-                            </ul>
-                        {% elif prediction == 'Pneumonia' %}
-                            <p>Bovine respiratory disease (Pneumonia) affects the lungs and respiratory tract.</p>
-                            <h5>Common Symptoms:</h5>
-                            <ul>
-                                <li>Difficulty breathing and coughing</li>
-                                <li>Nasal discharge</li>
-                                <li>Fever and reduced appetite</li>
-                                <li>Depression and lethargy</li>
-                            </ul>
-                            <h5>Recommended Actions:</h5>
-                            <ul>
-                                <li>Administer prescribed antibiotics</li>
-                                <li>Provide clean, well-ventilated environment</li>
-                                <li>Monitor temperature regularly</li>
-                            </ul>
-                        {% endif %}
-                    </div>
+                    {% if analysis %}
+                        <div class="info-section">
+                            <h5>Description:</h5>
+                            <div class="description-text">
+                                {{ analysis.description }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h5 class="section-heading" style="color: #d9534f;">
+                                <i class="fas fa-notes-medical"></i> Symptoms:
+                            </h5>
+                            <div class="section-content">
+                                {{ analysis.symptoms|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h5 class="section-heading" style="color: #5cb85c;">
+                                <i class="fas fa-pills"></i> Treatment & Cure:
+                            </h5>
+                            <div class="section-content">
+                                {{ analysis.treatment|join:", " }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h5 class="section-heading" style="color: #0275d8;">
+                                <i class="fas fa-shield-alt"></i> Prevention:
+                            </h5>
+                            <div class="section-content">
+                                {{ analysis.prevention|join:", " }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p>Detailed analysis not available for this disease.</p>
+                        </div>
+                    {% endif %}
                 </div>
-            </div>
-            {% else %}
-            <div class="alert alert-warning">
-                <p>Could not detect any disease in the image. Please try with a different image.</p>
-            </div>
-            {% endif %}
-        </div>
-        {% endif %}
+
+             
+
+
+                   {% if analysis.treatment %}
+                    <div class="analysis-section">
+                        <h5><i class=""></i>    </h5>
+                        <ul>
+                            {% for step in '' %}
+                            <li>{{ step }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    
+                    {% endif %}
+                
+                {% endif %}
+            
+           
+   
         
 
         <!-- <ul class="features-list">
@@ -181,7 +243,7 @@
         </ul> -->
 
         <div class="coming-soon">
-            <p><i class="fas fa-tools"></i> Advanced features coming soon!</p>
+            <p><i class="fas fa-tools"></i> 🐄 Because Every Life Matters — Let US Protect Your Cattle! - Powered by Advanced DCS AI !</p>
         </div>
     </div>
     </div>

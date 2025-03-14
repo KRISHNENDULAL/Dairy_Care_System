@@ -56,6 +56,7 @@ class Products_table(models.Model):
     status = models.BooleanField(default=True)         # 1 if available, else 0
     added_at = models.DateTimeField(auto_now_add=True) # Timestamp for when the product is added
     updated_at = models.DateTimeField(auto_now=True)   # Timestamp for when the product is last updated
+    view_count = models.IntegerField(default=0)  # Add this line
 
     def __str__(self):
         return self.product_name
@@ -241,9 +242,34 @@ class DiseaseImage(models.Model):
     uploaded_by = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     upload_time = models.DateTimeField(auto_now_add=True)
     diagnosis = models.TextField(null=True, blank=True)
+    animal = models.ForeignKey(Animals_table, on_delete=models.CASCADE, null=True, blank=True)
+    confidence = models.FloatField(null=True, blank=True)
+    details = models.TextField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-upload_time']
     
     def __str__(self):
-        return f"Disease Image uploaded by {self.uploaded_by.username} at {self.upload_time}"
+        return f"Disease Detection - {self.diagnosis} ({self.upload_time})"
+    
+
+
+class DiseaseAnalysisHistory(models.Model):
+    user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    disease_name = models.CharField(max_length=200)
+    description = models.TextField()
+    symptoms = models.TextField()
+    treatment = models.TextField()
+    prevention = models.TextField()
+    analyzed_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='disease_analysis/', null=True, blank=True)
+    confidence_score = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-analyzed_at']
+
+    def __str__(self):
+        return f"{self.disease_name} - {self.analyzed_at}"
     
     
 

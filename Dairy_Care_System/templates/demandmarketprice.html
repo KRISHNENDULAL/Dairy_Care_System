@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Demand Prediction & Market Price Analysis</title>
+    <link rel="stylesheet" href="{% static 'css/farmownerpage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headsidenav.css' %}">
+    <style>
+        body {
+            background: url('{% static "images/farmownerpage.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            margin-left: 250px; /* Adjusting body margin to make space for the fixed sidebar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 { margin-bottom: 20px; }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover { background-color: #218838; }
+
+        .output { margin-top: 20px; font-size: 18px; font-weight: bold; }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        .output {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .output p {
+            margin: 10px 0;
+        }
+
+    </style>
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Add Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+    <!-- Side Navigation (Always Visible) -->
+    <div id="mySidenav" class="sidenav"><br><br>
+        <a href="{% url 'productslist' %}" id="product"><i class="fas fa-shopping-basket"></i> Products List</a>
+        <a href="{% url 'addproducts' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fa fa-cart-plus"></i> Add Product</a><br>
+        <a href="{% url 'animalslist' %}" id="animal"><i class="fas fa-paw"></i> Animals List</a>
+        <a href="{% url 'addanimal' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-plus-circle"></i> Add Animal</a><br>
+        <a href="{% url 'diseasedetection' %}" style="padding-left: 35px; font-size: 1.0em;"><i class="fas fa-heartbeat"></i> Health Checker</a><br>
+        <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i> Order Details</a><br>
+        <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i> Pre-Order Details</a><br>
+        <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i> Milk Details</a><br> -->
+        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i> Stock Details</a><br>
+        <a href="{% url 'milkqualityanalysis' %}" id="milkquality"><i class="fas fa-microscope"></i> Quality Analysis</a><br>
+        <a href="{% url 'demandmarketprice' %}" id="milkquality"><i class="fas fa-microscope"></i> Market Price Analysis</a><br>
+        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i> Feedback Review</a><br>
+        <a href="{% url 'salegraph' %}"><i class="fas fa-chart-bar"></i> Sale</a><br>
+    </div>
+
+    <!-- Navigation Bar -->
+    <ul>
+        <div class="brand-name"><span>Dairy Care System</span></div>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul>
+
+
+    <div class="container">
+        <h2>Dynamic Market Pricing</h2>
+
+        <form id="predictionForm">
+            {% csrf_token %}
+            <label for="product_name"><b>Product Name:</b></label>
+            <select id="product_name" name="product_name" required>
+                <option value="">Select a product</option>
+                <option value="milk">Milk</option>
+                <option value="cheese">Cheese</option>
+                <option value="butter">Butter</option>
+                <option value="yogurt">Yogurt</option>
+            </select>
+
+            <button type="submit">Get Market Pricing</button>
+        </form>
+
+        <div class="output">
+            <p>Predicted Demand: <span id="predicted_demand">--</span> units</p>
+            <p>Predicted Market Price: $<span id="predicted_price">--</span></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("predictionForm").onsubmit = async function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            let formData = new FormData(event.target);
+            
+            // Log to check if form data is being captured correctly
+            console.log("Form Data Sent:", formData.get("product_name"));
+    
+            let response = await fetch("{% url 'predict_market_price' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                }
+            });
+    
+            try {
+                let data = await response.json();
+                console.log("Response Data:", data); // Debugging output
+    
+                if (data.success) {
+                    document.getElementById("predicted_demand").innerText = data.predicted_demand;
+                    document.getElementById("predicted_price").innerText = data.predicted_price;
+                } else {
+                    Swal.fire("Error", data.error, "error");
+                }
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+                Swal.fire("Error", "Invalid response from server.", "error");
+            }
+        };
+    </script>
+
+    <!-- Add SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Toggle dropdown on click
+    function toggleDropdown() {
+        var dropdown = document.getElementById("dropdown-content");
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+        } else {
+            dropdown.style.display = "block";
+        }
+    }
+
+    // Close the dropdown if clicked outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('.username')) {
+            var dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            }
+        }
+    }
+
+        // Custom SweetAlert2 logout confirmation
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of Dairy Care System!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to logout URL
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
+
+
+

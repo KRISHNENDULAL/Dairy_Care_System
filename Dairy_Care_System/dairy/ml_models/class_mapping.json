@@ -1,7 +1,10 @@
 {
-    "0": "blackleg cow",
-    "1": "foot and mouth in cow",
-    "2": "john's cow",
-    "3": "leptospirosis",
-    "4": "lumpy cow"
+    "0": "Hoof Rot (Interdigital Dermatitis)",
+    "1": "Mange (Parasitic Skin Disease) cow",
+    "2": "Pink Eye (Infectious Bovine Keratoconjunctivitis)",
+    "3": "Ringworm (Dermatophytosis) cow",
+    "4": "blackleg cow",
+    "5": "foot and mouth in cow",
+    "6": "leptospirosis",
+    "7": "lumpy cow"
 }

@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus, DiseaseImage
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus, DiseaseImage, DiseaseAnalysisHistory
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -62,7 +62,32 @@ import io
 import socket
 import joblib
 
+import google.generativeai as genai
+from django.http import JsonResponse
+import json
+import os
+from dotenv import load_dotenv
+import requests
 
+# Load environment variables
+load_dotenv()
+
+# Configure Gemini
+# GEMINI_API_KEY = "AIzaSyAuW9WLXi_W-Rzb02hM-Os2SFI_bx-NdPk"  # Updated API key
+# genai.configure(api_key=GEMINI_API_KEY)
+# model = genai.GenerativeModel('gemini-1.5-flash') 
+
+# Or configure directly:
+# genai.configure(api_key="your_actual_api_key_here")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Configure Gemini - Keep this configuration at the top after imports
+GEMINI_API_KEY = "AIzaSyAuW9WLXi_W-Rzb02hM-Os2SFI_bx-NdPk"
+genai.configure(api_key=GEMINI_API_KEY)
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')  # Changed variable name to avoid confusion
 
 DAIRY_KEYWORDS = {
     # Basic dairy products with variations
@@ -1413,6 +1438,14 @@ def productdetails(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
         product = get_object_or_404(Products_table, product_id=product_id)
+
+        # Increment view count
+        product.view_count = F('view_count') + 1
+        product.save()
+        
+        # Refresh from database to get the updated view count
+        product.refresh_from_db()
+        
         images = product.images.all()  # Get associated images
 
         # Determine product availability status
@@ -2280,11 +2313,14 @@ def update_cart(request, cart_id):
 
         return redirect('viewcart')
 
+
+
 # Delete a product from the cart
 def delete_from_cart(request, cart_id):
     cart_item = get_object_or_404(Cart, pk=cart_id)
     cart_item.delete()
     return redirect('viewcart')
+
 
 
 # def checkoutbilling(request):
@@ -2348,6 +2384,7 @@ def checkoutbilling(request):
     })
 
 
+
 # def checkoutorder(request):
 #     user = Users_table.objects.get(user_id=request.session['user_id'])
 #     user_cart = Cart.objects.filter(user=user)
@@ -2407,6 +2444,7 @@ def checkoutbilling(request):
 #         'total_price': total_price,
 #         'billing_details': billing_details
 #     })
+
 
 
 # Initialize Razorpay client
@@ -3267,61 +3305,99 @@ def predict_disease(image_path):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def diseasedetection(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    if user_id:
-        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        # Get disease detection history for the current user
-        disease_history = DiseaseImage.objects.filter(uploaded_by=user).order_by('-upload_time')
-        
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return redirect('login')
+            
+        user = Users_table.objects.get(user_id=user_id)
         context = {
             'username': user.username,
-            'disease_history': disease_history
         }
         
         if request.method == 'POST' and request.FILES.get('disease_image'):
             try:
                 image_file = request.FILES['disease_image']
-                
-                # Save image to the DiseaseImage model
                 disease_image = DiseaseImage.objects.create(
                     image=image_file,
-                    uploaded_by=user,
-                    upload_time=timezone.now()
+                    uploaded_by=user
                 )
                 
-                # Get the saved image path
-                image_path = disease_image.image.path
-                
                 # Get disease prediction
-                prediction_result = predict_disease(image_path)
+                prediction_result = predict_disease(disease_image.image.path)
                 
                 if prediction_result:
-                    disease_image.diagnosis = prediction_result['disease']
-                    disease_image.save()
+                    disease_name = prediction_result['disease']
+                    print(f"Disease detected: {disease_name}")  # Debug print
+                    
+                    # Get Gemini analysis
+                    analysis = get_disease_analysis_from_gemini(disease_name)
+                    print(f"Gemini analysis result: {analysis}")  # Debug print
                     
                     context.update({
                         'uploaded_image': disease_image.image.url,
-                        'upload_time': disease_image.upload_time,
-                        'prediction': prediction_result['disease'],
+                        'prediction': disease_name,
                         'confidence': f"{prediction_result['confidence']:.2f}%",
-                        'all_probabilities': prediction_result['all_probabilities']
+                        'all_probabilities': prediction_result['all_probabilities'],
+                        'analysis': analysis
                     })
-                    # messages.success(request, "Image analyzed successfully!")
+                    
                 else:
                     messages.error(request, "Failed to analyze image. Please try again.")
-                    context.update({
-                        'uploaded_image': disease_image.image.url,
-                        'upload_time': disease_image.upload_time
-                    })
-                
+                    
             except Exception as e:
-                print(f"Error in diseasedetection: {str(e)}")
-                messages.error(request, "An error occurred. Please try again.")
-                return redirect('farmownerpage')
-        
+                print(f"Error in disease detection: {str(e)}")
+                messages.error(request, f"Error during analysis: {str(e)}")
+                
         return render(request, 'diseasedetection.html', context)
-    else:
-        return redirect('login')  # Redirect to login if no user is logged in
+        
+    except Exception as e:
+        print(f"Error in diseasedetection view: {str(e)}")
+        messages.error(request, "An error occurred. Please try again.")
+        return redirect('farmownerpage')
+
+def get_disease_analysis_from_gemini(disease_name):
+    try:
+        print(f"Getting analysis for disease: {disease_name}")
+        
+        prompt = f"""
+        Analyze this cattle disease: {disease_name}
+        
+        Provide analysis in this exact JSON format:
+        {{
+            "description": "Detailed description of the disease",
+            "symptoms": ["symptom 1", "symptom 2"],
+            "treatment": ["treatment step 1", "treatment step 2"],
+            "prevention": ["prevention step 1", "prevention step 2"]
+        }}
+        """
+        
+        response = model.generate_content(prompt)
+        response_text = response.text.strip()
+        print(f"Raw Gemini response: {response_text}")
+        
+        # Find and extract JSON
+        start_idx = response_text.find('{')
+        end_idx = response_text.rfind('}')
+        
+        if start_idx != -1 and end_idx != -1:
+            json_str = response_text[start_idx:end_idx + 1]
+            print(f"Extracted JSON: {json_str}")
+            
+            try:
+                analysis = json.loads(json_str)
+                print(f"Parsed analysis: {analysis}")
+                return analysis
+            except json.JSONDecodeError as e:
+                print(f"JSON parsing error: {e}")
+                return None
+        else:
+            print("No JSON found in response")
+            return None
+            
+    except Exception as e:
+        print(f"Error in Gemini analysis: {str(e)}")
+        return None
 
 
 
@@ -3501,41 +3577,271 @@ def admin_disease_detection(request):
             return redirect('login')
             
         user = Users_table.objects.get(user_id=user_id)
-        if user.role != 'admin':
-            messages.error(request, "Access denied. Admin privileges required.")
-            return redirect('login')
-            
         context = {
             'username': user.username,
         }
         
         if request.method == 'POST' and request.FILES.get('disease_image'):
             try:
-                image = request.FILES['disease_image']
+                image_file = request.FILES['disease_image']
                 disease_image = DiseaseImage.objects.create(
-                    image=image,
-                    uploaded_by=user,
-                    upload_time=timezone.now()
+                    image=image_file,
+                    uploaded_by=user
                 )
-                context.update({
-                    'uploaded_image': disease_image.image.url,
-                    'upload_time': disease_image.upload_time
-                })
-                messages.success(request, "Image uploaded successfully!")
+                
+                # Get disease prediction
+                prediction_result = predict_disease(disease_image.image.path)
+                
+                if prediction_result:
+                    disease_name = prediction_result['disease']
+                    print(f"Disease detected: {disease_name}")  # Debug print
+                    
+                    # Get Gemini analysis
+                    analysis = get_disease_analysis_from_gemini(disease_name)
+                    print(f"Gemini analysis result: {analysis}")  # Debug print
+                    
+                    if analysis:
+                        context.update({
+                            'uploaded_image': disease_image.image.url,
+                            'prediction': disease_name,
+                            'confidence': f"{prediction_result['confidence']:.2f}%",
+                            'all_probabilities': prediction_result['all_probabilities'],
+                            'analysis': analysis
+                        })
+                        print(f"Context updated with analysis: {context['analysis']}")  # Debug print
+                    else:
+                        print("No analysis received from Gemini")
+                        context.update({
+                            'uploaded_image': disease_image.image.url,
+                            'prediction': disease_name,
+                            'confidence': f"{prediction_result['confidence']:.2f}%",
+                            'all_probabilities': prediction_result['all_probabilities']
+                        })
+                else:
+                    messages.error(request, "Failed to analyze image. Please try again.")
+                    
             except Exception as e:
-                print(f"Error uploading image: {str(e)}")
-                messages.error(request, "Failed to upload image. Please try again.")
+                print(f"Error in disease detection: {str(e)}")
+                messages.error(request, f"Error during analysis: {str(e)}")
+                
+        return render(request, 'diseasedetection.html', context)
         
-        return render(request, 'admin_disease_detection.html', context)
-        
-    except Users_table.DoesNotExist:
-        messages.error(request, "User not found.")
-        return redirect('login')
     except Exception as e:
         print(f"Error in admin_disease_detection: {str(e)}")
         messages.error(request, "An error occurred. Please try again.")
         return redirect('adminpage')
 
+def get_disease_analysis_from_gemini(disease_name):
+    try:
+        print(f"Getting analysis for disease: {disease_name}")
+        
+        prompt = f"""
+        Analyze this cattle disease: {disease_name}
+        
+        Provide analysis in this exact JSON format:
+        {{
+            "description": "Detailed description of the disease",
+            "symptoms": ["symptom 1", "symptom 2"],
+            "treatment": ["treatment step 1", "treatment step 2"],
+            "prevention": ["prevention step 1", "prevention step 2"]
+        }}
+        """
+        
+        response = model.generate_content(prompt)
+        response_text = response.text.strip()
+        print(f"Raw Gemini response: {response_text}")
+        
+        # Find and extract JSON
+        start_idx = response_text.find('{')
+        end_idx = response_text.rfind('}')
+        
+        if start_idx != -1 and end_idx != -1:
+            json_str = response_text[start_idx:end_idx + 1]
+            print(f"Extracted JSON: {json_str}")
+            
+            try:
+                analysis = json.loads(json_str)
+                print(f"Parsed analysis: {analysis}")
+                return analysis
+            except json.JSONDecodeError as e:
+                print(f"JSON parsing error: {e}")
+                return None
+        else:
+            print("No JSON found in response")
+            return None
+            
+    except Exception as e:
+        print(f"Error in Gemini analysis: {str(e)}")
+        return None
+
+# Update the model paths to match exactly where train_disease_model.py saves them
+# MODEL_PATH = os.path.join(settings.BASE_DIR, 'dairy', 'ml_models', 'cow_disease_model.h5')
+# CLASS_MAP_PATH = os.path.join(settings.BASE_DIR, 'dairy', 'ml_models', 'class_mapping.json')
+
+# # Load the model and class mapping
+# try:
+#     disease_model = load_model(MODEL_PATH)
+#     with open(CLASS_MAP_PATH, 'r') as f:
+#         DISEASE_CLASSES = json.load(f)
+#     print("Model and class mapping loaded successfully")
+# except Exception as e:
+#     print(f"Error loading model or class mapping: {str(e)}")
+
+# def predict_disease(image_path):
+#     try:
+#         print(f"Starting prediction for image: {image_path}")
+        
+#         if not os.path.exists(MODEL_PATH):
+#             raise Exception(f"Model file not found at {MODEL_PATH}")
+            
+#         # Load and preprocess the image
+#         img = image.load_img(image_path, target_size=(224, 224))
+#         img_array = image.img_to_array(img)
+#         img_array = np.expand_dims(img_array, axis=0)
+#         img_array = img_array / 255.0
+
+#         print("Making prediction...")
+#         # Make prediction
+#         predictions = disease_model.predict(img_array)
+#         predicted_class = np.argmax(predictions[0])
+#         confidence = float(predictions[0][predicted_class])
+
+#         print(f"Raw predictions: {predictions}")
+#         print(f"Predicted class: {predicted_class}")
+#         print(f"Available classes: {DISEASE_CLASSES}")
+
+#         # Get disease name from class mapping
+#         disease_name = DISEASE_CLASSES.get(str(predicted_class))
+#         if not disease_name:
+#             raise Exception(f"Disease class {predicted_class} not found in mapping")
+
+#         result = {
+#             'disease': disease_name,
+#             'confidence': confidence * 100,
+#             'all_probabilities': {  # Fixed the split key name
+#                 DISEASE_CLASSES[str(i)]: float(prob) * 100 
+#                 for i, prob in enumerate(predictions[0])
+#             }
+#         }
+#         print(f"Prediction result: {result}")
+#         return result
+        
+#     except Exception as e:
+#         print(f"Error in prediction: {str(e)}")
+#         return None
+
+# @csrf_exempt
+# def verify_model(request):
+#     try:
+#         # Check if model and class mapping exist
+#         if not os.path.exists(MODEL_PATH):
+#             return JsonResponse({
+#                 'success': False,
+#                 'error': 'Model file not found'
+#             })
+            
+#         if not os.path.exists(CLASS_MAP_PATH):
+#             return JsonResponse({
+#                 'success': False,
+#                 'error': 'Class mapping file not found'
+#             })
+            
+#         # Verify model can make predictions
+#         test_shape = (1, 224, 224, 3)
+#         test_input = np.zeros(test_shape)
+#         _ = disease_model.predict(test_input)
+        
+#         return JsonResponse({
+#             'success': True,
+#             'message': 'Model verified successfully'
+#         })
+#     except Exception as e:
+#         return JsonResponse({
+#             'success': False,
+#             'error': str(e)
+#         })
+
+@csrf_exempt
+def get_disease_analysis(request):
+    if request.method == 'POST':
+        try:
+            # Use the already configured Gemini API key
+            data = json.loads(request.body)
+            disease_name = data.get('disease_name')
+            
+            prompt = f"""
+            Analyze the following cattle disease: {disease_name}
+            
+            Provide a detailed veterinary analysis with the following structure:
+            1. A comprehensive description of the disease including its causes and impact on cattle
+            2. Specific symptoms that can be observed in affected cattle
+            3. Detailed treatment methods, medications, and care procedures
+            4. Prevention strategies and biosecurity measures
+            
+            Ensure the response is in this exact JSON format:
+            {{
+                "description": "A detailed description of the disease",
+                "symptoms": ["symptom 1", "symptom 2"],
+                "treatment": ["treatment step 1", "treatment step 2"],
+                "prevention": ["prevention step 1", "prevention step 2"]
+            }}
+            """
+            
+            print(f"Analyzing disease: {disease_name}")
+            response = gemini_model.generate_content(prompt)  # Using the global model instance
+            response_text = response.text.strip()
+            print(f"Raw response: {response_text}")
+            
+            try:
+                # First try to find JSON-like content
+                start_idx = response_text.find('{')
+                end_idx = response_text.rfind('}')
+                if start_idx != -1 and end_idx != -1:
+                    json_str = response_text[start_idx:end_idx + 1]
+                    analysis = json.loads(json_str)
+                else:
+                    # Fallback to text parsing
+                    sections = response_text.split('\n\n')
+                    analysis = {
+                        "description": "",
+                        "symptoms": [],
+                        "treatment": [],
+                        "prevention": []
+                    }
+                    
+                    for section in sections:
+                        if "Description:" in section or "Disease:" in section:
+                            analysis["description"] = section.split(":", 1)[1].strip()
+                        elif "Symptoms:" in section:
+                            analysis["symptoms"] = [s.strip('- ').strip() for s in section.split('\n')[1:] if s.strip('- ').strip()]
+                        elif "Treatment:" in section:
+                            analysis["treatment"] = [t.strip('- ').strip() for t in section.split('\n')[1:] if t.strip('- ').strip()]
+                        elif "Prevention:" in section:
+                            analysis["prevention"] = [p.strip('- ').strip() for p in section.split('\n')[1:] if p.strip('- ').strip()]
+                
+                return JsonResponse({
+                    'success': True,
+                    'description': analysis.get('description', ''),
+                    'symptoms': analysis.get('symptoms', []),
+                    'treatment': analysis.get('treatment', []),
+                    'prevention': analysis.get('prevention', [])
+                })
+            
+            except Exception as e:
+                print(f"Error parsing response: {str(e)}")
+                return JsonResponse({
+                    'success': False,
+                    'error': f"Error parsing response: {str(e)}"
+                })
+                
+        except Exception as e:
+            print(f"Error in get_disease_analysis: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
 
@@ -3544,7 +3850,179 @@ def admin_disease_detection(request):
 
 
 
+import os
+import pickle
+import pandas as pd
+from django.shortcuts import render
+from django.http import JsonResponse
 
+# Load the trained model
+model_path = os.path.join(os.path.dirname(__file__), "..", "ml_models", "market_price_model.pkl")
+model = joblib.load(model_path)
 
+def demand_market_price_page(request):
+    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        context = {
+            'username': user.username,  # Pass the username to the template
+        }
+        return render(request, 'demandmarketprice.html', context)
+    else:
+        return redirect('login')  # Redirect to login if no user is logged in 
 
+@csrf_exempt
+def demand_market_price_prediction(request):
+    """Handle form submission and return predictions."""
+    if request.method == "POST":
+        try:
+            product_name = request.POST.get("product_name", "").strip()
 
+            if not product_name:
+                return JsonResponse({"success": False, "error": "Product name is required."})
+
+            # Generate placeholder values for missing inputs (since only product name is given)
+            stock = 100  # Example default stock
+            supplier_price = 50  # Example supplier price
+            season = 1  # Default to High season
+            reviews = 4.0  # Example customer review score
+            competitor_price = 60  # Example competitor price
+
+            # Create feature array
+            input_features = np.array([[stock, supplier_price, season, reviews, competitor_price]])
+
+            # Make prediction
+            predicted_price = model.predict(input_features)[0]
+            predicted_demand = round(predicted_price * 0.8)  # Dummy logic: Demand is 80% of price
+
+            return JsonResponse({
+                "success": True,
+                "predicted_demand": predicted_demand,
+                "predicted_price": round(predicted_price, 2)
+            })
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid request."})
+
+def get_disease_analysis_from_gemini(disease_name):
+    """Helper function to get disease analysis from Gemini"""
+    try:
+        logger.info(f"Starting Gemini analysis for disease: {disease_name}")
+        
+        prompt = f"""
+        Analyze the following cattle disease: {disease_name}
+        
+        Provide a detailed veterinary analysis with the following structure:
+        1. A comprehensive description of the disease including its causes and impact on cattle
+        2. Specific symptoms that can be observed in affected cattle
+        3. Detailed treatment methods, medications, and care procedures
+        4. Prevention strategies and biosecurity measures
+        
+        Ensure the response is in this exact JSON format:
+        {{
+            "description": "A detailed description of the disease",
+            "symptoms": ["symptom 1", "symptom 2"],
+            "treatment": ["treatment step 1", "treatment step 2"],
+            "prevention": ["prevention step 1", "prevention step 2"]
+        }}
+        """
+        
+        logger.info("Sending request to Gemini...")
+        response = gemini_model.generate_content(prompt)
+        response_text = response.text.strip()
+        logger.info(f"Raw Gemini response: {response_text}")
+        
+        try:
+            # Find JSON content
+            start_idx = response_text.find('{')
+            end_idx = response_text.rfind('}')
+            if start_idx != -1 and end_idx != -1:
+                json_str = response_text[start_idx:end_idx + 1]
+                logger.info(f"Extracted JSON string: {json_str}")
+                
+                analysis = json.loads(json_str)
+                result = {
+                    'success': True,
+                    'description': analysis.get('description', ''),
+                    'symptoms': analysis.get('symptoms', []),
+                    'treatment': analysis.get('treatment', []),
+                    'prevention': analysis.get('prevention', [])
+                }
+                logger.info(f"Successfully parsed analysis: {result}")
+                return result
+            else:
+                logger.error("No JSON content found in Gemini response")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error parsing Gemini response: {str(e)}")
+            logger.error(f"Response text: {response_text}")
+            return None
+            
+    except Exception as e:
+        logger.error(f"Error in Gemini analysis: {str(e)}")
+        return None
+
+# Update the diseasedetection view to include debug prints
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def diseasedetection(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = Users_table.objects.get(user_id=user_id)
+        disease_history = DiseaseImage.objects.filter(uploaded_by=user).order_by('-upload_time')
+        
+        context = {
+            'username': user.username,
+            'disease_history': disease_history
+        }
+        
+        if request.method == 'POST' and request.FILES.get('disease_image'):
+            try:
+                image_file = request.FILES['disease_image']
+                
+                # Save the image
+                disease_image = DiseaseImage.objects.create(
+                    image=image_file,
+                    uploaded_by=user,
+                    upload_time=timezone.now()
+                )
+                
+                # Get disease prediction
+                prediction_result = predict_disease(disease_image.image.path)
+                
+                if prediction_result:
+                    print(f"Disease predicted: {prediction_result['disease']}")  # Debug print
+                    
+                    # Get AI analysis from Gemini
+                    analysis_response = get_disease_analysis_from_gemini(prediction_result['disease'])
+                    print(f"Gemini analysis response: {analysis_response}")  # Debug print
+                    
+                    disease_image.diagnosis = prediction_result['disease']
+                    disease_image.save()
+                    
+                    context.update({
+                        'uploaded_image': disease_image.image.url,
+                        'upload_time': disease_image.upload_time,
+                        'prediction': prediction_result['disease'],
+                        'confidence': f"{prediction_result['confidence']:.2f}%",
+                        'all_probabilities': prediction_result['all_probabilities'],
+                        'analysis': analysis_response
+                    })
+                    print(f"Final context: {context}")  # Debug print
+                else:
+                    messages.error(request, "Failed to analyze image. Please try again.")
+                    context.update({
+                        'uploaded_image': disease_image.image.url,
+                        'upload_time': disease_image.upload_time
+                    })
+                
+            except Exception as e:
+                print(f"Error in diseasedetection: {str(e)}")
+                messages.error(request, "An error occurred. Please try again.")
+                return redirect('farmownerpage')
+        
+        return render(request, 'diseasedetection.html', context)
+    else:
+        return redirect('login')

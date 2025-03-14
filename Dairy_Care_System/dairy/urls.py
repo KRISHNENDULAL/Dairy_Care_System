@@ -66,6 +66,8 @@ urlpatterns = [
     path('farmerproductstock',views.farmerproductstock,name='farmerproductstock'),
     path('salegraph',views.salegraph,name='salegraph'),
     path('milkqualityanalysis' ,views.milkqualityanalysis,name='milkqualityanalysis'),
+    path("demandmarketprice/", views.demand_market_price_page, name="demandmarketprice"),
+    path("predict_market_price/", views.demand_market_price_prediction, name="predict_market_price"),
 
     path('addanimal', views.addanimal, name='addanimal'),
     path('animalslist',views.animalslist,name='animalslist'),
@@ -136,13 +138,18 @@ urlpatterns = [
     path('scan-qr/', views.scan_qr, name='scan_qr'),
     path('confirm-delivery/<int:order_id>/', views.confirm_delivery, name='confirm_delivery'),
     path('confirm-delivery/DCS/', views.confirm_delivery, {'order_id': None}, name='confirm_delivery_masked'),
-
     path('get_delivery_status/<int:order_id>/', views.get_delivery_status, name='get_delivery_status'),
     path('get_delivery_status/DCS/', views.get_delivery_status, {'order_id': None}, name='get_delivery_status_masked'),
 
     path('get_server_ip/', views.get_server_ip, name='get_server_ip'),
 
     path('admin_disease_detection/', views.admin_disease_detection, name='admin_disease_detection'),
+
+    path('predict-disease/', views.predict_disease, name='predict_disease'),
+
+    path('get_disease_analysis/', views.get_disease_analysis, name='get_disease_analysis'),
+
+    path('verify-model/', views.verify_model, name='verify_model'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
