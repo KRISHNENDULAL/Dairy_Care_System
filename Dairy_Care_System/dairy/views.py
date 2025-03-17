@@ -755,7 +755,7 @@ def chatbot_response(request):
                     'response': "Our delivery service:\n"
                                "• Daily morning delivery (6 AM - 9 AM)\n"
                                "• Evening delivery slot (4 PM - 7 PM)\n"
-                               "• Free delivery for orders above ₹500\n"
+                               "• Free delivery for orders above Rs. 500\n"
                                "• Temperature-controlled delivery vehicles\n"
                                "• Real-time order tracking available"
                 },
@@ -826,8 +826,8 @@ def chatbot_response(request):
                     'response': "Current offers:\n"
                                "• 10% off on subscription orders\n"
                                "• Buy 3 get 1 free on curd products\n"
-                               "• Free delivery above ₹500\n"
-                               "• Referral bonus: ₹100 off\n"
+                               "• Free delivery above Rs. 500\n"
+                               "• Referral bonus: Rs. 100 off\n"
                                "Check our website for more offers!"
                 }
             }
@@ -2672,13 +2672,13 @@ def send_order_email(order, request):
                         <span style="margin-left: 10px;">{item.product.product_name}</span>
                     </div>
                     <div>{item.quantity}</div>
-                    <div>₹ {item.price}</div>
+                    <div>Rs. {item.price}</div>
                 </div>
                 """ for item in order_items)}
             </div>
             
             <div class="divider"></div>
-            <p class="total-price">Total Price: ₹ {order.total_price}</p>
+            <p class="total-price">Total Price: Rs. {order.total_price}</p>
             
             <div class="footer">Thank you for your order!</div>
             <div class="copyright">.... © Dairy Care System ....</div>
@@ -2701,9 +2701,9 @@ def send_order_email(order, request):
     Order Date: {order.order_date.strftime('%B %d, %Y, %I:%M %p')}
     
     Items Ordered:
-    {''.join(f"- {item.product.product_name} x {item.quantity}: ₹{item.price}\\n" for item in order_items)}
+    {''.join(f"- {item.product.product_name} x {item.quantity}: Rs. {item.price}\\n" for item in order_items)}
     
-    Total Price: ₹{order.total_price}
+    Total Price: Rs. {order.total_price}
     
     Thank you for your order!
     .... © Dairy Care System ....
