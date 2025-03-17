@@ -223,6 +223,53 @@
                 text-align: center;
             }
         }
+
+        .price-summary {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            margin-left: auto;
+            margin-right: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .price-line .label {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .price-line .amount {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .price-line.grand-total {
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .price-line.grand-total .label {
+            color: #0da84d;
+            font-size: 1.3em;
+        }
+
+        .price-line.grand-total .amount {
+            color: #0da84d;
+            font-size: 1.3em;
+        }
     </style>
     <!-- Add Font Awesome and SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -277,6 +324,7 @@
                     <th>Quantity</th>
                     <th>Price</th>
                     <th>Total</th>
+                    <!-- <th>Delivery Charge</th> -->
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -303,6 +351,7 @@
                     </td>
                     <td>₹ {{ item.product.product_price }}</td>
                     <td>₹ {{ item.get_total_price }}</td>
+                    <!-- <td>₹ {{ item.delivery_charge }}</td> -->
                     <td>
                         <form method="POST" action="{% url 'delete_from_cart' item.cart_id %}">
                             {% csrf_token %}
@@ -314,9 +363,20 @@
             </tbody>
         </table>
 
-        <div class="total">
-            Total Price: <strong>₹ {{ total_price }}</strong>
-        </div><br>
+        <div class="price-summary">
+            <div class="price-line">
+                <span class="label">Subtotal:</span>
+                <span class="amount">₹ {{ total_price }}</span>
+            </div>
+            <div class="price-line">
+                <span class="label">Delivery Charges:</span>
+                <span class="amount">₹ {{ total_delivery }}</span>
+            </div>
+            <div class="price-line grand-total">
+                <span class="label">Total Amount:</span>
+                <span class="amount">₹ {{ grand_total }}</span>
+            </div>
+        </div>
 
         <div class="checkout">
             <a href="{% url 'custproductslist' %}" class="btn btn-shop"><i class="fas fa-shopping-basket"></i> Continue Shopping</a>

@@ -13,23 +13,7 @@
         margin: 0;
         margin-left: 250px; /* Keep this for sidebar space */
         padding-top: 0; /* Remove any top padding */
-    }
-
-    /* Remove any unwanted top margins/padding from header elements */
-    .brand-name {
-        margin-top: 0;
-        padding-top: 0;
-    }
-
-    ul {
-        margin-top: 0;
-        padding-top: 0;
-    }
-
-    /* Remove the <br> tags after sidenav */
-    #mySidenav {
-        padding-top: 60px; /* Adjust this value as needed */
-    }
+    }    
 
     /* Adjust the main content container */
     .content-container {
@@ -89,8 +73,9 @@
         <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>Order Details</a><br>
         <a href="{% url 'preorderfarm' %}"><i class="fas fa-clipboard-list"></i>Pre-Order Details</a><br>
         <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>Milk Details</a><br> -->
+        <a href="{% url 'milkqualityanalysis' %}" id="milkquality"><i class="fas fa-microscope"></i> Quality Analysis</a><br>
+        <a href="{% url 'demandmarketprice' %}" id="marketprice"><i class="fas fa-chart-line"></i> Market Price Analysis</a><br>
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>Stock Details</a><br>
-        <a href="{% url 'milkqualityanalysis' %}"><i class="fas fa-microscope"></i> Quality Analysis</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i>Notifications</a><br>
         <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>Feedback Review</a><br>
         <a href="{% url 'salegraph' %}"><i class="fas fa-chart-bar"></i> Sale</a><br>

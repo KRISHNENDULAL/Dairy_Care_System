@@ -2285,14 +2285,40 @@ def viewcart(request):
         # Fetch cart items for the logged-in user
         cart_items = Cart.objects.filter(user=user)
         
-        # Calculate the total price of the cart
-        total_price = sum([item.get_total_price() for item in cart_items])
+        # Calculate the total price and delivery charges
+        total_price = 0
+        total_delivery = 0
         
-        # Pass the username, cart items, and total price to the template
+        for item in cart_items:
+            # Calculate item total price
+            item_total = item.get_total_price()
+            total_price += item_total
+            
+            # Calculate delivery charge based on quantity
+            if item.quantity <= 1:
+                delivery_charge = 5
+            elif item.quantity <= 2:
+                delivery_charge = 10
+            elif item.quantity <= 3:
+                delivery_charge = 15
+            elif item.quantity <= 4:
+                delivery_charge = 20
+            else:
+                delivery_charge = 80
+                
+            item.delivery_charge = delivery_charge
+            total_delivery += delivery_charge
+        
+        # Calculate grand total
+        grand_total = total_price + total_delivery
+        
+        # Pass all the calculated values to the template
         context = {
-            'username': user.username,  # User's username
-            'cart_items': cart_items,    # Cart items for the user
-            'total_price': total_price   # Total price of the items in the cart
+            'username': user.username,
+            'cart_items': cart_items,
+            'total_price': total_price,
+            'total_delivery': total_delivery,
+            'grand_total': grand_total
         }
         return render(request, 'viewcart.html', context)
     
@@ -2457,7 +2483,27 @@ def checkoutorder(request):
 
     user = get_object_or_404(Users_table, user_id=user_id)
     user_cart = Cart.objects.filter(user=user)
-    total_price = sum([item.get_total_price() for item in user_cart])
+    
+    # Calculate subtotal, delivery charges and total
+    subtotal = sum([item.get_total_price() for item in user_cart])
+    total_delivery = 0
+    
+    # Calculate delivery charges
+    for item in user_cart:
+        if item.quantity <= 5:
+            delivery_charge = 20
+        elif item.quantity <= 10:
+            delivery_charge = 30
+        elif item.quantity <= 20:
+            delivery_charge = 50
+        else:
+            delivery_charge = 80
+        item.delivery_charge = delivery_charge
+        total_delivery += delivery_charge
+    
+    # Calculate grand total
+    total_price = subtotal + total_delivery
+    
     billing_details = request.session.get('billing_details')
 
     if not billing_details:
@@ -2527,6 +2573,8 @@ def checkoutorder(request):
 
     return render(request, 'checkoutorder.html', {
         'user_cart': user_cart,
+        'subtotal': subtotal,
+        'total_delivery': total_delivery,
         'total_price': total_price,
         'billing_details': billing_details,
         'RAZORPAY_KEY_ID': settings.RAZORPAY_KEY_ID
@@ -4025,4 +4073,35 @@ def diseasedetection(request):
         
         return render(request, 'diseasedetection.html', context)
     else:
+        return redirect('login')
+
+@csrf_exempt
+def update_preorder_status(request, preorder_id):
+    if request.method == 'POST':
+        try:
+            preorder = get_object_or_404(PreOrder, id=preorder_id)
+            preorder.status = "Approved"
+            preorder.save()
+            return JsonResponse({'status': 'success', 'message': 'Pre-order approved successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def preorderfarm(request):
+    # Get the logged-in farmer's ID from the session
+    farmer_id = request.session.get('user_id')
+
+    if farmer_id:  # Check if the farmer is logged in
+        # Fetch preorders where the logged-in farmer is the owner of the products
+        preorders = PreOrder.objects.filter(farmer=farmer_id)
+
+        # Pass the preorders to the template
+        context = {
+            'username': request.session.get('username'),  # Pass username for display
+            'preorders': preorders,  # Filtered preorders for the farmer
+        }
+        return render(request, 'preorderfarm.html', context)
+    else:
+        # Redirect to login if farmer_id is not found in the session
         return redirect('login')

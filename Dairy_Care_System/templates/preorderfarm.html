@@ -116,9 +116,12 @@
         <a href="{% url 'orderdetails' %}"><i class="fas fa-shopping-bag"></i>  Order Details</a><br>
         <a href="{% url 'milkdetails' %}"><i class="fas fa-clipboard-list"></i>  Pre-Order Details</a><br>
         <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br> -->
+        <a href="{% url 'milkqualityanalysis' %}" id="milkquality"><i class="fas fa-microscope"></i> Quality Analysis</a><br>
+        <a href="{% url 'demandmarketprice' %}" id="marketprice"><i class="fas fa-chart-line"></i> Market Price Analysis</a><br>
         <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
         <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
         <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+        <a href="{% url 'salegraph' %}"><i class="fas fa-chart-bar"></i> Sale</a><br>
         <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
@@ -157,7 +160,7 @@
                         <th>Date of Delivery</th>
                         <th>Additional Notes</th>
                         <th>Ordered At</th>
-                        <!-- <th>Status</th> -->
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -174,13 +177,16 @@
                         <td>{{ preorder.date_of_delivery }}</td>
                         <td>{{ preorder.additional_notes }}</td>
                         <td>{{ preorder.created_at }}</td>
-                        <!-- <td>
+                        <td>
                             {% if preorder.status == 'Pending' %}
-                                <button class="button-pending">Approve</button>
-                            {% elif preorder.status == 'Placed' %}
-                                <button class="button-placed">Approved</button>
+                                <button class="btn-accept" onclick="updateStatus({{ preorder.id }})" 
+                                    style="background-color: #4CAF50; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    Accept
+                                </button>
+                            {% else %}
+                                <span style="color: #4CAF50; font-weight: bold;">{{ preorder.status }}</span>
                             {% endif %}
-                        </td> -->
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -236,6 +242,61 @@
                 }
             });
         }
-        </script>
+
+        function updateStatus(preorderId) {
+            // Show loading state
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Processing...';
+
+            fetch(`/update_preorder_status/${preorderId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update the button to show "Approved" text
+                    const td = button.parentElement;
+                    td.innerHTML = '<span style="color: #4CAF50; font-weight: bold;">Approved</span>';
+                    
+                    // Show success message
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Pre-order has been approved successfully',
+                        icon: 'success',
+                        confirmButtonColor: '#4CAF50'
+                    });
+                } else {
+                    // Show error message
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to approve pre-order',
+                        icon: 'error',
+                        confirmButtonColor: '#d33'
+                    });
+                    // Reset button state
+                    button.disabled = false;
+                    button.textContent = 'Accept';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show error message
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to approve pre-order',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+                // Reset button state
+                button.disabled = false;
+                button.textContent = 'Accept';
+            });
+        }
+    </script>
 </body>
 </html>

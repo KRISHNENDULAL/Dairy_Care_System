@@ -77,10 +77,46 @@
             background-color: #f1f1f1;
         }
         .total-price {
+            text-align: right;
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+        
+        .price-line {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+
+        .price-line h4 {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.2em;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .price-line:nth-child(2) h4 {
+            color: #c0392b;
+        }
+
+        .price-line span {
+            font-size: 1.2em;
+            font-weight: 600;
+            min-width: 100px;
+            text-align: left;
+        }
+        
+        .total-price h3 {
+            color: #0da84d;
+            margin: 15px 0;
+            font-size: 1.4em;
             font-weight: bold;
-            color: green;
-            font-size: 1.3em;
-            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
         }
         form {
             display: flex;
@@ -242,7 +278,17 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <h3 class="total-price">Total Price: Rs. {{ total_price }}</h3>
+                <div class="total-price">
+                    <div class="price-line">
+                        <h4>Subtotal:</h4>
+                        <span>Rs. {{ subtotal }}</span>
+                    </div>
+                    <div class="price-line">
+                        <h4>Delivery Charge:</h4>
+                        <span>Rs. {{ total_delivery }}</span>
+                    </div>
+                    <h3>Total Price: Rs. {{ total_price }}</h3>
+                </div>
             {% else %}
                 <p>No items in cart.</p>
             {% endif %}

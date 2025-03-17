@@ -151,6 +151,8 @@ urlpatterns = [
 
     path('verify-model/', views.verify_model, name='verify_model'),
 
+    path('update_preorder_status/<int:preorder_id>/', views.update_preorder_status, name='update_preorder_status'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

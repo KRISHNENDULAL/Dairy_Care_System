@@ -153,7 +153,7 @@
                         <th>Date of Delivery</th>
                         <th>Additional Notes</th>
                         <th>Ordered At</th>
-                        <!-- <th>Status</th> -->
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -170,13 +170,13 @@
                         <td>{{ preorder.date_of_delivery }}</td>
                         <td>{{ preorder.additional_notes }}</td>
                         <td>{{ preorder.created_at }}</td>
-                        <!-- <td>
+                        <td>
                             {% if preorder.status == 'Pending' %}
-                                <button class="button-pending">{{ preorder.status}}</button>
-                            {% elif preorder.status == 'Placed' %}
-                                <button class="button-placed">{{ preorder.status}}</button>
+                                <span style="color: #FFA500; font-weight: bold;">{{ preorder.status }}</span>
+                            {% else %}
+                                <span style="color: #4CAF50; font-weight: bold;">{{ preorder.status }}</span>
                             {% endif %}
-                        </td> -->
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
