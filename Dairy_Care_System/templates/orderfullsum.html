@@ -228,7 +228,7 @@
             <h3>Invoice Number: {{ order.id }}</h3>
             <p><strong>Total Amount:</strong> {{ order.name }}</p>
             <p><strong>Order Date:</strong> {{ order.order_date|date:"F d, Y" }}</p>
-            <p><strong>Total Amount:</strong> ₹{{ order.total_price }}</p>
+            <p><strong>Total Amount:</strong> Rs. {{ order.total_price }}</p>
             <p><strong>Payment Method:</strong> {{ payment_method }}</p>
             <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
             <p><strong>Pincode:</strong> {{ order.pincode }}</p>

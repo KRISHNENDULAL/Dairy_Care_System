@@ -157,7 +157,7 @@
                     {% endif %}
                     <p>{{ item.product.product_description }}</p><br>
                     <!-- <p><strong>Quantity:</strong> {{ item.product.product_quantity }} {{ item.product.quantity_unit }}</p><br> -->
-                    <p><strong>Price:</strong> ₹ {{ item.product.product_price }}</p><br><br>
+                    <p><strong>Price:</strong> Rs. {{ item.product.product_price }}</p><br><br>
                 </div>
                 <form method="POST" action="{% url 'wishlist' %}">
                     {% csrf_token %}

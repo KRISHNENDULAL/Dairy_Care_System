@@ -109,10 +109,10 @@
         <!-- <a href="{% url 'milkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Milk Details</a><br> -->
         <a href="{% url 'milkqualityanalysis' %}" id="milkquality"><i class="fas fa-microscope"></i> Quality Analysis</a><br>
         <a href="{% url 'demandmarketprice' %}" id="marketprice"><i class="fas fa-chart-line"></i> Market Price Analysis</a><br>
-        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
-        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
-        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
         <a href="{% url 'salegraph' %}"><i class="fas fa-chart-bar"></i> Sale</a><br>
+        <a href="{% url 'stocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'farmerproductstock' %}"><i class="fas fa-boxes"></i>  Stock Details</a><br>
+        <a href="{% url 'feedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
         <a href="{% url 'farmownerpage' %}"><i class="fas fa-home home-icon"></i> Home</a><br>
     </div>
 
@@ -139,7 +139,7 @@
         <div class="order-card">
             <span>{{ order.order_date|date:"M. d, Y" }}</span>
             <span><strong>Status:</strong> {{ order.get_status_display }}</span>
-            <span><strong>Total:</strong> ₹ {{ order.total_price }}</span>
+            <span><strong>Total:</strong> Rs. {{ order.total_price }}</span>
             <!-- <a href="{% url 'ordersummary' order.id %}" class="view-summary"><strong>View Receipt</strong></a> -->
             <a href="{% url 'orderfullsum' order.id %}" class="view-summary"><strong>Track Order</strong></a>
         </div>

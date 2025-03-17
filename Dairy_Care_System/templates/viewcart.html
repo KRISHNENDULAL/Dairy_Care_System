@@ -349,8 +349,8 @@
                             <button class="btn btn-update" type="submit"><i class="fas fa-undo"></i> Update</button>
                         </form>
                     </td>
-                    <td>₹ {{ item.product.product_price }}</td>
-                    <td>₹ {{ item.get_total_price }}</td>
+                    <td>Rs. {{ item.product.product_price }}</td>
+                    <td>Rs. {{ item.get_total_price }}</td>
                     <!-- <td>₹ {{ item.delivery_charge }}</td> -->
                     <td>
                         <form method="POST" action="{% url 'delete_from_cart' item.cart_id %}">
@@ -366,15 +366,15 @@
         <div class="price-summary">
             <div class="price-line">
                 <span class="label">Subtotal:</span>
-                <span class="amount">₹ {{ total_price }}</span>
+                <span class="amount">Rs. {{ total_price }}</span>
             </div>
             <div class="price-line">
                 <span class="label">Delivery Charges:</span>
-                <span class="amount">₹ {{ total_delivery }}</span>
+                <span class="amount">Rs. {{ total_delivery }}</span>
             </div>
             <div class="price-line grand-total">
                 <span class="label">Total Amount:</span>
-                <span class="amount">₹ {{ grand_total }}</span>
+                <span class="amount">Rs. {{ grand_total }}</span>
             </div>
         </div>
 
