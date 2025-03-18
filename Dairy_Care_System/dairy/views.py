@@ -2304,7 +2304,7 @@ def viewcart(request):
             elif item.quantity <= 4:
                 delivery_charge = 20
             else:
-                delivery_charge = 80
+                delivery_charge = 50
                 
             item.delivery_charge = delivery_charge
             total_delivery += delivery_charge
@@ -2487,17 +2487,19 @@ def checkoutorder(request):
     # Calculate subtotal, delivery charges and total
     subtotal = sum([item.get_total_price() for item in user_cart])
     total_delivery = 0
-    
+
     # Calculate delivery charges
     for item in user_cart:
-        if item.quantity <= 5:
+        if item.quantity <= 1:
+            delivery_charge = 5
+        elif item.quantity <= 2:
+            delivery_charge = 10
+        elif item.quantity <= 3:
+            delivery_charge = 15
+        elif item.quantity <= 4:
             delivery_charge = 20
-        elif item.quantity <= 10:
-            delivery_charge = 30
-        elif item.quantity <= 20:
-            delivery_charge = 50
         else:
-            delivery_charge = 80
+            delivery_charge = 50
         item.delivery_charge = delivery_charge
         total_delivery += delivery_charge
     
@@ -2658,24 +2660,6 @@ def send_order_email(order, request):
             <p><strong>Pincode:</strong> {order.pincode}</p>
             <p><strong>Payment Method:</strong> {order.payment_method}</p>
             <p><strong>Order Date:</strong> {order.order_date.strftime('%B %d, %Y, %I:%M %p')}</p>
-            
-            <div class="divider"></div>
-            <h3>Items Ordered:</h3>
-            
-            <div style="margin: 15px 0;">
-                {''.join(f"""
-                <div class="item-row">
-                    <div>
-                        <img src="{request.build_absolute_uri(item.product.product_image.url)}" 
-                             alt="{item.product.product_name}" 
-                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-                        <span style="margin-left: 10px;">{item.product.product_name}</span>
-                    </div>
-                    <div>{item.quantity}</div>
-                    <div>Rs. {item.price}</div>
-                </div>
-                """ for item in order_items)}
-            </div>
             
             <div class="divider"></div>
             <p class="total-price">Total Price: Rs. {order.total_price}</p>
@@ -2860,7 +2844,6 @@ def orderfullsum(request, order_id):
         # Map the status to tracking steps
         status_mapping = {
             'Placed': 'orderPlaced',
-            'Confirmed': 'orderConfirmed',
             'Shipped': 'orderShipped',
             'Out': 'orderOut',
             'Delivered': 'orderDelivered'
@@ -2871,7 +2854,6 @@ def orderfullsum(request, order_id):
         # Initialize all tracking steps with empty info
         tracking_info = {
             'orderPlaced': None,
-            'orderConfirmed': None,
             'orderShipped': None,
             'orderOut': None,
             'orderDelivered': None
@@ -3259,7 +3241,6 @@ def get_order_tracking(request, order_id):
         # Map the status to tracking steps
         status_mapping = {
             'Placed': 'orderPlaced',
-            'Confirmed': 'orderConfirmed',
             'Shipped': 'orderShipped',
             'Out': 'orderOut',
             'Delivered': 'orderDelivered'
@@ -3270,7 +3251,6 @@ def get_order_tracking(request, order_id):
         # Get tracking information with timestamps
         tracking_info = {
             'orderPlaced': order.created_at.strftime("%B %d, %Y %I:%M %p"),
-            'orderConfirmed': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Confirmed', 'Shipped', 'Out', 'Delivered'] else None,
             'orderShipped': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Shipped', 'Out'] else None,
             'orderOut': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status in ['Out', 'Delivered'] else None,
             'orderDelivered': order.updated_at.strftime("%B %d, %Y %I:%M %p") if order.status == 'Delivered' else None
