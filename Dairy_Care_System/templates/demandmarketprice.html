@@ -129,6 +129,22 @@
                 <option value="cheese">Cheese</option>
                 <option value="butter">Butter</option>
                 <option value="yogurt">Yogurt</option>
+                <option value="Milkmade">Milkmade</option>
+                <option value="Ghee">Ghee</option>
+                <option value="Butter">Butter</option>
+                <option value="Paneer">Paneer</option>
+                <option value="Cream">Cream</option>
+                <option value="Curd">Curd</option>
+                <option value="Milk Powder">Milk Powder</option>
+                <option value="Cheese">Cheese</option>
+                <option value="Scoop Ice Cream">Scoop Ice Cream</option>
+                <option value="Lassi">Lassi</option>
+                <option value="Kulfi">Kulfi</option>
+                <option value="Peda">Peda</option>
+                <option value="Rasmalai">Rasmalai</option>
+                <option value="Milk Pudding">Milk Pudding</option>
+                <option value="Rasgulla">Rasgulla</option>
+                <option value="Kefir">Kefir</option>
             </select>
 
             <button type="submit">Get Market Pricing</button>
@@ -136,7 +152,7 @@
 
         <div class="output">
             <p>Predicted Demand: <span id="predicted_demand">--</span> units</p>
-            <p>Predicted Market Price: $<span id="predicted_price">--</span></p>
+            <p>Predicted Market Price: ₹<span id="predicted_price">--</span></p>
         </div>
     </div>
 
@@ -146,30 +162,44 @@
     
             let formData = new FormData(event.target);
             
-            // Log to check if form data is being captured correctly
-            console.log("Form Data Sent:", formData.get("product_name"));
-    
-            let response = await fetch("{% url 'predict_market_price' %}", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
-                }
-            });
-    
+            // Show loading state
+            document.querySelector('button[type="submit"]').disabled = true;
+            document.querySelector('button[type="submit"]').textContent = 'Loading...';
+            
             try {
-                let data = await response.json();
-                console.log("Response Data:", data); // Debugging output
+                let response = await fetch("{% url 'predict_market_price' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                    }
+                });
     
+                let data = await response.json();
+                
                 if (data.success) {
                     document.getElementById("predicted_demand").innerText = data.predicted_demand;
                     document.getElementById("predicted_price").innerText = data.predicted_price;
                 } else {
-                    Swal.fire("Error", data.error, "error");
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.error || 'Failed to get predictions',
+                        icon: 'error',
+                        confirmButtonColor: '#d33'
+                    });
                 }
             } catch (error) {
-                console.error("Error parsing JSON:", error);
-                Swal.fire("Error", "Invalid response from server.", "error");
+                console.error("Error:", error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to get predictions',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } finally {
+                // Reset button state
+                document.querySelector('button[type="submit"]').disabled = false;
+                document.querySelector('button[type="submit"]').textContent = 'Get Market Pricing';
             }
         };
     </script>

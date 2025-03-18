@@ -127,29 +127,29 @@ WSGI_APPLICATION = 'Dairy_Care_System.wsgi.application'
 
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'dairycaresystem',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
-
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dairycaresystem_strengthit',
-        'USER': 'dairycaresystem_strengthit',
-        'PASSWORD': 'e72a5ca9af7cd57ab8223e827778ac0fcf332e39',
-        'HOST': 'ng18e.h.filess.io',
-        'PORT': '3307',
+        'NAME': 'dairycaresystem',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
+
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'dairycaresystem_strengthit',
+#         'USER': 'dairycaresystem_strengthit',
+#         'PASSWORD': 'e72a5ca9af7cd57ab8223e827778ac0fcf332e39',
+#         'HOST': 'ng18e.h.filess.io',
+#         'PORT': '3307',
+#     }
+# }
 
 
 

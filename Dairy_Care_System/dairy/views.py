@@ -3555,8 +3555,8 @@ def get_server_ip(request):
 
 
 
-def load_model():
-    model_path = os.path.join(settings.BASE_DIR, 'ml_models', 'milk_quality_model.pkl')
+def load_models():
+    model_path = os.path.join(settings.BASE_DIR, 'ml_modelss', 'milk_quality_model.pkl')
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
     return joblib.load(model_path)
@@ -3580,7 +3580,7 @@ def milkqualityanalysis(request):
             density = float(data.get('density'))
             temperature = float(data.get('temperature'))
 
-            model = load_model()
+            model = load_models()
             input_data = np.array([[ph_level, fat_content, density, temperature]])
 
             scaler_path = os.path.join(os.path.dirname(__file__), 'ml_model', 'scaler.pkl')
@@ -3598,6 +3598,7 @@ def milkqualityanalysis(request):
             return JsonResponse({'error': str(e)}, status=400)
 
     return render(request, 'milkqualityanalysis.html', {'username': user.username})
+
 
 
 
@@ -3894,66 +3895,6 @@ def get_disease_analysis(request):
 
 
 
-
-
-
-
-import os
-import pickle
-import pandas as pd
-from django.shortcuts import render
-from django.http import JsonResponse
-
-# Load the trained model
-model_path = os.path.join(os.path.dirname(__file__), "..", "ml_models", "market_price_model.pkl")
-model = joblib.load(model_path)
-
-def demand_market_price_page(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
-    if user_id:
-        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
-        context = {
-            'username': user.username,  # Pass the username to the template
-        }
-        return render(request, 'demandmarketprice.html', context)
-    else:
-        return redirect('login')  # Redirect to login if no user is logged in 
-
-@csrf_exempt
-def demand_market_price_prediction(request):
-    """Handle form submission and return predictions."""
-    if request.method == "POST":
-        try:
-            product_name = request.POST.get("product_name", "").strip()
-
-            if not product_name:
-                return JsonResponse({"success": False, "error": "Product name is required."})
-
-            # Generate placeholder values for missing inputs (since only product name is given)
-            stock = 100  # Example default stock
-            supplier_price = 50  # Example supplier price
-            season = 1  # Default to High season
-            reviews = 4.0  # Example customer review score
-            competitor_price = 60  # Example competitor price
-
-            # Create feature array
-            input_features = np.array([[stock, supplier_price, season, reviews, competitor_price]])
-
-            # Make prediction
-            predicted_price = model.predict(input_features)[0]
-            predicted_demand = round(predicted_price * 0.8)  # Dummy logic: Demand is 80% of price
-
-            return JsonResponse({
-                "success": True,
-                "predicted_demand": predicted_demand,
-                "predicted_price": round(predicted_price, 2)
-            })
-
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-
-    return JsonResponse({"success": False, "error": "Invalid request."})
-
 def get_disease_analysis_from_gemini(disease_name):
     """Helper function to get disease analysis from Gemini"""
     try:
@@ -4012,6 +3953,9 @@ def get_disease_analysis_from_gemini(disease_name):
     except Exception as e:
         logger.error(f"Error in Gemini analysis: {str(e)}")
         return None
+
+
+
 
 # Update the diseasedetection view to include debug prints
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -4075,6 +4019,8 @@ def diseasedetection(request):
     else:
         return redirect('login')
 
+
+
 @csrf_exempt
 def update_preorder_status(request, preorder_id):
     if request.method == 'POST':
@@ -4086,6 +4032,8 @@ def update_preorder_status(request, preorder_id):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def preorderfarm(request):
@@ -4105,3 +4053,112 @@ def preorderfarm(request):
     else:
         # Redirect to login if farmer_id is not found in the session
         return redirect('login')
+    
+
+
+import pickle
+import os
+import pandas as pd
+from django.conf import settings
+from django.shortcuts import render
+
+def load_model():
+    model_path = os.path.join(settings.BASE_DIR, 'ml_models', 'market_pricing_model.pkl')
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found at {model_path}")
+    with open(model_path, 'rb') as f:
+        return pickle.load(f)
+
+# Load trained model
+try:
+    model = load_model()
+except Exception as e:
+    print(f"Error loading model: {str(e)}")
+    model = None
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def demand_market_price(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    
+    user = Users_table.objects.get(user_id=user_id)
+    context = {
+        'username': user.username
+    }
+    return render(request, 'demandmarketprice.html', context)
+
+@csrf_exempt
+def predict_market_price(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid request method'
+        })
+
+    if not model:
+        return JsonResponse({
+            'success': False,
+            'error': 'Model not loaded properly'
+        })
+
+    product_name = request.POST.get('product_name')
+    if not product_name:
+        return JsonResponse({
+            'success': False,
+            'error': 'Product name is required'
+        })
+
+    # Comprehensive product data mapping for all dairy products
+    product_data = {
+        'milk': {'stock': 100, 'supplier_price': 50, 'demand': 120, 'season': 1, 'reviews': 4.5, 'competitor_price': 55},
+        'cheese': {'stock': 75, 'supplier_price': 120, 'demand': 80, 'season': 1, 'reviews': 4.3, 'competitor_price': 125},
+        'butter': {'stock': 50, 'supplier_price': 80, 'demand': 90, 'season': 0, 'reviews': 4.2, 'competitor_price': 85},
+        'yogurt': {'stock': 150, 'supplier_price': 40, 'demand': 200, 'season': 1, 'reviews': 4.7, 'competitor_price': 45},
+        'milkmade': {'stock': 60, 'supplier_price': 90, 'demand': 70, 'season': 1, 'reviews': 4.4, 'competitor_price': 95},
+        'ghee': {'stock': 40, 'supplier_price': 450, 'demand': 50, 'season': 1, 'reviews': 4.6, 'competitor_price': 460},
+        'paneer': {'stock': 80, 'supplier_price': 280, 'demand': 100, 'season': 1, 'reviews': 4.4, 'competitor_price': 290},
+        'cream': {'stock': 70, 'supplier_price': 160, 'demand': 85, 'season': 1, 'reviews': 4.3, 'competitor_price': 170},
+        'curd': {'stock': 120, 'supplier_price': 35, 'demand': 150, 'season': 1, 'reviews': 4.5, 'competitor_price': 40},
+        'milk powder': {'stock': 90, 'supplier_price': 200, 'demand': 70, 'season': 0, 'reviews': 4.2, 'competitor_price': 210},
+        'scoop ice cream': {'stock': 200, 'supplier_price': 150, 'demand': 250, 'season': 1, 'reviews': 4.6, 'competitor_price': 160},
+        'lassi': {'stock': 180, 'supplier_price': 25, 'demand': 220, 'season': 1, 'reviews': 4.4, 'competitor_price': 30},
+        'kulfi': {'stock': 100, 'supplier_price': 40, 'demand': 130, 'season': 1, 'reviews': 4.5, 'competitor_price': 45},
+        'peda': {'stock': 70, 'supplier_price': 300, 'demand': 90, 'season': 1, 'reviews': 4.3, 'competitor_price': 310},
+        'rasmalai': {'stock': 60, 'supplier_price': 350, 'demand': 80, 'season': 1, 'reviews': 4.7, 'competitor_price': 360},
+        'milk pudding': {'stock': 50, 'supplier_price': 180, 'demand': 65, 'season': 1, 'reviews': 4.2, 'competitor_price': 190},
+        'rasgulla': {'stock': 80, 'supplier_price': 280, 'demand': 100, 'season': 1, 'reviews': 4.4, 'competitor_price': 290},
+        'kefir': {'stock': 40, 'supplier_price': 120, 'demand': 50, 'season': 0, 'reviews': 4.1, 'competitor_price': 130}
+    }
+
+    try:
+        # Convert product name to lowercase and replace spaces with underscores for matching
+        product_key = product_name.lower().replace(' ', '_')
+        
+        if product_key not in product_data:
+            return JsonResponse({
+                'success': False,
+                'error': f'Product "{product_name}" not found in database'
+            })
+
+        data = product_data[product_key]
+        df = pd.DataFrame([data])
+        
+        # Ensure correct feature order
+        features = df[['stock', 'supplier_price', 'demand', 'season', 'reviews', 'competitor_price']]
+        
+        # Make prediction
+        predicted_price = float(model.predict(features)[0])
+        predicted_demand = data['demand']  # Using current demand as prediction
+
+        return JsonResponse({
+            'success': True,
+            'predicted_demand': predicted_demand,
+            'predicted_price': round(predicted_price, 2)
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Error making prediction: {str(e)}'
+        })

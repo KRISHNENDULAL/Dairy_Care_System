@@ -66,8 +66,7 @@ urlpatterns = [
     path('farmerproductstock',views.farmerproductstock,name='farmerproductstock'),
     path('salegraph',views.salegraph,name='salegraph'),
     path('milkqualityanalysis' ,views.milkqualityanalysis,name='milkqualityanalysis'),
-    path("demandmarketprice/", views.demand_market_price_page, name="demandmarketprice"),
-    path("predict_market_price/", views.demand_market_price_prediction, name="predict_market_price"),
+    path("demandmarketprice/", views.demand_market_price, name="demandmarketprice"),
 
     path('addanimal', views.addanimal, name='addanimal'),
     path('animalslist',views.animalslist,name='animalslist'),
@@ -152,6 +151,8 @@ urlpatterns = [
     path('verify-model/', views.verify_model, name='verify_model'),
 
     path('update_preorder_status/<int:preorder_id>/', views.update_preorder_status, name='update_preorder_status'),
+
+    path('predict_market_price/', views.predict_market_price, name='predict_market_price'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
