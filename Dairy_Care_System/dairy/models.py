@@ -254,6 +254,20 @@ class DiseaseImage(models.Model):
     
 
 
+class PaymentStatus(models.Model):
+    farmer = models.ForeignKey(Users_table, on_delete=models.CASCADE)
+    is_paid = models.BooleanField(default=False)
+    last_paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    last_paid_date = models.DateTimeField(null=True, blank=True)
+    
+    def __str__(self):
+        return f"Payment Status for {self.farmer.username}"
+
+    class Meta:
+        verbose_name_plural = "Payment Statuses"
+
+
+
 class DiseaseAnalysisHistory(models.Model):
     user = models.ForeignKey(Users_table, on_delete=models.CASCADE)
     disease_name = models.CharField(max_length=200)
@@ -290,7 +304,4 @@ class Address_table(models.Model):
         return f"{self.street_address}, {self.town_city}, {self.district}, {self.postcode_zip}"
     
 
-
-
-    
 

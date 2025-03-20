@@ -1,0 +1,479 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Add Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- <link rel="stylesheet" href="{% static 'css/adminpage.css' %}"> -->
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('{% static "images/employeepages.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            padding: 0;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Back link styling */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 25px;
+            color: black;
+            text-decoration: none;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Header styling */
+        h2 {
+            color: #000000;
+            font-family: Copperplate, Papyrus, fantasy;
+            font-size: 40px;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Container styling */
+        .revenue-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        /* Farm owner card styling */
+        .farm-owner-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .farm-owner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .farm-owner-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .total-revenue {
+            font-size: 20px;
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        /* Products table styling */
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .products-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .products-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .product-name {
+            font-weight: 500;
+        }
+
+        .product-category {
+            color: #666;
+        }
+
+        .product-sales {
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .product-quantity {
+            color: #666;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        /* New styles for payment section */
+        .revenue-breakdown {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .revenue-item {
+            text-align: center;
+        }
+
+        .revenue-item h4 {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .revenue-item p {
+            margin: 5px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .total-revenue { color: #2c3e50; }
+        .platform-fee { color: #e74c3c; }
+        .payable-amount { color: #27ae60; }
+
+        .payment-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 15px;
+        }
+
+        .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-unpaid {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .pay-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .pay-button:hover {
+            background-color: #218838;
+        }
+
+        .pay-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .last-paid-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Admin Revenue Summary Styles */
+        .admin-revenue-summary {
+            background: linear-gradient(to right, #9ed1f6, #dfe6eb);
+            color: rgb(0, 0, 0);
+            border-radius: 35px;
+            padding: 25px;
+            margin: 20px auto 40px;
+            max-width: 1000px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .admin-revenue-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .admin-stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 50px;
+            border-color: #000000;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .admin-stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .admin-stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .admin-stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .admin-stat-icon {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: rgba(0, 0, 0, 0.9);
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Side Navigation (Always Visible) -->
+    <!-- <div id="mySidenav" class="sidenav"><br><br><br><br>
+        <a href="{% url 'reguserlist' 'all' %}"><i class="fas fa-users"></i>  Manage Users</a>
+        <a href="{% url 'addemployee' %}" style="padding-left: 45px; font-size: 1.3em;"><i class="fas fa-user-plus"></i> Add Employee</a><br>
+        <a href="{% url 'adminproductslist' %}" id="product"><i class="fas fa-shopping-basket"></i>  Manage Products</a><br>
+        <a href="{% url 'deliveryassigns' %}"><i class="fas fa-truck"></i>  Assign Deliveries</a><br>
+        <a href="{% url 'adminanimalslist' %}"><i class="fas fa-paw"></i>  Manage Animals</a><br>
+        <a href="{% url 'adminproductstock' %}"><i class="fas fa-boxes"></i>  Manage Stock</a><br>
+        <a href="{% url 'adminmilkdetails' %}"><i class="fas fa-glass-whiskey"></i>  Manage Milk</a><br>
+        <a href="{% url 'adminstocknotification' %}"><i class="fas fa-bell"></i> Notifications</a><br>
+        <a href="{% url 'adminfeedbackreview' %}"><i class="fas fa-comments"></i>  Feedback Review</a><br>
+    </div> -->
+
+    <!-- Navigation Bar -->
+    <!-- <ul>
+        <div class="brand-name"><i class="fas fa-cow"></i><span>Dairy Care System</span></div>
+        <div class="header">
+            <div class="nav-item">
+                <li>
+                    <b><a href="#" class="username" onclick="toggleDropdown()"><i class="fas fa-user-circle"></i> {{ username }}</a></b>
+                    <div class="dropdown-content" id="dropdown-content">
+                        <a href="{% url 'userprofile' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </ul> -->
+
+    <a href="{% url 'adminpage' %}" class="back-link"><b>&larr; BACK</b></a><br>
+    <h2><i class="fas fa-chart-line"></i> Revenue Overview</h2>
+
+    <div class="admin-revenue-summary">
+        <div class="admin-revenue-title">
+            <i class="fas fa-chart-pie"></i>
+            Platform Revenue Summary
+        </div>
+        <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+                <i class="fas fa-users admin-stat-icon"></i>
+                <div class="admin-stat-label">Total Farm Owners</div>
+                <div class="admin-stat-value">{{ farm_owner_details|length }}</div>
+            </div>
+            <div class="admin-stat-card">
+                <i class="fas fa-money-bill-wave admin-stat-icon"></i>
+                <div class="admin-stat-label">Total Platform Revenue</div>
+                <div class="admin-stat-value">₹{{ total_platform_revenue|floatformat:2 }}</div>
+            </div>
+            <!-- <div class="admin-stat-card">
+                <i class="fas fa-check-circle admin-stat-icon"></i>
+                <div class="admin-stat-label">Paid Farmers</div>
+                <div class="admin-stat-value">{{ paid_farmers_count }}</div>
+            </div>
+            <div class="admin-stat-card">
+                <i class="fas fa-clock admin-stat-icon"></i>
+                <div class="admin-stat-label">Pending Payments</div>
+                <div class="admin-stat-value">{{ pending_farmers_count }}</div>
+            </div> -->
+        </div>
+    </div>
+
+    <div class="revenue-container">
+        {% if farm_owner_details %}
+            {% for detail in farm_owner_details %}
+                <div class="farm-owner-card">
+                    <div class="farm-owner-header">
+                        <div class="farm-owner-name">
+                            <i class="fas fa-user-circle"></i> {{ detail.owner.username }}
+                            <span class="payment-status {% if detail.payment_status.is_paid %}status-paid{% else %}status-unpaid{% endif %}">
+                                {% if detail.payment_status.is_paid %}Paid{% else %}Unpaid{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if detail.products %}
+                        <table class="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Quantity Sold</th>
+                                    <th>Total Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in detail.products %}
+                                    <tr>
+                                        <td class="product-name">{{ product.name }}</td>
+                                        <td class="product-category">{{ product.category }}</td>
+                                        <td class="product-quantity">{{ product.quantity_sold }}</td>
+                                        <td class="product-sales">₹{{ product.total_sales|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="revenue-breakdown">
+                            <div class="revenue-item">
+                                <h4>Total Revenue</h4>
+                                <p class="total-revenue">₹{{ detail.total_revenue|floatformat:2 }}</p>
+                            </div>
+                            <div class="revenue-item">
+                                <h4>Platform Fee (10%)</h4>
+                                <p class="platform-fee">₹{{ detail.platform_fee|floatformat:2 }}</p>
+                            </div>
+                            <div class="revenue-item">
+                                <h4>Payable Amount (90%)</h4>
+                                <p class="payable-amount">₹{{ detail.payable_amount|floatformat:2 }}</p>
+                                <button class="pay-button" 
+                                        onclick="initiatePayment('{{ detail.owner.user_id }}', {{ detail.payable_amount }})"
+                                        {% if detail.payment_status.is_paid %}disabled{% endif %}>
+                                    {% if detail.payment_status.is_paid %}Paid{% else %}Pay Now{% endif %}
+                                </button>
+                                {% if detail.payment_status.last_paid_date %}
+                                    <div class="last-paid-info">
+                                        Last paid: ₹{{ detail.payment_status.last_paid_amount }} on {{ detail.payment_status.last_paid_date|date:"d M Y" }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            No products sold yet
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                No farm owners found
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Add SweetAlert2 for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        function initiatePayment(farmerId, amount) {
+            Swal.fire({
+                title: 'Confirm Payment',
+                text: `Are you sure you want to process payment of ₹${amount.toFixed(2)}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, process payment'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send payment request to server
+                    fetch(`/process_farmer_payment/${farmerId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            amount: amount
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Payment Successful!',
+                                'The payment has been processed successfully.',
+                                'success'
+                            ).then(() => {
+                                // Reload page to update status
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error',
+                                data.error || 'Payment processing failed.',
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            'Error',
+                            'There was an error processing the payment.',
+                            'error'
+                        );
+                    });
+                }
+            });
+        }
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

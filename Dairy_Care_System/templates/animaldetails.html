@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+
 {% load static %}
 
 {% block title %}{{ animal.animal_name }} Details{% endblock %}
@@ -617,12 +617,12 @@
     }
     </script>
 
-    <script>
-    // Store animal ID in session storage when page loads
+    <!-- <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.setItem('lastAnimalId', '{{ animal.animal_id }}');
         
-        // Mask the URL after storing the ID
+        
         const path = window.location.pathname;
         if (path.match(/\/animal\/\d+\//)) {
             const maskedPath = path.replace(/\/animal\/\d+\//, '/animal/YK/');
@@ -632,13 +632,13 @@
 
     function maskHealthStatusUrl(event, url) {
         event.preventDefault();
-        // Store the current animal ID in session storage
+        
         sessionStorage.setItem('lastAnimalId', '{{ animal.animal_id }}');
-        // Navigate to the URL which will be masked
+        
         window.location.href = url;
     }
 
-    // Handle back navigation
+    
     window.addEventListener('popstate', function(event) {
         const lastAnimalId = sessionStorage.getItem('lastAnimalId');
         if (window.location.pathname === '/animal/YK/') {
@@ -649,7 +649,7 @@
             }
         }
     });
-    </script>
+    </script> -->
 
 </body>
 </html>

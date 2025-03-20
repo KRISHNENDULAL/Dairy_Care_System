@@ -184,7 +184,7 @@
                                     Accept
                                 </button>
                             {% else %}
-                                <span style="color: #4CAF50; font-weight: bold;">{{ preorder.status }}</span>
+                                <span id="status-{{ preorder.id }}" style="color: #4CAF50; font-weight: bold;">{{ preorder.status }}</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -297,6 +297,38 @@
                 button.textContent = 'Accept';
             });
         }
+
+        // Function to check delivery dates and update status
+        function checkDeliveryDates() {
+            const today = new Date();
+            const preorders = document.querySelectorAll('tr[data-preorder-id]');
+            
+            preorders.forEach(row => {
+                const deliveryDate = new Date(row.querySelector('td:nth-child(4)').textContent);
+                const statusSpan = row.querySelector('td:last-child span');
+                
+                if (today > deliveryDate && statusSpan && statusSpan.textContent === 'Approved') {
+                    statusSpan.textContent = 'Delivered';
+                    statusSpan.style.color = '#4CAF50';
+                }
+            });
+        }
+
+        // Check delivery dates when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDeliveryDates();
+            // Check every hour
+            setInterval(checkDeliveryDates, 3600000);
+        });
+
+        // Add data-preorder-id to each row
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const preorderId = row.querySelector('td:last-child span')?.id?.replace('status-', '') || 
+                             row.querySelector('td:last-child button')?.onclick.toString().match(/\d+/)[0];
+            if (preorderId) {
+                row.setAttribute('data-preorder-id', preorderId);
+            }
+        });
     </script>
 </body>
 </html>

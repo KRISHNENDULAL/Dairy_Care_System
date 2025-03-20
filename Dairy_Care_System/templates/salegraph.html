@@ -51,7 +51,7 @@
 
         .stat-card h3 {
             margin: 0;
-            color: #555;
+            color: #03065f;
             font-size: 1.1em;
             font-weight: 600;
         }
@@ -108,12 +108,97 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Revenue Details Table Styling */
+        .revenue-details-container {
+            margin: 40px auto;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+        }
+
+        .farm-owner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .farm-owner-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #100680;
+        }
+
+        .total-revenue {
+            font-size: 20px;
+            color: #04701a;
+            font-weight: 600;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .products-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .products-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .product-name {
+            font-weight: 500;
+        }
+
+        .product-category {
+            color: #620505;
+        }
+
+        .product-sales {
+            color: #058f25;
+            font-weight: 500;
+        }
+
+        .product-quantity {
+            color: #000000;
+        }
+
+        .payment-info {
+            font-size: 0.9em;
+            color: #2e7d32;
+            margin-top: 8px;
+            padding: 5px 10px;
+            background-color: rgba(46, 125, 50, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .payment-info i {
+            margin-right: 5px;
+            color: #2e7d32;
+        }
     </style>
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Add Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
     <!-- Side Navigation (Always Visible) -->
@@ -169,8 +254,43 @@
             <div class="stat-card">
                 <i class="fas fa-rupee-sign stat-icon"></i>
                 <h3>Total Revenue</h3>
-                <p>Rs. {{ total_revenue|floatformat:2 }}</p>
+                <p>₹ {{ total_revenue|floatformat:2 }}</p>
+                <div class="payment-info">
+                    <i class="fas fa-check-circle"></i>Payment received: ₹ {{ last_paid_amount|floatformat:2 }}
+                </div>
             </div>
+        </div>
+
+        <!-- Revenue Details Table -->
+        <div class="revenue-details-container chart-container">
+            <div class="farm-owner-header">
+                <div class="farm-owner-name">
+                    <i class="fa-solid fa-sack-dollar"></i> Revenue Distribution: 90% Farmer Share | 10% Platform Fee
+                </div>
+                <div class="total-revenue">
+                    Total Revenue: ₹ {{ total_revenue|floatformat:2 }}
+                </div>
+            </div>
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Quantity Sold</th>
+                        <th>Total Sales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sales_data %}
+                        <tr>
+                            <td class="product-name">{{ item.product_name }}</td>
+                            <td class="product-category">{{ item.category }}</td>
+                            <td class="product-quantity">{{ item.quantity_sold }}</td>
+                            <td class="product-sales">₹ {{ item.revenue|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <!-- Chart Grid -->
@@ -195,7 +315,8 @@
                 <canvas id="revenuePieChart"></canvas>
             </div>
         </div>
-    
+
+        
 
     <!-- Add SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

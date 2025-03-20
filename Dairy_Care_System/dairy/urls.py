@@ -33,6 +33,7 @@ urlpatterns = [
     path('addemployee', views.addemployee, name='addemployee'),
     path('adminmilkdetails/', views.adminmilkdetails, name='adminmilkdetails'),
     path('adminproductstock',views.adminproductstock,name='adminproductstock'),
+    path('adminrevenue',views.adminrevenue,name='adminrevenue'),
     path('adminfeedbackreview',views.adminfeedbackreview,name='adminfeedbackreview'),
     path('adminstocknotification', views.adminstocknotification, name='adminstocknotification'),
     path('reguserlist/<str:role>/',views.reguserlist,name='reguserlist'),
@@ -82,9 +83,9 @@ urlpatterns = [
     path('health/update/DCS/', views.update_health_record, {'health_id': None}, name='update_health_record_masked'),
     
     path('animal/delete/<int:animal_id>/', views.delete_animal, name='delete_animal'),
-    path('animal/delete/DCS/', views.delete_animal, {'animal_id': None}, name='delete_animal_masked'),
+    # path('animal/delete/DCS/', views.delete_animal, {'animal_id': None}, name='delete_animal_masked'),
     path('animal/restore/<int:animal_id>/', views.restore_animal, name='restore_animal'),
-    path('animal/restore/DCS/', views.restore_animal, {'animal_id': None}, name='restore_animal_masked'),
+    # path('animal/restore/DCS/', views.restore_animal, {'animal_id': None}, name='restore_animal_masked'),
     
     path('milkdetails/', views.milkdetails, name='milkdetails'),
 
@@ -153,6 +154,8 @@ urlpatterns = [
     path('update_preorder_status/<int:preorder_id>/', views.update_preorder_status, name='update_preorder_status'),
 
     path('predict_market_price/', views.predict_market_price, name='predict_market_price'),
+
+    path('process_farmer_payment/<str:farmer_id>/', views.process_farmer_payment, name='process_farmer_payment'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

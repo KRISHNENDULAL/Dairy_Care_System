@@ -171,11 +171,7 @@
                         <td>{{ preorder.additional_notes }}</td>
                         <td>{{ preorder.created_at }}</td>
                         <td>
-                            {% if preorder.status == 'Pending' %}
-                                <span style="color: #FFA500; font-weight: bold;">{{ preorder.status }}</span>
-                            {% else %}
-                                <span style="color: #4CAF50; font-weight: bold;">{{ preorder.status }}</span>
-                            {% endif %}
+                            <span id="status-{{ preorder.id }}" style="color: {% if preorder.status == 'Pending' %}#FFA500{% else %}#4CAF50{% endif %}; font-weight: bold;">{{ preorder.status }}</span>
                         </td>
                     </tr>
                     {% endfor %}
@@ -232,6 +228,37 @@
                 }
             });
         }
-        </script>
+
+        // Function to check delivery dates and update status
+        function checkDeliveryDates() {
+            const today = new Date();
+            const preorders = document.querySelectorAll('tr[data-preorder-id]');
+            
+            preorders.forEach(row => {
+                const deliveryDate = new Date(row.querySelector('td:nth-child(4)').textContent);
+                const statusSpan = row.querySelector('td:last-child span');
+                
+                if (today > deliveryDate && statusSpan && statusSpan.textContent === 'Approved') {
+                    statusSpan.textContent = 'Delivered';
+                    statusSpan.style.color = '#4CAF50';
+                }
+            });
+        }
+
+        // Check delivery dates when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDeliveryDates();
+            // Check every hour
+            setInterval(checkDeliveryDates, 3600000);
+        });
+
+        // Add data-preorder-id to each row
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const preorderId = row.querySelector('td:last-child span')?.id?.replace('status-', '');
+            if (preorderId) {
+                row.setAttribute('data-preorder-id', preorderId);
+            }
+        });
+    </script>
 </body>
 </html>

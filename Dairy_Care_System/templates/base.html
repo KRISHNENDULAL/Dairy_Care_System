@@ -19,8 +19,8 @@
             let url = window.location.href;
             // Add all ID patterns to mask
             const patterns = [
-                { regex: /\/animal\/(\d+)\//g, replace: '/animal/DCS/' },
-                { regex: /\/updateanimal\/(\d+)\//g, replace: '/updateanimal/DCS/' },
+                // { regex: /\/animal\/(\d+)\//g, replace: '/animal/DCS/' },
+                // { regex: /\/updateanimal\/(\d+)\//g, replace: '/updateanimal/DCS/' },
                 { regex: /\/updateproduct\/(\d+)\//g, replace: '/updateproduct/DCS/' },
                 { regex: /\/deleteproduct\/(\d+)\//g, replace: '/deleteproduct/DCS/' },
                 { regex: /\/restoreproduct\/(\d+)\//g, replace: '/restoreproduct/DCS/' },
@@ -28,8 +28,8 @@
                 { regex: /\/restoreuser\/(\d+)\//g, replace: '/restoreuser/DCS/' },
                 { regex: /\/deleteaccount\/(\d+)\//g, replace: '/deleteaccount/DCS/' },
                 
-                { regex: /\/deleteanimal\/(\d+)\//g, replace: '/deleteanimal/DCS/' },
-                { regex: /\/restoreanimal\/(\d+)\//g, replace: '/restoreanimal/DCS/' },
+                // { regex: /\/deleteanimal\/(\d+)\//g, replace: '/deleteanimal/DCS/' },
+                // { regex: /\/restoreanimal\/(\d+)\//g, replace: '/restoreanimal/DCS/' },
                 
                 { regex: /\/ordersummary\/(\d+)\//g, replace: '/ordersummary/DCS/' },
                 { regex: /\/orderfullsum\/(\d+)\//g, replace: '/orderfullsum/DCS/' },
@@ -42,7 +42,7 @@
                 { regex: /\/confirm-delivery\/(\d+)\//g, replace: '/confirm-delivery/DCS/' },
                 { regex: /\/get_delivery_status\/(\d+)\//g, replace: '/get_delivery_status/DCS/' },
                 // { regex: /\/scan-qr\/\?(\d+)/g, replace: '/scan-qr/DCS/' },
-                { regex: /\/animal\/(\d+)\/animalhealthstatus/g, replace: '/animal/DCS/animalhealthstatus' },
+                // { regex: /\/animal\/(\d+)\/animalhealthstatus/g, replace: '/animal/DCS/animalhealthstatus' },
             ];
 
             // Store original URL in state before masking
@@ -65,16 +65,16 @@
         // Handle back/forward navigation
         window.addEventListener('popstate', function(event) {
             const ykPatterns = [
-                '/animal/DCS/',
-                '/updateanimal/DCS/',
+                // '/animal/DCS/',
+                // '/updateanimal/DCS/',
                 '/updateproduct/DCS/',
                 '/deleteproduct/DCS/',
                 '/restoreproduct/DCS/',
                 '/regdeleteuser/DCS/',
                 '/restoreuser/DCS/',
 
-                '/deleteanimal/DCS/',
-                '/restoreanimal/DCS/',
+                // '/deleteanimal/DCS/',
+                // '/restoreanimal/DCS/',
                 
                 '/deleteaccount/DCS/',
                 '/ordersummary/DCS/',
@@ -96,9 +96,10 @@
                     window.location.replace(event.state.originalUrl);
                 } else {
                     // Redirect to appropriate list page based on current path
-                    if (currentPath.includes('animal')) {
-                        window.location.replace('/animalslist');
-                    } else if (currentPath.includes('product')) {
+                    // if (currentPath.includes('animal')) {
+                    //     window.location.replace('/animalslist');
+                    // } 
+                    if (currentPath.includes('product')) {
                         window.location.replace('/productslist');
                     } else if (currentPath.includes('user')) {
                         window.location.replace('/reguserlist/all');
@@ -122,12 +123,12 @@
         //     }
         // });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            let url = window.location.href;
-            if (url.includes('/animal/') && /\/animal\/\d+\/animalhealthstatus/.test(url)) {
-                history.replaceState(null, '', url.replace(/\/animal\/\d+\/animalhealthstatus/, '/animal/DCS/animalhealthstatus'));
-            }
-        });
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     let url = window.location.href;
+        //     if (url.includes('/animal/') && /\/animal\/\d+\/animalhealthstatus/.test(url)) {
+        //         history.replaceState(null, '', url.replace(/\/animal\/\d+\/animalhealthstatus/, '/animal/DCS/animalhealthstatus'));
+        //     }
+        // });
     </script>
 </head>
 <body>

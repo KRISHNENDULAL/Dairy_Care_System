@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus, DiseaseImage, DiseaseAnalysisHistory
+from .models import Users_table, Products_table, ProductImage, Feedback_table, WishlistItem, PreOrder, Cart, Order_table, OrderItem_table, Address_table, Notifications_table, Animals_table, AnimalImages, AnimalHealth_table, DeliveryStatus, DiseaseImage, DiseaseAnalysisHistory, PaymentStatus
 from django.core.mail import send_mail
 from django.conf import settings 
 from django.contrib.auth.hashers import make_password, check_password
@@ -68,6 +68,7 @@ import json
 import os
 from dotenv import load_dotenv
 import requests
+from decimal import Decimal
 
 # Load environment variables
 load_dotenv()
@@ -2762,6 +2763,81 @@ def stocknotification(request):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def adminrevenue(request):
+    from decimal import Decimal
+    # Get all farm owners and order them alphabetically by username
+    farm_owners = Users_table.objects.filter(role='owner').order_by('username')
+    
+    # Create a list to store farm owner details with their revenue
+    farm_owner_details = []
+    total_platform_revenue = Decimal('0')
+    paid_farmers_count = 0
+    pending_farmers_count = 0
+    
+    for owner in farm_owners:
+        # Get all products added by this farm owner
+        products = Products_table.objects.filter(employee=owner).order_by('product_name')
+        
+        # Get all order items containing these products
+        order_items = OrderItem_table.objects.filter(product__in=products)
+        
+        # Calculate total revenue for this farm owner
+        total_revenue = sum(item.quantity * item.price for item in order_items)
+        
+        # Calculate platform fee (10%) and payable amount (90%)
+        platform_fee = total_revenue * Decimal('0.10')
+        payable_amount = total_revenue * Decimal('0.90')
+        
+        # Add to total platform revenue
+        total_platform_revenue += platform_fee
+        
+        # Get product details with their sales
+        product_details = []
+        for product in products:
+            product_order_items = order_items.filter(product=product)
+            product_total_sales = sum(item.quantity * item.price for item in product_order_items)
+            product_details.append({
+                'name': product.product_name,
+                'category': product.product_category,
+                'total_sales': product_total_sales,
+                'quantity_sold': sum(item.quantity for item in product_order_items)
+            })
+        
+        # Sort product details alphabetically by name
+        product_details.sort(key=lambda x: x['name'].lower())
+        
+        # Get or create payment status
+        payment_status, created = PaymentStatus.objects.get_or_create(
+            farmer=owner,
+            defaults={'is_paid': False, 'last_paid_amount': Decimal('0')}
+        )
+        
+        # Count paid and pending farmers
+        if payment_status.is_paid:
+            paid_farmers_count += 1
+        else:
+            pending_farmers_count += 1
+        
+        farm_owner_details.append({
+            'owner': owner,
+            'products': product_details,
+            'total_revenue': total_revenue,
+            'platform_fee': platform_fee,
+            'payable_amount': payable_amount,
+            'payment_status': payment_status
+        })
+    
+    context = {
+        'farm_owner_details': farm_owner_details,
+        'total_platform_revenue': total_platform_revenue,
+        'paid_farmers_count': paid_farmers_count,
+        'pending_farmers_count': pending_farmers_count
+    }
+    return render(request, 'adminrevenue.html', context)
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def ordersummary(request, order_id):
     # order_id = request.GET.get('order_id')
     # if not order_id:
@@ -2935,40 +3011,38 @@ def salegraph(request):
         user = Users_table.objects.get(user_id=user_id)
         
         # Get all products of the farmer
-        farmer_products = Products_table.objects.filter(employee=user)
+        farmer_products = Products_table.objects.filter(employee=user).order_by('product_name')
+        
+        # Get all order items for this farmer's products
+        order_items = OrderItem_table.objects.filter(product__in=farmer_products)
+        
+        # Calculate total revenue
+        total_revenue = sum(item.quantity * item.price for item in order_items)
+        
+        # Get last paid amount from PaymentStatus
+        payment_status = PaymentStatus.objects.filter(farmer=user).first()
+        last_paid_amount = payment_status.last_paid_amount if payment_status else 0
         
         # Get sales data for each product
         sales_data = []
         for product in farmer_products:
-            # Count total quantity sold for each product
-            total_sold = OrderItem_table.objects.filter(
-                product=product,
-                order__status='Delivered'  # Only count completed orders
-            ).values('product__product_name').annotate(
-                total_quantity=Sum('quantity'),
-                total_revenue=Sum(F('quantity') * F('product__product_price'))
-            ).order_by('product__product_name').first()
+            # Get order items for this specific product
+            product_order_items = order_items.filter(product=product)
+            product_total_sales = sum(item.quantity * item.price for item in product_order_items)
             
-            if total_sold:
-                sales_data.append({
-                    'product_name': product.product_name,
-                    'quantity_sold': total_sold['total_quantity'] or 0,
-                    'revenue': float(total_sold['total_revenue'] or 0)  # Convert Decimal to float
-                })
-            else:
-                # Include products with no sales
-                sales_data.append({
-                    'product_name': product.product_name,
-                    'quantity_sold': 0,
-                    'revenue': 0.0
-                })
+            # Add product to sales data
+            sales_data.append({
+                'product_name': product.product_name,
+                'category': product.product_category or 'Uncategorized',
+                'quantity_sold': sum(item.quantity for item in product_order_items),
+                'revenue': float(product_total_sales)  # Convert Decimal to float
+            })
         
-        # Sort by quantity sold
-        sales_data.sort(key=lambda x: x['quantity_sold'], reverse=True)
+        # Sort alphabetically by product name
+        sales_data.sort(key=lambda x: x['product_name'].lower())
         
         # Calculate totals
         total_quantity = sum(item['quantity_sold'] for item in sales_data)
-        total_revenue = sum(item['revenue'] for item in sales_data)
         total_products = len(sales_data)
 
         # Prepare data for charts
@@ -2985,7 +3059,8 @@ def salegraph(request):
             'revenues': json.dumps(revenues),
             'total_quantity': total_quantity,
             'total_revenue': total_revenue,
-            'total_products': total_products
+            'total_products': total_products,
+            'last_paid_amount': last_paid_amount
         }
         return render(request, 'salegraph.html', context)
     else:
@@ -4142,3 +4217,39 @@ def predict_market_price(request):
             'success': False,
             'error': f'Error making prediction: {str(e)}'
         })
+
+@csrf_exempt
+def process_farmer_payment(request, farmer_id):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
+    try:
+        # Get the farmer
+        farmer = get_object_or_404(Users_table, user_id=farmer_id)
+        
+        # Parse the payment amount from request body
+        data = json.loads(request.body)
+        amount = data.get('amount')
+        
+        if not amount:
+            return JsonResponse({'success': False, 'error': 'Payment amount is required'})
+        
+        # Get or create payment status
+        payment_status, created = PaymentStatus.objects.get_or_create(
+            farmer=farmer,
+            defaults={'is_paid': False, 'last_paid_amount': 0}
+        )
+        
+        # Update payment status
+        payment_status.is_paid = True
+        payment_status.last_paid_amount = amount
+        payment_status.last_paid_date = timezone.now()
+        payment_status.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Payment of ₹{amount} processed successfully for {farmer.username}'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

@@ -492,7 +492,7 @@
                     <th><i class="fas fa-notes-medical"></i> Treatment Details</th>
                     <th><i class="fas fa-user-md"></i> Veterinarian</th>
                     <th><i class="fas fa-calendar-plus"></i> Next Checkup Date</th>
-                    <th><i class="fa fa-bars"></i> Actions</th>
+                    <!-- <th><i class="fa fa-bars"></i> Actions</th> -->
                 </tr>
                 {% for record in health_records %}
                 <tr>
@@ -502,9 +502,9 @@
                     <td>{{ record.treatment_details }}</td>
                     <td>{{ record.veterinarian_name }}</td>
                     <td>{{ record.next_checkup_date }}</td>
-                    <td>
+                    <!-- <td>
                         <a href="{% url 'update_health_record' record.health_id %}" class="update-button">Update</a>
-                    </td>
+                    </td> -->
                 </tr>
                 {% empty %}
                 <tr>
@@ -644,29 +644,29 @@
             }
         };
 
-        function handleBackNavigation() {
-            const lastAnimalId = sessionStorage.getItem('lastAnimalId');
-            if (lastAnimalId) {
-                // First go to the numeric URL
-                window.location.href = "{% url 'animaldetails' 0 %}".replace('0', lastAnimalId);
-            } else {
-                window.location.href = "{% url 'animalslist' %}";
-            }
-        }
+        // function handleBackNavigation() {
+        //     const lastAnimalId = sessionStorage.getItem('lastAnimalId');
+        //     if (lastAnimalId) {
+        //         // First go to the numeric URL
+        //         window.location.href = "{% url 'animaldetails' 0 %}".replace('0', lastAnimalId);
+        //     } else {
+        //         window.location.href = "{% url 'animalslist' %}";
+        //     }
+        // }
 
-        // Store the animal ID when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            sessionStorage.setItem('lastAnimalId', '{{ animal.animal_id }}');
-        });
+        // // Store the animal ID when the page loads
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     sessionStorage.setItem('lastAnimalId', '{{ animal.animal_id }}');
+        // });
 
-        // Handle URL masking after page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const path = window.location.pathname;
-            if (path.match(/\/animal\/\d+\//)) {
-                const maskedPath = path.replace(/\/animal\/\d+\//, '/animal/DCS/');
-                window.history.replaceState(null, '', maskedPath);
-            }
-        });
+        // // Handle URL masking after page load
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const path = window.location.pathname;
+        //     if (path.match(/\/animal\/\d+\//)) {
+        //         const maskedPath = path.replace(/\/animal\/\d+\//, '/animal/DCS/');
+        //         window.history.replaceState(null, '', maskedPath);
+        //     }
+        // });
     </script>
 
 </body>
