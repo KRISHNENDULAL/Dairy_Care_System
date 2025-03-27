@@ -3349,11 +3349,11 @@ def get_order_tracking(request, order_id):
 
 
 
-# Update the model paths to match exactly where train_disease_model.py saves them
+
 MODEL_PATH = os.path.join(settings.BASE_DIR, 'dairy', 'ml_models', 'cow_disease_model.h5')
 CLASS_MAP_PATH = os.path.join(settings.BASE_DIR, 'dairy', 'ml_models', 'class_mapping.json')
 
-# Load the model and class mapping
+
 try:
     disease_model = load_model(MODEL_PATH)
     with open(CLASS_MAP_PATH, 'r') as f:
@@ -3369,14 +3369,14 @@ def predict_disease(image_path):
         if not os.path.exists(MODEL_PATH):
             raise Exception(f"Model file not found at {MODEL_PATH}")
             
-        # Load and preprocess the image
+        
         img = image.load_img(image_path, target_size=(224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
 
         print("Making prediction...")
-        # Make prediction
+        
         predictions = disease_model.predict(img_array)
         predicted_class = np.argmax(predictions[0])
         confidence = float(predictions[0][predicted_class])
@@ -3385,7 +3385,7 @@ def predict_disease(image_path):
         print(f"Predicted class: {predicted_class}")
         print(f"Available classes: {DISEASE_CLASSES}")
 
-        # Get disease name from class mapping
+        
         disease_name = DISEASE_CLASSES.get(str(predicted_class))
         if not disease_name:
             raise Exception(f"Disease class {predicted_class} not found in mapping")
@@ -3426,16 +3426,16 @@ def diseasedetection(request):
                     uploaded_by=user
                 )
                 
-                # Get disease prediction
+                
                 prediction_result = predict_disease(disease_image.image.path)
                 
                 if prediction_result:
                     disease_name = prediction_result['disease']
-                    print(f"Disease detected: {disease_name}")  # Debug print
+                    print(f"Disease detected: {disease_name}")  
                     
-                    # Get Gemini analysis
+                    
                     analysis = get_disease_analysis_from_gemini(disease_name)
-                    print(f"Gemini analysis result: {analysis}")  # Debug print
+                    print(f"Gemini analysis result: {analysis}")  
                     
                     context.update({
                         'uploaded_image': disease_image.image.url,
@@ -3479,7 +3479,7 @@ def get_disease_analysis_from_gemini(disease_name):
         response_text = response.text.strip()
         print(f"Raw Gemini response: {response_text}")
         
-        # Find and extract JSON
+        
         start_idx = response_text.find('{')
         end_idx = response_text.rfind('}')
         
@@ -3507,7 +3507,7 @@ def get_disease_analysis_from_gemini(disease_name):
 @csrf_exempt
 def verify_model(request):
     try:
-        # Check if model and class mapping exist
+        
         if not os.path.exists(MODEL_PATH):
             return JsonResponse({
                 'success': False,
@@ -3520,7 +3520,7 @@ def verify_model(request):
                 'error': 'Class mapping file not found'
             })
             
-        # Verify model can make predictions
+        
         test_shape = (1, 224, 224, 3)
         test_input = np.zeros(test_shape)
         _ = disease_model.predict(test_input)
@@ -3539,15 +3539,15 @@ def verify_model(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def deliverynotifications(request):
-    user_id = request.session.get('user_id')  # Retrieve user_id from the session
+    user_id = request.session.get('user_id') 
     if user_id:
-        user = Users_table.objects.get(user_id=user_id)  # Fetch the user object using user_id
+        user = Users_table.objects.get(user_id=user_id)  
         context = {
-            'username': user.username,  # Pass the username to the template
+            'username': user.username,  
         }
         return render(request, 'deliverynotifications.html', context)
     else:
-        return redirect('login')  # Redirect to login if no user is logged in
+        return redirect('login')  
 
 
 
