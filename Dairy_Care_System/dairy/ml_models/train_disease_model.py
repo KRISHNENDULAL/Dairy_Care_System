@@ -28,7 +28,7 @@ def get_disease_classes(data_dir):
         print(f"Error reading disease classes: {str(e)}")
         raise
 
-def train_disease_model(data_dir="C:/Users/TUF GAMING/Downloads/cows disease", 
+def train_disease_model(data_dir="C:/Users/Downloads/cows disease", 
                        model_save_path=None):
     print(f"\nAnalyzing directory: {data_dir}")
     
@@ -150,7 +150,7 @@ def train_disease_model(data_dir="C:/Users/TUF GAMING/Downloads/cows disease",
 
 if __name__ == "__main__":
     # Set the exact paths
-    base_dir = r"C:\Users\TUF GAMING\Downloads\Dairy_Care_System\Dairy_Care_System"
+    base_dir = r"C:\Users\Downloads\Dairy_Care_System\Dairy_Care_System"
     model_dir = os.path.join(base_dir, 'dairy', 'ml_models')
     os.makedirs(model_dir, exist_ok=True)
     
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     class_map_path = os.path.join(model_dir, 'class_mapping.json')
     
     # Training data directory
-    data_dir = r"C:/Users/TUF GAMING/Downloads/cows disease"
+    data_dir = r"C:/Users/Downloads/cows disease"
     
     print("\nConfiguration:")
     print(f"Model will be saved to: {model_save_path}")

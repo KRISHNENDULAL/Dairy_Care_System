@@ -81,14 +81,17 @@ load_dotenv()
 # Or configure directly:
 # genai.configure(api_key="your_actual_api_key_here")
 
-# Configure logging
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Configure Gemini - Keep this configuration at the top after imports
+
 GEMINI_API_KEY = "AIzaSyAuW9WLXi_W-Rzb02hM-Os2SFI_bx-NdPk"
 genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel('gemini-1.5-flash')  # Changed variable name to avoid confusion
+gemini_model = genai.GenerativeModel('gemini-1.5-flash') 
+
+
 
 DAIRY_KEYWORDS = {
     # Basic dairy products with variations
@@ -3619,7 +3622,7 @@ def load_models():
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@csrf_exempt  # Allow POST requests without CSRF for testing (replace with CSRF token handling in production)
+
 def milkqualityanalysis(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -3629,7 +3632,7 @@ def milkqualityanalysis(request):
 
     if request.method == 'POST':
         try:
-            data = json.loads(request.body.decode('utf-8'))  # Parse JSON request
+            data = json.loads(request.body.decode('utf-8'))  
             ph_level = float(data.get('phLevel'))
             fat_content = float(data.get('fatContent'))
             density = float(data.get('density'))
@@ -3644,7 +3647,7 @@ def milkqualityanalysis(request):
                 input_data = scaler.transform(input_data)
 
             prediction = model.predict(input_data)[0]
-            quality_mapping = {0: 'Poor', 1: 'Good', 2: 'Very Good'}
+            quality_mapping = {0: 'Poor', 1: 'Good'}
             quality_result = quality_mapping.get(prediction, 'Unknown')
 
             return JsonResponse({'quality': quality_result})
@@ -4124,7 +4127,7 @@ def load_model():
     with open(model_path, 'rb') as f:
         return pickle.load(f)
 
-# Load trained model
+
 try:
     model = load_model()
 except Exception as e:
@@ -4164,7 +4167,7 @@ def predict_market_price(request):
             'error': 'Product name is required'
         })
 
-    # Comprehensive product data mapping for all dairy products
+    
     product_data = {
         'milk': {'stock': 100, 'supplier_price': 50, 'demand': 120, 'season': 1, 'reviews': 4.5, 'competitor_price': 55},
         'cheese': {'stock': 75, 'supplier_price': 120, 'demand': 80, 'season': 1, 'reviews': 4.3, 'competitor_price': 125},
@@ -4187,7 +4190,7 @@ def predict_market_price(request):
     }
 
     try:
-        # Convert product name to lowercase and replace spaces with underscores for matching
+        
         product_key = product_name.lower().replace(' ', '_')
         
         if product_key not in product_data:
@@ -4199,12 +4202,12 @@ def predict_market_price(request):
         data = product_data[product_key]
         df = pd.DataFrame([data])
         
-        # Ensure correct feature order
+        
         features = df[['stock', 'supplier_price', 'demand', 'season', 'reviews', 'competitor_price']]
         
-        # Make prediction
+        
         predicted_price = float(model.predict(features)[0])
-        predicted_demand = data['demand']  # Using current demand as prediction
+        predicted_demand = data['demand']  
 
         return JsonResponse({
             'success': True,
@@ -4217,6 +4220,8 @@ def predict_market_price(request):
             'success': False,
             'error': f'Error making prediction: {str(e)}'
         })
+
+
 
 @csrf_exempt
 def process_farmer_payment(request, farmer_id):
